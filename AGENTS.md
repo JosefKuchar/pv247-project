@@ -4,7 +4,7 @@ Users can create posts linked to specific places, describe their experiences, an
 The platform’s main purpose is to allow people to discover and evaluate locations through authentic, user-generated content.
 
 ## Technical overview
-Used technologies
+Technologies
 - Typescript
 - Next.js 16 with App router
 - Tailwind
@@ -13,12 +13,18 @@ Used technologies
   - If you need to add new component, run `npx shadcn@latest add [component_name]`
 - Drizzle ORM with Turso (SQLite compatible)
   - Located in `/db`
-  - All tables should have a primary key and a created_at and updated_at column
   - After adding or changing schema, run `npx drizzle-kit push` to update the database 
   - To seed the database, run `npm run db:seed`
 - TanStack Query
 - TanStack Table
 - React Hook Form
+
+Requirements
+- Responsive design
+- User authentication
+- Server-side rendering alongside client-side rendering
+- Database (CRUD operations)
+  - All tables should have a primary key and a created_at and updated_at column
 
 ## Project specification
 1. User Accounts
