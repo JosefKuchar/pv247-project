@@ -9,8 +9,13 @@ Used technologies
 - Next.js 16 with App router
 - Tailwind
 - Shadcn UI
+  - Located in `/components/ui`
   - If you need to add new component, run `npx shadcn@latest add [component_name]`
 - Drizzle ORM with Turso (SQLite compatible)
+  - Located in `/db`
+  - All tables should have a primary key and a created_at and updated_at column
+  - After adding or changing schema, run `npx drizzle-kit push` to update the database 
+  - To seed the database, run `npm run db:seed`
 - TanStack Query
 - TanStack Table
 - React Hook Form
