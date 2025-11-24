@@ -7,7 +7,9 @@ The platform’s main purpose is to allow people to discover and evaluate locati
 Used technologies
 - Typescript
 - Next.js 16 with App router
-- Tailwind and Shadcn
+- Tailwind
+- Shadcn UI
+  - If you need to add new component, run `npx shadcn@latest add [component_name]`
 - Drizzle ORM with Turso (SQLite compatible)
 - TanStack Query
 - TanStack Table
