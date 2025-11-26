@@ -10,7 +10,10 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:seed": "tsx ./db/seed/seed.ts"
+    "db:seed": "tsx ./db/seed/seed.ts",
+    "db:push": "npx drizzle-kit push",
+    "db:studio": "npx drizzle-kit studio",
+    "db": "turso dev --db-file dev.db --port 8020"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
@@ -18,6 +21,7 @@
     "@tanstack/react-query": "^5.90.10",
     "@tanstack/react-query-devtools": "^5.91.0",
     "@tanstack/react-table": "^8.21.3",
+    "better-auth": "^1.4.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
