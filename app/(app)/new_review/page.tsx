@@ -1,5 +1,6 @@
 'use client';
 
+import { createReview } from '@/actions/review/create-review';
 import { FormDropzone, FormInput, FormTextarea } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { ComboBoxResponsive } from '@/components/ui/combobox';
@@ -13,8 +14,13 @@ export default function Page() {
       <ComboBoxResponsive />
       <FormProvider {...methods}>
         <form
-          onSubmit={methods.handleSubmit(() => {
-            console.log(methods.getValues());
+          onSubmit={methods.handleSubmit(async () => {
+            const formData = new FormData();
+            formData.append('locationId', methods.getValues('locationId'));
+            formData.append('description', methods.getValues('description'));
+            formData.append('rating', methods.getValues('rating'));
+            formData.append('photos', methods.getValues('photos'));
+            await createReview(formData);
           })}
         >
           <FormInput name="title" label="Title" />
