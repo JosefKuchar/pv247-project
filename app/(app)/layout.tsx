@@ -1,8 +1,10 @@
+import { AppSidebar } from '@/components/navigation/app-sidebar';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <div>App Layout</div>
-      {children}
+      <AppSidebar />
+      <main>{children}</main>
     </>
   );
 }
