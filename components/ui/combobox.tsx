@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { useMediaQuery } from '@/hooks/use-media-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -35,10 +35,8 @@ type Status = {
 export function ComboBoxResponsive() {
   const [open, setOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
-  const isDesktop = useMediaQuery('(min-width: 768px)', {
-    defaultValue: false,
-    initializeWithValue: false,
-  });
+  const isMobile = useIsMobile();
+
   const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
     null,
   );
@@ -55,7 +53,7 @@ export function ComboBoxResponsive() {
     );
   }
 
-  if (isDesktop) {
+  if (!isMobile) {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
