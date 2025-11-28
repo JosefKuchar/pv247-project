@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-build:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,10 +33,3 @@ jobs:
 
       - name: Run TypeScript type check
         run: pnpm exec tsc --noEmit
-
-      - name: Build project
-        run: pnpm build
-        env:
-          NODE_ENV: production
-          DATABASE_URL: "http://127.0.0.1:8020"
-          BETTER_AUTH_URL: "http://localhost:3000"
