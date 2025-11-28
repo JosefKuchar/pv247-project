@@ -5,7 +5,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AppSidebar />
-      <main className="pb-16 md:pb-0">{children}</main>
+      <main className="mx-auto pb-16 md:pb-0">{children}</main>
       <BottomNav />
     </>
   );

@@ -95,23 +95,29 @@ export const ReviewCard = ({
         <p className="text-sm text-gray-700">{description}</p>
 
         {photos.length > 0 && (
-          <Carousel className="flex items-center justify-center">
+          <Carousel className="relative flex items-center justify-center pt-4">
             <CarouselContent>
               {photos.map((photo, index) => (
-                <CarouselItem key={index} className="relative h-64 w-96">
+                <CarouselItem
+                  key={index}
+                  className="relative h-96 w-96 object-contain"
+                >
                   <Image
                     src={photo.url}
                     alt={`Photo ${index + 1}`}
                     fill
-                    objectFit="contain"
                     placeholder="blur"
                     blurDataURL={photo.url}
                   />
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            {photos.length > 1 && (
+              <>
+                <CarouselPrevious className="absolute top-1/2 left-2 z-1 -translate-y-1/2" />
+                <CarouselNext className="absolute top-1/2 right-2 z-1 -translate-y-1/2" />
+              </>
+            )}
           </Carousel>
         )}
       </CardContent>

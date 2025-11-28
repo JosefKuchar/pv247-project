@@ -1,8 +1,6 @@
 'server only';
 
 import { db } from '@/db';
-import { review } from '@/db/schema';
-import { user } from '@/db/schema';
 
 export const getReviewCard = async () => {
   const reviews = await db.query.review.findMany({
