@@ -22,8 +22,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -38,5 +38,5 @@ jobs:
         run: pnpm build
         env:
           NODE_ENV: production
-          DATABASE_URL: "http://127.0.0.1:8020"
-          BETTER_AUTH_URL: "http://localhost:3000"
+          DATABASE_URL: 'http://127.0.0.1:8020'
+          BETTER_AUTH_URL: 'http://localhost:3000'

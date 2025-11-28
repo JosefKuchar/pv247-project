@@ -2,7 +2,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
 import { ChangeEventHandler, FC } from 'react';
 
-export const DropzoneField: FC<{ name: string; multiple?: boolean }> = ({
+export const FormDropzone: FC<{ name: string; multiple?: boolean }> = ({
   name,
   multiple,
   ...rest
@@ -37,7 +37,7 @@ const Dropzone: FC<{
   });
 
   return (
-    <div {...getRootProps()}>
+    <div {...getRootProps()} className="h-8 w-8 bg-red-500">
       <input {...getInputProps({ onChange })} />
     </div>
   );
