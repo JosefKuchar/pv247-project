@@ -1,8 +1,12 @@
+import { AppSidebar } from '@/components/navigation/app-sidebar';
+import { BottomNav } from '@/components/navigation/bottom-nav';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="container mx-auto">
-      <div>App Layout</div>
-      {children}
-    </main>
+    <>
+      <AppSidebar />
+      <main className="pb-16 md:pb-0">{children}</main>
+      <BottomNav />
+    </>
   );
 }
