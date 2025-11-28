@@ -1,5 +1,11 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
+import { follow } from './follow';
+import { userLocationFollow } from './userLocationFollow';
+import { review } from './review';
+import { comment } from './comment';
+import { reviewLike } from './reviewLike';
+import { locationManagement } from './locationManagement';
 
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
@@ -90,6 +96,17 @@ export const verification = sqliteTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  followers: many(follow, { relationName: 'following' }),
+  following: many(follow, { relationName: 'follower' }),
+  followedLocations: many(userLocationFollow, {
+    relationName: 'followedLocations',
+  }),
+  reviews: many(review),
+  comments: many(comment),
+  reviewLikes: many(reviewLike),
+  managedLocations: many(locationManagement, {
+    relationName: 'managedLocations',
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
