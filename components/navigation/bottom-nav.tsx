@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { navItems } from './nav-items';
+import { isNavItemActive, navItems } from './nav-items';
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -18,8 +18,7 @@ export function BottomNav() {
     <nav className="bg-background fixed right-0 bottom-0 left-0 z-50 border-t md:hidden">
       <div className="flex h-16 items-center justify-around">
         {navItems.map(item => {
-          const isActive =
-            item.url === '/' ? pathname === '/' : pathname.startsWith(item.url);
+          const isActive = isNavItemActive(item.url, pathname);
           const Icon = item.icon;
 
           return (

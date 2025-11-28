@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Sidebar,
   SidebarContent,
@@ -10,9 +12,12 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { navItems } from './nav-items';
+import { usePathname } from 'next/navigation';
+import { isNavItemActive, navItems } from './nav-items';
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarHeader />
@@ -22,7 +27,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {navItems.map(item => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isNavItemActive(item.url, pathname)}
+                  >
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.label}</span>

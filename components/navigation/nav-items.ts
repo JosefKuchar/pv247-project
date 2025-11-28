@@ -33,3 +33,7 @@ export const navItems = [
     url: '/profile',
   },
 ] as const;
+
+export function isNavItemActive(itemUrl: string, pathname: string): boolean {
+  return itemUrl === '/' ? pathname === '/' : pathname.startsWith(itemUrl);
+}
