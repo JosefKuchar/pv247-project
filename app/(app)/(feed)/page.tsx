@@ -10,15 +10,7 @@ export default async function Page() {
       <ul>
         {reviews.map(review => (
           <li key={review.id}>
-            <ReviewCard
-              user={review.user}
-              location={review.location}
-              description={review.description}
-              rating={review.rating}
-              photos={review.photos}
-              createdAt={review.createdAt}
-              updatedAt={review.updatedAt}
-            />
+            <ReviewCard review={review} />
           </li>
         ))}
       </ul>

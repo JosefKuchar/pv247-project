@@ -15,6 +15,7 @@ export const location = sqliteTable(
   {
     id: text('id').primaryKey(),
     name: text('name').notNull(),
+    handle: text('handle').notNull().unique(),
     address: text('address'),
     latitude: real('latitude').notNull(),
     longitude: real('longitude').notNull(),

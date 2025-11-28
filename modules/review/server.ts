@@ -6,10 +6,10 @@ export const getReviewCard = async () => {
   const reviews = await db.query.review.findMany({
     with: {
       user: {
-        columns: { name: true, image: true },
+        columns: { name: true, handle: true, image: true },
       },
       location: {
-        columns: { name: true },
+        columns: { name: true, handle: true },
         with: {
           reviews: {
             columns: { rating: true },
@@ -33,6 +33,7 @@ export const getReviewCard = async () => {
       location: {
         name: location.name,
         avgRating,
+        handle: location.handle,
       },
     };
   });
