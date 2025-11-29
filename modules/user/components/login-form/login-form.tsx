@@ -93,7 +93,10 @@ export const LoginForm = () => {
           </Button>
           <div className="flex flex-col items-end text-sm">
             <span>Don&apos;t have an account?</span>
-            <Link href="/register" className="mr-1 text-blue-600 hover:underline">
+            <Link
+              href="/register"
+              className="mr-1 text-blue-600 hover:underline"
+            >
               Register
             </Link>
           </div>
