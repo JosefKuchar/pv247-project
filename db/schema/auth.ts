@@ -123,3 +123,5 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export type userType = typeof user.$inferSelect;
