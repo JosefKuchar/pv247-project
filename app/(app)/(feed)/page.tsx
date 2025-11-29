@@ -1,4 +1,5 @@
 import { getReviewCard } from '@/modules/review/server';
+import { authClient } from '@/lib/auth-client';
 
 import { ReviewCard } from '@/components/reviewCard';
 
