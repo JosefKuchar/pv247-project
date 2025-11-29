@@ -7,15 +7,18 @@ export const registerFormSchema = z
     handle: z.string().min(1, 'Handle is required'),
     email: z.email('Email is required'),
     password: z.string().min(8, 'Password must have at at least 8 characters'),
-    confirmPassword: z.string().min(8, 'Password must have at at least 8 characters'),
+    confirmPassword: z
+      .string()
+      .min(8, 'Password must have at at least 8 characters'),
     image: z.string().optional(),
     // image: z.file().mime(['image/jpeg', 'image/png', 'image/jpg']),
-  }).superRefine(({ confirmPassword, password }, ctx) => {
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
       ctx.addIssue({
-        code: "custom",
-        message: "The passwords did not match",
-        path: ['confirmPassword']
+        code: 'custom',
+        message: 'The passwords did not match',
+        path: ['confirmPassword'],
       });
     }
   });

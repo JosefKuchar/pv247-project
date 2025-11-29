@@ -27,7 +27,7 @@ export const RegisterForm = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      image: ''
+      image: '',
     },
   });
 
