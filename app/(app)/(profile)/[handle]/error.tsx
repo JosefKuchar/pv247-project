@@ -1,5 +1,6 @@
 'use client';
+import { notFound } from 'next/navigation';
 
 export default function Error() {
-  return <h1>Failed to load profile.</h1>;
+  return notFound();
 }
