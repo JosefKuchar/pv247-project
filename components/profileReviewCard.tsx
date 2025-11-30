@@ -51,49 +51,41 @@ export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
         Review for {review.location.name}
       </CardTitle>
 
-      <CardHeader className="grid gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
+      <CardHeader className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
           <a
             href={`/place/${review.location.handle}`}
-            className="font-semibold text-base hover:underline line-clamp-1"
-            title={review.location.name}
+            className="flex items-center gap-2"
           >
-            {review.location.name}
+            <p className="font-semibold">{review.location.name}</p>
+            <Rating
+              value={review.location.avgRating}
+              readOnly
+              className="gap-1"
+            />
           </a>
-
-          <div className="flex items-center gap-1 shrink-0">
-            <Rating value={review.location.avgRating} readOnly className="gap-0.5">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <RatingButton
-                  className="h-3 w-3 text-yellow-500"
-                  size={12}
-                  key={index}
-                />
-              ))}
-            </Rating>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <Rating value={review.rating} readOnly className="gap-0.5">
+          <Rating value={review.rating} readOnly>
             {Array.from({ length: 5 }).map((_, index) => (
-              <RatingButton
-                className="h-3 w-3 text-yellow-500"
-                size={12}
-                key={index}
-              />
+              <RatingButton size={12} key={index} />
             ))}
           </Rating>
-
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {formatDate(new Date(review.createdAt))}
-          </span>
         </div>
+        <Rating value={review.rating} readOnly className="gap-1">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <RatingButton
+              className="-mt-2.5 h-3 w-5 text-yellow-500"
+              key={index}
+            />
+          ))}
+        </Rating>
       </CardHeader>
 
       <CardContent className="pt-0">
-        <p className="text-sm text-foreground mb-4 leading-relaxed">
+        <p className="text-sm text-foreground mb-2 leading-relaxed">
           {review.description}
+        </p>
+        <p className="text-xs text-muted-foreground mb-4">
+          {formatDate(new Date(review.createdAt))}
         </p>
 
         {review.photos.length > 0 && (

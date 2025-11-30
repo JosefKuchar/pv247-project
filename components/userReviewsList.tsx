@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
 import { ProfileReviewCard } from '@/components/profileReviewCard';
 import { ReviewListSkeleton } from '@/components/reviewCardSkeleton';
 import { EmptyReviewsState } from '@/components/emptyReviewsState';
