@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProfileReviewCard } from '@/components/profileReviewCard';
 import { ReviewListSkeleton } from '@/components/reviewCardSkeleton';
@@ -52,30 +52,12 @@ export const UserReviewsList = ({
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  // Load initial reviews
-  React.useEffect(() => {
-    if (reviewsCount === 0) {
-      setIsInitialLoading(false);
-      return;
-    }
+  // Ref for the intersection observer target
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-    startTransition(async () => {
-      try {
-        const result = await loadUserReviews(userId, 1);
-        setReviews(result.items);
-        setHasMore(result.hasMore);
-        setPage(2);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load reviews. Please try again.');
-        console.error('Error loading reviews:', err);
-      } finally {
-        setIsInitialLoading(false);
-      }
-    });
-  }, [userId, reviewsCount]);
-
-  const loadMore = () => {
+  // Load more reviews function
+  const loadMore = useCallback(() => {
     if (!hasMore || isPending) return;
 
     startTransition(async () => {
@@ -90,7 +72,74 @@ export const UserReviewsList = ({
         console.error('Error loading more reviews:', err);
       }
     });
-  };
+  }, [userId, page, hasMore, isPending]);
+
+  // Set up intersection observer
+  useEffect(() => {
+    if (!hasMore || isPending) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting) {
+          loadMore();
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '100px' // Start loading 100px before the element comes into view
+      }
+    );
+
+    observerRef.current = observer;
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [loadMore, hasMore, isPending]);
+
+  // Load initial reviews - load more to fill the screen initially
+  React.useEffect(() => {
+    if (reviewsCount === 0) {
+      setIsInitialLoading(false);
+      return;
+    }
+
+    const loadInitialReviews = async () => {
+      try {
+        // Load first page
+        const result = await loadUserReviews(userId, 1);
+        setReviews(result.items);
+        setHasMore(result.hasMore);
+        setPage(2);
+        setError(null);
+
+        // If we have fewer than 6 reviews and there are more, load the next page automatically
+        // This helps fill the screen on larger displays
+        if (result.items.length < 6 && result.hasMore) {
+          const secondResult = await loadUserReviews(userId, 2);
+          setReviews([...result.items, ...secondResult.items]);
+          setHasMore(secondResult.hasMore);
+          setPage(3);
+        }
+      } catch (err) {
+        setError('Failed to load reviews. Please try again.');
+        console.error('Error loading reviews:', err);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    startTransition(() => {
+      loadInitialReviews();
+    });
+  }, [userId, reviewsCount]);
 
   // Show initial loading state
   if (isInitialLoading) {
@@ -142,32 +191,25 @@ export const UserReviewsList = ({
         ))}
       </div>
 
-      {/* Loading More Skeletons */}
-      {isPending && hasMore && (
-        <ReviewListSkeleton count={3} />
+      {/* Intersection Observer Target for Auto-loading */}
+      {hasMore && (
+        <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+          {isPending ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Loading more reviews...</span>
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground">
+              Scroll to load more reviews
+            </div>
+          )}
+        </div>
       )}
 
-      {/* Load More Button */}
-      {hasMore && !isPending && (
-        <div className="flex justify-center pt-8">
-          <Button
-            onClick={loadMore}
-            variant="outline"
-            size="lg"
-            disabled={isPending}
-            className="min-w-[140px]"
-            aria-label={`Load more reviews. Currently showing ${reviews.length} of ${reviewsCount} reviews`}
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              'Load More'
-            )}
-          </Button>
-        </div>
+      {/* Additional Loading Skeletons during fetch */}
+      {isPending && hasMore && (
+        <ReviewListSkeleton count={3} />
       )}
 
       {/* End of results indicator */}
