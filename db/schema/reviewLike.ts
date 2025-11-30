@@ -44,3 +44,5 @@ export const reviewLikeRelations = relations(reviewLike, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export type reviewLikeType = typeof reviewLike.$inferSelect;

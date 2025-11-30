@@ -37,3 +37,5 @@ export const locationRelations = relations(location, ({ many }) => ({
   followers: many(userLocationFollow, { relationName: 'followers' }),
   managers: many(locationManagement, { relationName: 'managers' }),
 }));
+
+export type locationType = typeof location.$inferSelect;
