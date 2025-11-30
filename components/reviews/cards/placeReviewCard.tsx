@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Card,
   CardHeader,
@@ -18,7 +16,7 @@ import {
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
 
-type reviewCardProps = {
+type PlaceReviewCardProps = {
   review: {
     user: {
       image: string | null;
@@ -43,7 +41,7 @@ type reviewCardProps = {
   };
 };
 
-export const ReviewCard = ({ review }: reviewCardProps) => {
+export const PlaceReviewCard = ({ review }: PlaceReviewCardProps) => {
   return (
     <Card className="w-full max-w-md shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
@@ -72,24 +70,6 @@ export const ReviewCard = ({ review }: reviewCardProps) => {
               </span>
             </h3>
           </a>
-        </div>
-        <div className="flex items-center justify-between">
-          <a
-            href={`/${review.location.handle}`}
-            className="flex items-center gap-2"
-          >
-            <p className="font-semibold">{review.location.name}</p>
-            <Rating
-              value={review.location.avgRating}
-              readOnly
-              className="gap-1"
-            />
-          </a>
-          <Rating value={review.rating} readOnly>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <RatingButton size={12} key={index} />
-            ))}
-          </Rating>
         </div>
         <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (

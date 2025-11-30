@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:seed": "tsx ./db/seed/seed.ts",
+    "db:seed_debug": "tsx ./db/seed/seed_debug.ts",
     "db:push": "npx drizzle-kit push",
     "db:studio": "npx drizzle-kit studio",
     "db": "turso dev --db-file dev.db --port 8020"
