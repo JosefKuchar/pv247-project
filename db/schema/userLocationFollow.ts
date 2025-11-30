@@ -52,3 +52,5 @@ export const userLocationFollowRelations = relations(
     }),
   }),
 );
+
+export type userLocationFollowType = typeof userLocationFollow.$inferSelect;

@@ -50,3 +50,5 @@ export const locationManagementRelations = relations(
     }),
   }),
 );
+
+export type locationManagementType = typeof locationManagement.$inferSelect;

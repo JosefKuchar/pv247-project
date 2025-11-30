@@ -38,3 +38,5 @@ export const commentRelations = relations(comment, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export type commentType = typeof comment.$inferSelect;
