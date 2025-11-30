@@ -6,6 +6,7 @@ export interface Location {
   address: string | null;
   latitude: number;
   longitude: number;
+  averageRating: number | null;
 }
 
 export function useLocations() {
