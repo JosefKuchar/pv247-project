@@ -13,10 +13,14 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { isNavItemActive, navItems } from './nav-items';
+import { isNavItemActive, getNavItems } from './nav-items';
+import { authClient } from '@/lib/auth-client';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+
+  const navItems = getNavItems(session?.user?.handle);
 
   return (
     <Sidebar>
