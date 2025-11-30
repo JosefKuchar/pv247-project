@@ -22,15 +22,15 @@ export const UserProfileCard = ({ userProfile, isOwnProfile = false }: UserProfi
       <Card>
         <CardContent className="p-6">
           {/* Profile Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
-            <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto sm:mx-0">
+          <div className="flex flex-col items-center sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
+            <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
               <AvatarImage src={userProfile.image || undefined} alt={userProfile.name} />
               <AvatarFallback className="text-xl sm:text-2xl">
                 {userProfile.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            <div className="flex-1 text-center sm:text-left">
+            <div className="text-center sm:text-left">
               <h1 className="text-xl sm:text-2xl font-bold">{userProfile.name}</h1>
               <p className="text-muted-foreground">@{userProfile.handle}</p>
             </div>

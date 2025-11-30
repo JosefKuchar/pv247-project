@@ -22,14 +22,14 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
       <Card>
         <CardContent className="p-6">
           {/* Profile Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
-            <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto sm:mx-0">
+          <div className="flex flex-col items-center sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
+            <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
               <AvatarFallback className="text-xl sm:text-2xl">
                 {placeProfile.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            <div className="flex-1 text-center sm:text-left">
+            <div className="text-center sm:text-left">
               <h1 className="text-xl sm:text-2xl font-bold">{placeProfile.name}</h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
               {placeProfile.address && (
@@ -51,11 +51,11 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
               <div className="text-xl sm:text-2xl font-bold mb-1">
                 {placeProfile.avgRating ? placeProfile.avgRating.toFixed(1) : '0.0'}
               </div>
-              <Rating
-                value={placeProfile.avgRating}
-                readOnly
-                className="gap-1"
-              />
+              <Rating value={placeProfile.avgRating} readOnly>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <RatingButton size={12} key={index} />
+                ))}
+              </Rating>
               <div className="text-xs sm:text-sm text-muted-foreground">average rating</div>
             </div>
           </div>

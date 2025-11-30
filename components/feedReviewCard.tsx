@@ -79,17 +79,13 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
             className="flex items-center gap-2"
           >
             <p className="font-semibold">{review.location.name}</p>
-            <Rating
-              value={review.location.avgRating}
-              readOnly
-              className="gap-1"
-            />
+            <Rating value={review.location.avgRating} readOnly>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <RatingButton size={12} key={index} />
+              ))}
+            </Rating>
           </a>
-          <Rating value={review.rating} readOnly>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <RatingButton size={12} key={index} />
-            ))}
-          </Rating>
+
         </div>
         <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
