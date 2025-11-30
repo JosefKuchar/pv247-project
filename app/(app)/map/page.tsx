@@ -1,3 +1,6 @@
+'use client';
+import { Map } from '@/components/map/map';
+
 export default function Page() {
-  return <div>Map Page</div>;
+  return <Map />;
 }
