@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useLocations } from '@/hooks/use-locations';
 import { LocationMarker } from './location-marker';
 import { PlaceMarkerIcon } from './place-marker-icon';
+import { LocationDetail } from './location-detail';
 
 export function Map() {
   const locations = useLocations();
@@ -20,7 +21,7 @@ export function Map() {
     >
       <MapContainer
         center={{ lat: 40.7589, lng: -73.9851 }}
-        zoom={15}
+        zoom={17}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
@@ -36,13 +37,14 @@ export function Map() {
             icon={PlaceMarkerIcon}
           >
             <Popup>
-              <strong>{loc.name}</strong>
-              {loc.address && (
-                <>
-                  <br />
-                  {loc.address}
-                </>
-              )}
+              <LocationDetail
+                name={loc.name}
+                address={loc.address}
+                averageRating={loc.averageRating}
+                onDetailClick={() =>
+                  (window.location.href = `/profile/place/${loc.name}`)
+                }
+              />
             </Popup>
           </Marker>
         ))}
