@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Card,
   CardHeader,
@@ -17,7 +15,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
-// Using built-in Intl.DateTimeFormat instead of date-fns to avoid additional dependency
+
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -53,45 +51,51 @@ export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
         Review for {review.location.name}
       </CardTitle>
 
-      <CardHeader className="flex flex-col gap-3 pb-4">
-        {/* Location and rating info */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <CardHeader className="grid gap-2 p-4">
+        <div className="flex items-start justify-between gap-2">
           <a
             href={`/place/${review.location.handle}`}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="font-semibold text-base hover:underline line-clamp-1"
+            title={review.location.name}
           >
-            <p className="font-semibold text-base">{review.location.name}</p>
-            <Rating
-              value={review.location.avgRating}
-              readOnly
-              className="gap-1"
-            />
+            {review.location.name}
           </a>
 
-          <div className="flex items-center gap-2">
-            <Rating value={review.rating} readOnly className="gap-1">
+          <div className="flex items-center gap-1 shrink-0">
+            <Rating value={review.location.avgRating} readOnly className="gap-0.5">
               {Array.from({ length: 5 }).map((_, index) => (
                 <RatingButton
-                  className="h-4 w-4 text-yellow-500"
-                  size={16}
+                  className="h-3 w-3 text-yellow-500"
+                  size={12}
                   key={index}
                 />
               ))}
             </Rating>
-            <span className="text-sm text-muted-foreground">
-              {formatDate(new Date(review.createdAt))}
-            </span>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <Rating value={review.rating} readOnly className="gap-0.5">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <RatingButton
+                className="h-3 w-3 text-yellow-500"
+                size={12}
+                key={index}
+              />
+            ))}
+          </Rating>
+
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {formatDate(new Date(review.createdAt))}
+          </span>
         </div>
       </CardHeader>
 
       <CardContent className="pt-0">
-        {/* Review description */}
         <p className="text-sm text-foreground mb-4 leading-relaxed">
           {review.description}
         </p>
 
-        {/* Photos carousel */}
         {review.photos.length > 0 && (
           <div className="mt-4">
             <Carousel className="relative">
@@ -151,3 +155,4 @@ export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
     </Card>
   );
 };
+
