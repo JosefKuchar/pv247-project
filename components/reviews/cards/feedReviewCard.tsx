@@ -108,18 +108,14 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
       </CardContent>
       <CardFooter className="flex justify-between">
         <div className="flex gap-4">
-          <button
-            type="button"
-            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-red-400"
-          >
-            <Heart />
-          </button>
-          <button
-            type="button"
-            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-blue-400"
-          >
-            <MessageCircle />
-          </button>
+          <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
+            <Heart type="button" className="hover:cursor-pointer" />
+            <span className="ml-1">{reviewData.likesCount}</span>
+          </div>
+          <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
+            <MessageCircle type="button" className="hover:cursor-pointer" />
+            <span className="ml-1">{reviewData.commentsCount}</span>
+          </div>
         </div>
 
         <button

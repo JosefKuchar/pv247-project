@@ -16,6 +16,9 @@ export type ReviewDataType = {
   user: Pick<userType, 'name' | 'handle' | 'image'>;
   location: Pick<locationType, 'name' | 'handle'> & { avgRating: number };
   photos: Pick<reviewPhotoType, 'url'>[];
+  likesCount: number;
+  commentsCount: number;
+  comments: { id: string; userId: string; content: string }[];
 };
 
 export const getAllReviewCards = async () => {
@@ -33,6 +36,8 @@ export const getAllReviewCards = async () => {
         },
       },
       photos: { columns: { url: true } },
+      likes: { columns: { id: true } },
+      comments: { columns: { id: true, userId: true, content: true } },
     },
   });
 
@@ -45,7 +50,7 @@ export const getAllReviewCards = async () => {
       r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
       (r.location.reviews.length || 1);
 
-    const { photos, user, location, ...rest } = r;
+    const { photos, user, location, likes, comments, ...rest } = r;
 
     return {
       review: {
@@ -58,6 +63,9 @@ export const getAllReviewCards = async () => {
         handle: location.handle,
       },
       photos: photos,
+      likesCount: likes.length,
+      commentsCount: comments.length,
+      comments: comments,
     };
   });
 };
@@ -78,6 +86,8 @@ export const getReviewCard = async (id: string) => {
         },
       },
       photos: { columns: { url: true } },
+      likes: { columns: { id: true } },
+      comments: { columns: { id: true, userId: true, content: true } },
     },
   });
 
@@ -89,7 +99,7 @@ export const getReviewCard = async (id: string) => {
     reviewData.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
     (reviewData.location.reviews.length || 1);
 
-  const { photos, user, location, ...rest } = reviewData;
+  const { photos, user, location, likes, comments, ...rest } = reviewData;
 
   return {
     review: {
@@ -102,6 +112,9 @@ export const getReviewCard = async (id: string) => {
       handle: location.handle,
     },
     photos: photos,
+    likesCount: likes.length,
+    commentsCount: comments.length,
+    comments: comments,
   };
 };
 
