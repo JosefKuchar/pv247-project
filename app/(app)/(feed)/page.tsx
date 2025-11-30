@@ -1,7 +1,5 @@
 import { getReviewCard } from '@/modules/review/server';
-import { authClient } from '@/lib/auth-client';
-
-import { ReviewCard } from '@/components/reviewCard';
+import { FeedReviewCard } from '@/components/feedReviewCard';
 
 export default async function Page() {
   const reviews = await getReviewCard();
@@ -11,7 +9,7 @@ export default async function Page() {
       <ul>
         {reviews.map(review => (
           <li key={review.id}>
-            <ReviewCard review={review} />
+            <FeedReviewCard review={review} />
           </li>
         ))}
       </ul>

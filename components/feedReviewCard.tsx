@@ -43,7 +43,7 @@ type reviewCardProps = {
   };
 };
 
-export const ReviewCard = ({ review }: reviewCardProps) => {
+export const FeedReviewCard = ({ review }: reviewCardProps) => {
   return (
     <Card className="w-full max-w-md shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
@@ -75,7 +75,7 @@ export const ReviewCard = ({ review }: reviewCardProps) => {
         </div>
         <div className="flex items-center justify-between">
           <a
-            href={`/${review.location.handle}`}
+            href={`/place/${review.location.handle}`}
             className="flex items-center gap-2"
           >
             <p className="font-semibold">{review.location.name}</p>
