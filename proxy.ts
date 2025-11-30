@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard',
-    '/[name]',
+    '/[handle]',
     '/place/[name]',
     '/map',
     '/search',
