@@ -1,5 +1,5 @@
 import { getUserProfile } from '@/modules/user/server';
-import { UserProfileCard } from '@/components/userProfileCard';
+import { UserProfileCard } from '@/components/profiles/userProfileCard';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 

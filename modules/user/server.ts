@@ -4,7 +4,6 @@ import { db } from '@/db';
 import { follow, review, user } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-
 export const getUserProfile = async (handle: string) => {
   const userData = await db.query.user.findFirst({
     where: eq(user.handle, handle),
@@ -20,6 +19,5 @@ export const getUserProfile = async (handle: string) => {
     db.$count(follow, eq(follow.followerId, userData.id)),
   ]);
 
-  return { ...userData, reviewsCount, followersCount, followingCount }
-}
-
+  return { ...userData, reviewsCount, followersCount, followingCount };
+};

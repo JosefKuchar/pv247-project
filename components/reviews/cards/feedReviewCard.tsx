@@ -85,7 +85,6 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
               ))}
             </Rating>
           </a>
-
         </div>
         <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (

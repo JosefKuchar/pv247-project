@@ -1,19 +1,19 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import { MapPin } from 'lucide-react';
 import type { location } from '@/db/schema';
-import { PlaceReviewsList } from '@/components/placeReviewsList';
+import { PlaceReviewsList } from '@/components/reviews/lists/placeReviewsList';
 
 type PlaceProfile = typeof location.$inferSelect & {
   reviewsCount: number;
   avgRating: number;
-}
+};
 
 type PlaceProfileCardProps = {
   placeProfile: PlaceProfile;
-}
+};
 
 export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
   return (
@@ -22,19 +22,21 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
       <Card>
         <CardContent className="p-6">
           {/* Profile Header */}
-          <div className="flex flex-col items-center sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
-            <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
+          <div className="mb-6 flex flex-col items-center space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-6">
+            <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
               <AvatarFallback className="text-xl sm:text-2xl">
                 {placeProfile.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
             <div className="text-center sm:text-left">
-              <h1 className="text-xl sm:text-2xl font-bold">{placeProfile.name}</h1>
+              <h1 className="text-xl font-bold sm:text-2xl">
+                {placeProfile.name}
+              </h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
               {placeProfile.address && (
-                <div className="flex items-center justify-center sm:justify-start gap-1 mt-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
+                <div className="text-muted-foreground mt-2 flex items-center justify-center gap-1 sm:justify-start">
+                  <MapPin className="h-4 w-4" />
                   <span className="text-sm">{placeProfile.address}</span>
                 </div>
               )}
@@ -42,21 +44,29 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 text-center">
+          <div className="grid grid-cols-2 gap-4 text-center sm:gap-6">
             <div>
-              <div className="text-xl sm:text-2xl font-bold">{placeProfile.reviewsCount}</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">reviews</div>
+              <div className="text-xl font-bold sm:text-2xl">
+                {placeProfile.reviewsCount}
+              </div>
+              <div className="text-muted-foreground text-xs sm:text-sm">
+                reviews
+              </div>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-xl sm:text-2xl font-bold mb-1">
-                {placeProfile.avgRating ? placeProfile.avgRating.toFixed(1) : '0.0'}
+              <div className="mb-1 text-xl font-bold sm:text-2xl">
+                {placeProfile.avgRating
+                  ? placeProfile.avgRating.toFixed(1)
+                  : '0.0'}
               </div>
               <Rating value={placeProfile.avgRating} readOnly>
                 {Array.from({ length: 5 }).map((_, index) => (
                   <RatingButton size={12} key={index} />
                 ))}
               </Rating>
-              <div className="text-xs sm:text-sm text-muted-foreground">average rating</div>
+              <div className="text-muted-foreground text-xs sm:text-sm">
+                average rating
+              </div>
             </div>
           </div>
         </CardContent>
@@ -65,10 +75,11 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
       {/* Reviews Section */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold">Reviews</h2>
-            <span className="text-sm text-muted-foreground">
-              {placeProfile.reviewsCount} {placeProfile.reviewsCount === 1 ? 'review' : 'reviews'}
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-lg font-semibold sm:text-xl">Reviews</h2>
+            <span className="text-muted-foreground text-sm">
+              {placeProfile.reviewsCount}{' '}
+              {placeProfile.reviewsCount === 1 ? 'review' : 'reviews'}
             </span>
           </div>
 

@@ -41,7 +41,11 @@ export const getReviewCard = async () => {
   });
 };
 
-export const getUserReviews = async (userId: string, page: number = 1, pageSize: number = 9) => {
+export const getUserReviews = async (
+  userId: string,
+  page: number = 1,
+  pageSize: number = 9,
+) => {
   const offset = (page - 1) * pageSize;
 
   const reviews = await db.query.review.findMany({
@@ -90,7 +94,11 @@ export const getUserReviews = async (userId: string, page: number = 1, pageSize:
   };
 };
 
-export const getUserReviewsPaginated = async (userId: string, page: number = 1, pageSize: number = 10) => {
+export const getUserReviewsPaginated = async (
+  userId: string,
+  page: number = 1,
+  pageSize: number = 10,
+) => {
   const offset = (page - 1) * pageSize;
 
   const reviews = await db.query.review.findMany({
@@ -142,7 +150,11 @@ export const getUserReviewsPaginated = async (userId: string, page: number = 1, 
   };
 };
 
-export const getLocationReviewsPaginated = async (locationId: string, page: number = 1, pageSize: number = 10) => {
+export const getLocationReviewsPaginated = async (
+  locationId: string,
+  page: number = 1,
+  pageSize: number = 10,
+) => {
   const offset = (page - 1) * pageSize;
 
   const reviews = await db.query.review.findMany({

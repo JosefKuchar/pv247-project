@@ -1,5 +1,5 @@
 import { getReviewCard } from '@/modules/review/server';
-import { FeedReviewCard } from '@/components/feedReviewCard';
+import { FeedReviewCard } from '@/components/reviews/cards/feedReviewCard';
 
 export default async function Page() {
   const reviews = await getReviewCard();

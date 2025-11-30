@@ -5,7 +5,6 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import Image from 'next/image';
 import {
@@ -16,14 +15,6 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
-
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date);
-};
 
 type PlaceReviewCardProps = {
   review: {

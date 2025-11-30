@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useState, useTransition, useEffect, useRef, useCallback } from 'react';
-import { PlaceReviewCard } from '@/components/placeReviewCard';
-import { ReviewListSkeleton } from '@/components/reviewCardSkeleton';
-import { EmptyReviewsState } from '@/components/emptyReviewsState';
+import React, {
+  useState,
+  useTransition,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
+import { PlaceReviewCard } from '@/components/reviews/cards/placeReviewCard';
+import { ReviewListSkeleton } from '@/components/reviews/reviewCardSkeleton';
+import { EmptyReviewsState } from '@/components/reviews/emptyReviewsState';
 import { loadLocationReviews } from '@/app/actions/reviews';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -40,7 +46,7 @@ type PlaceReviewsListProps = {
 export const PlaceReviewsList = ({
   locationId,
   reviewsCount,
-  placeName
+  placeName,
 }: PlaceReviewsListProps) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [page, setPage] = useState(1);
@@ -76,7 +82,7 @@ export const PlaceReviewsList = ({
     if (!hasMore || isPending) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         const target = entries[0];
         if (target.isIntersecting) {
           loadMore();
@@ -84,8 +90,8 @@ export const PlaceReviewsList = ({
       },
       {
         threshold: 0.1,
-        rootMargin: '100px' // Start loading 100px before the element comes into view
-      }
+        rootMargin: '100px', // Start loading 100px before the element comes into view
+      },
     );
 
     observerRef.current = observer;
@@ -141,11 +147,7 @@ export const PlaceReviewsList = ({
   // Show initial loading state
   if (isInitialLoading) {
     return (
-      <div
-        className="space-y-6"
-        role="status"
-        aria-label="Loading reviews"
-      >
+      <div className="space-y-6" role="status" aria-label="Loading reviews">
         <ReviewListSkeleton count={3} />
       </div>
     );
@@ -153,12 +155,7 @@ export const PlaceReviewsList = ({
 
   // Show empty state
   if (reviewsCount === 0 || reviews.length === 0) {
-    return (
-      <EmptyReviewsState
-        isOwnProfile={false}
-        userName={placeName}
-      />
-    );
+    return <EmptyReviewsState isOwnProfile={false} userName={placeName} />;
   }
 
   return (
@@ -173,7 +170,7 @@ export const PlaceReviewsList = ({
 
       {/* Reviews Grid */}
       <div
-        className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6"
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6"
         role="list"
         aria-label={`${reviews.length} reviews`}
       >
@@ -190,14 +187,17 @@ export const PlaceReviewsList = ({
 
       {/* Intersection Observer Target for Auto-loading */}
       {hasMore && (
-        <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+        <div
+          ref={loadMoreRef}
+          className="flex h-20 items-center justify-center"
+        >
           {isPending ? (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
+            <div className="text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Loading more reviews...</span>
             </div>
           ) : (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-muted-foreground text-xs">
               Scroll to load more reviews
             </div>
           )}
@@ -205,18 +205,16 @@ export const PlaceReviewsList = ({
       )}
 
       {/* Additional Loading Skeletons during fetch */}
-      {isPending && hasMore && (
-        <ReviewListSkeleton count={3} />
-      )}
+      {isPending && hasMore && <ReviewListSkeleton count={3} />}
 
       {/* End of results indicator */}
       {!hasMore && reviews.length > 0 && (
         <div
-          className="text-center py-8 text-muted-foreground text-sm"
+          className="text-muted-foreground py-8 text-center text-sm"
           role="status"
           aria-live="polite"
         >
-          You've reached the end of reviews for {placeName}
+          You&apos;ve reached the end of reviews for {placeName}
         </div>
       )}
     </div>

@@ -16,14 +16,6 @@ import {
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
 
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date);
-};
-
 type ProfileReviewCardProps = {
   review: {
     location: {
@@ -133,4 +125,3 @@ export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
     </Card>
   );
 };
-
