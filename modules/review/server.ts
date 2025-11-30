@@ -141,3 +141,55 @@ export const getUserReviewsPaginated = async (userId: string, page: number = 1, 
     nextPage: hasMore ? page + 1 : null,
   };
 };
+
+export const getLocationReviewsPaginated = async (locationId: string, page: number = 1, pageSize: number = 10) => {
+  const offset = (page - 1) * pageSize;
+
+  const reviews = await db.query.review.findMany({
+    where: eq(review.locationId, locationId),
+    with: {
+      user: {
+        columns: { name: true, handle: true, image: true },
+      },
+      location: {
+        columns: { name: true, handle: true },
+        with: {
+          reviews: {
+            columns: { rating: true },
+          },
+        },
+      },
+      photos: { columns: { url: true } },
+    },
+    orderBy: desc(review.createdAt),
+    limit: pageSize + 1, // +1 to check if there are more
+    offset: offset,
+  });
+
+  const hasMore = reviews.length > pageSize;
+  const items = hasMore ? reviews.slice(0, -1) : reviews;
+
+  const transformedReviews = items.map(r => {
+    const { location, user, ...rest } = r;
+
+    const avgRating =
+      r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
+      (r.location.reviews.length || 1);
+
+    return {
+      ...rest,
+      user,
+      location: {
+        name: location.name,
+        avgRating,
+        handle: location.handle,
+      },
+    };
+  });
+
+  return {
+    items: transformedReviews,
+    hasMore,
+    nextPage: hasMore ? page + 1 : null,
+  };
+};

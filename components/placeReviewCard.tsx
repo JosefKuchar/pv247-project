@@ -5,6 +5,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import Image from 'next/image';
 import {
@@ -24,8 +25,13 @@ const formatDate = (date: Date) => {
   }).format(date);
 };
 
-type ProfileReviewCardProps = {
+type PlaceReviewCardProps = {
   review: {
+    user: {
+      image: string | null;
+      handle: string;
+      name: string;
+    };
     location: {
       name: string;
       avgRating: number;
@@ -44,28 +50,35 @@ type ProfileReviewCardProps = {
   };
 };
 
-export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
+export const PlaceReviewCard = ({ review }: PlaceReviewCardProps) => {
   return (
     <Card className="w-full max-w-md shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
       <CardHeader className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <div>
           <a
-            href={`/place/${review.location.handle}`}
+            href={`/${review.user.handle}`}
             className="flex items-center gap-2"
           >
-            <p className="font-semibold">{review.location.name}</p>
-            <Rating
-              value={review.location.avgRating}
-              readOnly
-              className="gap-1"
-            />
+            {review.user.image ? (
+              <Image
+                src={review.user.image}
+                alt={review.user.name}
+                width={40}
+                height={40}
+                className="rounded-full"
+                unoptimized
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-gray-300" />
+            )}
+            <h3 className="font-semibold">
+              {review.user.name}
+              <span className="font-normal text-gray-500">
+                @{review.user.handle}
+              </span>
+            </h3>
           </a>
-          <Rating value={review.rating} readOnly>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <RatingButton size={12} key={index} />
-            ))}
-          </Rating>
         </div>
         <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
@@ -133,4 +146,3 @@ export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
     </Card>
   );
 };
-

@@ -23,7 +23,7 @@ export const config = {
   matcher: [
     '/dashboard',
     '/[handle]',
-    '/place/[name]',
+    '/place/[handle]',
     '/map',
     '/search',
     '/admin/claims',
