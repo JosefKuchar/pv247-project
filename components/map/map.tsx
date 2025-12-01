@@ -42,7 +42,7 @@ export function Map() {
                 address={loc.address}
                 averageRating={loc.averageRating}
                 onDetailClick={() =>
-                  (window.location.href = `/profile/place/${loc.name}`)
+                  (window.location.href = `/place/${loc.handle}`)
                 }
               />
             </Popup>

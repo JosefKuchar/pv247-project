@@ -4,6 +4,7 @@ export interface Location {
   id: string;
   name: string;
   address: string | null;
+  handle: string;
   latitude: number;
   longitude: number;
   averageRating: number | null;
