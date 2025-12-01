@@ -18,12 +18,20 @@ import {
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import { ReviewDataType } from '@/modules/review/server';
+import { useState } from 'react';
+import { ReviewCommentList } from '@/components/comment/lists/reviewCommentsList';
 
 type ReviewCardProps = {
   reviewData: ReviewDataType;
 };
 
 export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
+  const [showComments, setShowComments] = useState(false);
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
   return (
     <Card className="w-full max-w-md shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
@@ -106,29 +114,40 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
           </Carousel>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <div className="flex gap-4">
-          <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
-            <Heart type="button" className="hover:cursor-pointer" />
-            <span className="ml-1">{reviewData.likesCount}</span>
+      <CardFooter className="flex flex-col gap-2 border-t">
+        {showComments && (
+          <div className="pb-4">
+            <ReviewCommentList review_id={reviewData.review.id} />
           </div>
-          <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
-            <MessageCircle type="button" className="hover:cursor-pointer" />
-            <span className="ml-1">{reviewData.commentsCount}</span>
+        )}
+        <div className="flex w-full justify-between">
+          <div className="flex gap-4">
+            <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
+              <Heart type="button" className="hover:cursor-pointer" />
+              <span className="ml-1">{reviewData.likesCount}</span>
+            </div>
+            <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
+              <MessageCircle
+                type="button"
+                className="hover:cursor-pointer"
+                onClick={toggleComments}
+              />
+              <span className="ml-1">{reviewData.commentsCount}</span>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
-          onClick={() =>
-            navigator.clipboard.writeText(
-              window.location.href + `review/${reviewData.review.id}`,
-            )
-          }
-        >
-          <Send />
-        </button>
+          <button
+            type="button"
+            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
+            onClick={() =>
+              navigator.clipboard.writeText(
+                window.location.href + `review/${reviewData.review.id}`,
+              )
+            }
+          >
+            <Send />
+          </button>
+        </div>
       </CardFooter>
     </Card>
   );

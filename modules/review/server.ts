@@ -18,7 +18,6 @@ export type ReviewDataType = {
   photos: Pick<reviewPhotoType, 'url'>[];
   likesCount: number;
   commentsCount: number;
-  comments: { id: string; userId: string; content: string }[];
 };
 
 export const getAllReviewCards = async () => {
@@ -37,7 +36,7 @@ export const getAllReviewCards = async () => {
       },
       photos: { columns: { url: true } },
       likes: { columns: { id: true } },
-      comments: { columns: { id: true, userId: true, content: true } },
+      comments: { columns: { id: true } },
     },
   });
 
@@ -65,7 +64,6 @@ export const getAllReviewCards = async () => {
       photos: photos,
       likesCount: likes.length,
       commentsCount: comments.length,
-      comments: comments,
     };
   });
 };
@@ -87,7 +85,7 @@ export const getReviewCard = async (id: string) => {
       },
       photos: { columns: { url: true } },
       likes: { columns: { id: true } },
-      comments: { columns: { id: true, userId: true, content: true } },
+      comments: { columns: { id: true } },
     },
   });
 
@@ -114,7 +112,6 @@ export const getReviewCard = async (id: string) => {
     photos: photos,
     likesCount: likes.length,
     commentsCount: comments.length,
-    comments: comments,
   };
 };
 
