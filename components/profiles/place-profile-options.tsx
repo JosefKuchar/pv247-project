@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { ProfileOptionsDropdown } from '@/components/ui/profile-options-dropdown';
 

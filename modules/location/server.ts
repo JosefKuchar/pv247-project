@@ -1,7 +1,12 @@
 'server only';
 
 import { db } from '@/db';
-import { location, review, userLocationFollow, locationManagement } from '@/db/schema';
+import {
+  location,
+  review,
+  userLocationFollow,
+  locationManagement,
+} from '@/db/schema';
 import { eq, avg, count, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';

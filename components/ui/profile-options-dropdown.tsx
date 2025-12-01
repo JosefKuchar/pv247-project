@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { Settings, MoreHorizontal } from 'lucide-react';
 import {
@@ -31,7 +31,7 @@ export const ProfileOptionsDropdown = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className={`inline-flex items-center justify-center rounded-md bg-background text-foreground hover:bg-accent hover:text-accent-foreground h-9 w-9 p-0 border border-input transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${className || ''}`}
+          className={`bg-background text-foreground hover:bg-accent hover:text-accent-foreground border-input focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center rounded-md border p-0 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 ${className || ''}`}
         >
           <Icon className="h-4 w-4" />
           <span className="sr-only">
@@ -51,9 +51,7 @@ export const ProfileOptionsDropdown = ({
             </DropdownMenuItem>
           ))
         ) : (
-          <DropdownMenuItem disabled>
-            No options available
-          </DropdownMenuItem>
+          <DropdownMenuItem disabled>No options available</DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

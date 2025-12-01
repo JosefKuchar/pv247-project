@@ -19,7 +19,10 @@ type PlaceProfileCardProps = {
   isManager?: boolean;
 };
 
-export const PlaceProfileCard = ({ placeProfile, isManager = false }: PlaceProfileCardProps) => {
+export const PlaceProfileCard = ({
+  placeProfile,
+  isManager = false,
+}: PlaceProfileCardProps) => {
   return (
     <div className="space-y-6">
       {/* Main Profile Card */}
@@ -46,7 +49,7 @@ export const PlaceProfileCard = ({ placeProfile, isManager = false }: PlaceProfi
               )}
             </div>
 
-            <div className="flex items-center gap-3 justify-center sm:justify-end">
+            <div className="flex items-center justify-center gap-3 sm:justify-end">
               <FollowButton
                 type="location"
                 targetHandle={placeProfile.handle}

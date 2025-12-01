@@ -46,7 +46,7 @@ export const UserProfileCard = ({
               <p className="text-muted-foreground">@{userProfile.handle}</p>
             </div>
 
-            <div className="flex items-center gap-3 justify-center sm:justify-end">
+            <div className="flex items-center justify-center gap-3 sm:justify-end">
               <FollowButton
                 type="user"
                 targetHandle={userProfile.handle}
