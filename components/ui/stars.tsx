@@ -17,7 +17,7 @@ export function Stars({
       stars.push(
         <Star
           key={i}
-          className={`${starSizeClass} fill-yellow-400 text-yellow-500`}
+          className={`${starSizeClass} fill-yellow-400 text-yellow-500 drop-shadow-sm`}
           strokeWidth={2}
         />,
       );
@@ -25,12 +25,12 @@ export function Stars({
       stars.push(
         <div key={i} className={`relative ${starSizeClass}`}>
           <Star
-            className={`absolute ${starSizeClass} text-yellow-500`}
+            className={`absolute ${starSizeClass} text-yellow-500 drop-shadow-sm`}
             strokeWidth={2}
           />
-          <div className="absolute overflow-hidden" style={{ width: '50%' }}>
+          <div className="absolute w-1/2 overflow-hidden">
             <Star
-              className={`${starSizeClass} fill-yellow-400 text-yellow-500`}
+              className={`${starSizeClass} fill-yellow-400 text-yellow-500 drop-shadow-sm`}
               strokeWidth={2}
             />
           </div>
@@ -40,11 +40,11 @@ export function Stars({
       stars.push(
         <Star
           key={i}
-          className={`${starSizeClass} text-yellow-500`}
+          className={`${starSizeClass} text-yellow-500 drop-shadow-sm`}
           strokeWidth={2}
         />,
       );
     }
   }
-  return <span className="flex gap-0.5">{stars}</span>;
+  return <span className="flex items-center gap-0.5">{stars}</span>;
 }

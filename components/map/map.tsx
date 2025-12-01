@@ -9,21 +9,12 @@ export function Map() {
   const locations = useLocations();
 
   return (
-    <div
-      style={{
-        height: '100vh',
-        width: '100%',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        overflow: 'hidden',
-      }}
-    >
+    <div className="fixed top-0 left-0 h-screen w-full overflow-hidden">
       <MapContainer
         center={{ lat: 40.7589, lng: -73.9851 }}
         zoom={17}
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
+        className="h-full w-full"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

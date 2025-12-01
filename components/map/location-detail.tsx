@@ -19,7 +19,7 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
   onClose,
 }) => {
   return (
-    <div className="relative w-full max-w-sm rounded-xl bg-white p-3 shadow-xl">
+    <div className="relative flex w-full max-w-xs flex-col gap-3 rounded-lg bg-white p-4 shadow-lg">
       {onClose && (
         <button
           onClick={onClose}
@@ -30,27 +30,25 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
         </button>
       )}
 
-      <h2 className="mb-2 pr-5 text-base font-bold text-gray-900 md:text-xl">
-        {name}
-      </h2>
+      <h2 className="truncate text-lg font-semibold text-gray-900">{name}</h2>
 
       {address && (
-        <div className="mb-2 flex items-start gap-1 text-xs text-gray-600 md:text-sm">
-          <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-500" />
-          <span>{address}</span>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <MapPin className="h-4 w-4" />
+          <span className="truncate">{address}</span>
         </div>
       )}
 
-      <div className="mb-3 flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <Stars rating={averageRating || 0} />
-        <span className="text-base font-bold text-gray-900 md:text-lg">
+        <span className="text-base font-bold text-gray-900">
           {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
         </span>
         <span className="text-xs text-gray-500">/ 5</span>
       </div>
 
       <Button
-        className="w-full rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700 md:text-base"
+        className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
         onClick={onDetailClick}
       >
         View Details
