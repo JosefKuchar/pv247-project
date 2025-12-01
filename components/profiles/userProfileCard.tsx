@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { FollowButton } from '@/components/ui/follow-button';
 import type { userType } from '@/db/schema';
 import { UserReviewsList } from '@/components/reviews/lists/userReviewsList';
 
@@ -8,6 +9,7 @@ type UserProfile = userType & {
   followersCount: number;
   followingCount: number;
   reviewsCount: number;
+  isFollowing: boolean;
 };
 
 type UserProfileCardProps = {
@@ -36,11 +38,20 @@ export const UserProfileCard = ({
               </AvatarFallback>
             </Avatar>
 
-            <div className="text-center sm:text-left">
+            <div className="flex-1 text-center sm:text-left">
               <h1 className="text-xl font-bold sm:text-2xl">
                 {userProfile.name}
               </h1>
               <p className="text-muted-foreground">@{userProfile.handle}</p>
+            </div>
+
+            <div className="flex justify-center sm:justify-end">
+              <FollowButton
+                type="user"
+                targetHandle={userProfile.handle}
+                isFollowing={userProfile.isFollowing}
+                isOwnProfile={isOwnProfile}
+              />
             </div>
           </div>
 

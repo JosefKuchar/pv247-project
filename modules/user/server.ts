@@ -2,7 +2,9 @@
 
 import { db } from '@/db';
 import { follow, review, user } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 export const getUserProfile = async (handle: string) => {
   const userData = await db.query.user.findFirst({
@@ -20,4 +22,41 @@ export const getUserProfile = async (handle: string) => {
   ]);
 
   return { ...userData, reviewsCount, followersCount, followingCount };
+};
+
+export const getUserFollowStatus = async (targetUserHandle: string) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // If not authenticated, return false
+  if (!session?.user?.id) {
+    return { isFollowing: false };
+  }
+
+  // If viewing own profile, return false (can't follow yourself)
+  if (targetUserHandle === session.user.handle) {
+    return { isFollowing: false };
+  }
+
+  // Get target user by handle
+  const targetUser = await db.query.user.findFirst({
+    where: eq(user.handle, targetUserHandle),
+  });
+
+  // If target user doesn't exist, return false
+  if (!targetUser) {
+    return { isFollowing: false };
+  }
+
+  const existingFollow = await db.query.follow.findFirst({
+    where: and(
+      eq(follow.followerId, session.user.id),
+      eq(follow.followingId, targetUser.id),
+    ),
+  });
+
+  return {
+    isFollowing: !!existingFollow,
+  };
 };

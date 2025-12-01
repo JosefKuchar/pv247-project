@@ -1,8 +1,10 @@
 'server only';
 
 import { db } from '@/db';
-import { location, review } from '@/db/schema';
-import { eq, avg, count } from 'drizzle-orm';
+import { location, review, userLocationFollow } from '@/db/schema';
+import { eq, avg, count, and } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 export const getLocationProfile = async (handle: string) => {
   const locationData = await db.query.location.findFirst({
@@ -26,5 +28,37 @@ export const getLocationProfile = async (handle: string) => {
     ...locationData,
     reviewsCount: reviewStats?.reviewsCount || 0,
     avgRating: Number(reviewStats?.avgRating) || 0,
+  };
+};
+
+export const getLocationFollowStatus = async (locationHandle: string) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // If not authenticated, return false
+  if (!session?.user?.id) {
+    return { isFollowing: false };
+  }
+
+  // Get location by handle
+  const targetLocation = await db.query.location.findFirst({
+    where: eq(location.handle, locationHandle),
+  });
+
+  // If location doesn't exist, return false
+  if (!targetLocation) {
+    return { isFollowing: false };
+  }
+
+  const existingFollow = await db.query.userLocationFollow.findFirst({
+    where: and(
+      eq(userLocationFollow.userId, session.user.id),
+      eq(userLocationFollow.locationId, targetLocation.id),
+    ),
+  });
+
+  return {
+    isFollowing: !!existingFollow,
   };
 };
