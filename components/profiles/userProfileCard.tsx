@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { FollowButton } from '@/components/ui/follow-button';
 import type { userType } from '@/db/schema';
 import { UserReviewsList } from '@/components/reviews/lists/userReviewsList';
+import { UserProfileOptions } from '@/components/profiles/user-profile-options';
 
 type UserProfile = userType & {
   followersCount: number;
@@ -45,13 +46,14 @@ export const UserProfileCard = ({
               <p className="text-muted-foreground">@{userProfile.handle}</p>
             </div>
 
-            <div className="flex justify-center sm:justify-end">
+            <div className="flex items-center gap-3 justify-center sm:justify-end">
               <FollowButton
                 type="user"
                 targetHandle={userProfile.handle}
                 isFollowing={userProfile.isFollowing}
                 isOwnProfile={isOwnProfile}
               />
+              <UserProfileOptions isOwnProfile={isOwnProfile} />
             </div>
           </div>
 

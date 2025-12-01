@@ -1,6 +1,7 @@
 import {
   getLocationProfile,
   getLocationFollowStatus,
+  getLocationManagementStatus,
 } from '@/modules/location/server';
 import { notFound } from 'next/navigation';
 import { PlaceProfileCard } from '@/components/profiles/placeProfileCard';
@@ -8,9 +9,10 @@ import { PlaceProfileCard } from '@/components/profiles/placeProfileCard';
 export default async function Page({ params }: { params: { handle: string } }) {
   const wrappedParams = await Promise.resolve(params);
 
-  const [placeProfile, followStatus] = await Promise.all([
+  const [placeProfile, followStatus, managementStatus] = await Promise.all([
     getLocationProfile(wrappedParams.handle),
     getLocationFollowStatus(wrappedParams.handle),
+    getLocationManagementStatus(wrappedParams.handle),
   ]);
 
   if (!placeProfile) {
@@ -24,6 +26,7 @@ export default async function Page({ params }: { params: { handle: string } }) {
           ...placeProfile,
           isFollowing: followStatus.isFollowing,
         }}
+        isManager={managementStatus.isManager}
       />
     </div>
   );

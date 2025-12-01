@@ -1,7 +1,7 @@
 'server only';
 
 import { db } from '@/db';
-import { location, review, userLocationFollow } from '@/db/schema';
+import { location, review, userLocationFollow, locationManagement } from '@/db/schema';
 import { eq, avg, count, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
@@ -60,5 +60,38 @@ export const getLocationFollowStatus = async (locationHandle: string) => {
 
   return {
     isFollowing: !!existingFollow,
+  };
+};
+
+export const getLocationManagementStatus = async (locationHandle: string) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // If not authenticated, return false
+  if (!session?.user?.id) {
+    return { isManager: false };
+  }
+
+  // Get location by handle
+  const targetLocation = await db.query.location.findFirst({
+    where: eq(location.handle, locationHandle),
+  });
+
+  // If location doesn't exist, return false
+  if (!targetLocation) {
+    return { isManager: false };
+  }
+
+  const existingManagement = await db.query.locationManagement.findFirst({
+    where: and(
+      eq(locationManagement.userId, session.user.id),
+      eq(locationManagement.locationId, targetLocation.id),
+      eq(locationManagement.approved, true),
+    ),
+  });
+
+  return {
+    isManager: !!existingManagement,
   };
 };

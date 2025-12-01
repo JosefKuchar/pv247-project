@@ -6,6 +6,7 @@ import { FollowButton } from '@/components/ui/follow-button';
 import { MapPin } from 'lucide-react';
 import type { location } from '@/db/schema';
 import { PlaceReviewsList } from '@/components/reviews/lists/placeReviewsList';
+import { PlaceProfileOptions } from '@/components/profiles/place-profile-options';
 
 type PlaceProfile = typeof location.$inferSelect & {
   reviewsCount: number;
@@ -15,9 +16,10 @@ type PlaceProfile = typeof location.$inferSelect & {
 
 type PlaceProfileCardProps = {
   placeProfile: PlaceProfile;
+  isManager?: boolean;
 };
 
-export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
+export const PlaceProfileCard = ({ placeProfile, isManager = false }: PlaceProfileCardProps) => {
   return (
     <div className="space-y-6">
       {/* Main Profile Card */}
@@ -44,12 +46,13 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
               )}
             </div>
 
-            <div className="flex justify-center sm:justify-end">
+            <div className="flex items-center gap-3 justify-center sm:justify-end">
               <FollowButton
                 type="location"
                 targetHandle={placeProfile.handle}
                 isFollowing={placeProfile.isFollowing}
               />
+              <PlaceProfileOptions isManager={isManager} />
             </div>
           </div>
 
