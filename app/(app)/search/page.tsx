@@ -15,7 +15,6 @@ export default function Page() {
   const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    // Pouze pokud už jsme zkontrolovali jednou a změnilo se to z mobilu na desktop
     if (hasChecked && !isMobile) {
       router.push('/');
     }
