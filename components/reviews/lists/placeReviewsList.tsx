@@ -10,7 +10,7 @@ import React, {
 import { PlaceReviewCard } from '@/components/reviews/cards/placeReviewCard';
 import { ReviewListSkeleton } from '@/components/reviews/reviewCardSkeleton';
 import { EmptyReviewsState } from '@/components/reviews/emptyReviewsState';
-import { loadLocationReviews } from '@/app/actions/reviews';
+import { loadLocationReviewsAction } from '@/app/actions/reviews';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -65,7 +65,7 @@ export const PlaceReviewsList = ({
 
     startTransition(async () => {
       try {
-        const result = await loadLocationReviews(locationId, page);
+        const result = await loadLocationReviewsAction(locationId, page);
         setReviews(prev => [...prev, ...result.items]);
         setHasMore(result.hasMore);
         setPage(prev => prev + 1);
@@ -117,7 +117,7 @@ export const PlaceReviewsList = ({
     const loadInitialReviews = async () => {
       try {
         // Load first page
-        const result = await loadLocationReviews(locationId, 1);
+        const result = await loadLocationReviewsAction(locationId, 1);
         setReviews(result.items);
         setHasMore(result.hasMore);
         setPage(2);
@@ -126,7 +126,7 @@ export const PlaceReviewsList = ({
         // If we have fewer than 6 reviews and there are more, load the next page automatically
         // This helps fill the screen on larger displays
         if (result.items.length < 6 && result.hasMore) {
-          const secondResult = await loadLocationReviews(locationId, 2);
+          const secondResult = await loadLocationReviewsAction(locationId, 2);
           setReviews([...result.items, ...secondResult.items]);
           setHasMore(secondResult.hasMore);
           setPage(3);

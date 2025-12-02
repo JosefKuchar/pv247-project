@@ -14,12 +14,16 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { isNavItemActive, navItems } from './nav-items';
 import { SearchPanel } from '@/components/search/search-panel';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { isNavItemActive, getNavItems } from './nav-items';
+import { authClient } from '@/lib/auth-client';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+
+  const navItems = getNavItems(session?.user?.handle);
   const isMobile = useIsMobile();
   const [showSearch, setShowSearch] = useState(false);
   const searchPanelRef = useRef<HTMLDivElement>(null);

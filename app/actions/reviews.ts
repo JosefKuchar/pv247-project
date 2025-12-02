@@ -5,7 +5,7 @@ import {
   getLocationReviewsPaginated,
 } from '@/modules/review/server';
 
-export async function loadUserReviews(
+export async function loadUserReviewsAction(
   userId: string,
   page: number = 1,
   pageSize: number = 3 * 3,
@@ -13,7 +13,7 @@ export async function loadUserReviews(
   return getUserReviewsPaginated(userId, page, pageSize);
 }
 
-export async function loadLocationReviews(
+export async function loadLocationReviewsAction(
   locationId: string,
   page: number = 1,
   pageSize: number = 3 * 3,
