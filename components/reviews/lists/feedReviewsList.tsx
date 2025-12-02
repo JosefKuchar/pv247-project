@@ -57,15 +57,20 @@ export const FeedReviewsList = () => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div ref={contentRef} className="w-full flex-1 space-y-4">
+    <div className="flex flex-col">
+      <div ref={contentRef} className="w-full flex-1 space-y-4 bg-amber-400">
         {allReviews.length === 0 && <EmptyReviewsState />}
 
         {allReviews.map(review => (
           <FeedReviewCard key={review.id} review={review} />
         ))}
 
-        {isFetchingNextPage && <Spinner />}
+        {hasNextPage && <div ref={loadMoreRef} />}
+        {isFetchingNextPage && (
+          <div className="w-full">
+            <Spinner className="mx-auto" fontSize={32} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -61,16 +61,19 @@ export const UserReviewsList = ({ userId }: UserReviewsListProps) => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div ref={contentRef} className="w-full flex-1 space-y-4">
-        {allReviews.length === 0 && <EmptyReviewsState />}
+    <div ref={contentRef}>
+      {allReviews.length === 0 && <EmptyReviewsState />}
 
-        {allReviews.map(review => (
-          <ProfileReviewCard key={review.id} review={review} />
-        ))}
+      {allReviews.map(review => (
+        <ProfileReviewCard key={review.id} review={review} />
+      ))}
 
-        {isFetchingNextPage && <Spinner />}
-      </div>
+      {hasNextPage && <div ref={loadMoreRef} />}
+      {isFetchingNextPage && (
+        <div className="w-full">
+          <Spinner className="mx-auto" fontSize={32} />
+        </div>
+      )}
     </div>
   );
 };

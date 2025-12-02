@@ -92,7 +92,7 @@ export const getReviewsPaginated = async (
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize,
+    limit: pageSize + 1,
     offset: offset,
   });
 
@@ -156,7 +156,7 @@ export const getUserReviewsPaginated = async (
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize,
+    limit: pageSize + 1,
     offset: offset,
   });
 
@@ -220,7 +220,7 @@ export const getLocationReviewsPaginated = async (
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize + 1, // +1 to check if there are more
+    limit: pageSize + 1,
     offset: offset,
   });
 

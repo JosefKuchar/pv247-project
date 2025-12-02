@@ -70,7 +70,12 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
           <PlaceReviewCard key={review.id} review={review} />
         ))}
 
-        {isFetchingNextPage && <Spinner />}
+        {hasNextPage && <div ref={loadMoreRef} />}
+        {isFetchingNextPage && (
+          <div className="w-full">
+            <Spinner className="mx-auto" fontSize={32} />
+          </div>
+        )}
       </div>
     </div>
   );
