@@ -7,7 +7,6 @@ async function getSession() {
   });
 }
 
-// 2. The Higher-Order Function (HOC)
 /**
  * Wraps a Server Action function to perform authentication first.
  * If successful, it calls the wrapped function with the authenticated userId.
@@ -32,10 +31,4 @@ export function withAuth<T extends unknown[], R>(
     // passing the userId as the first argument
     return actionFn(userId, ...args);
   };
-}
-
-// 3. Helper for functions that don't throw on missing auth (like getFollowStatus)
-export async function getUserIdOrNull(): Promise<string | null> {
-  const session = await getSession();
-  return session?.user?.id ?? null;
 }

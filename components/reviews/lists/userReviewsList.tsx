@@ -1,227 +1,76 @@
 'use client';
 
-import React, {
-  useState,
-  useTransition,
-  useEffect,
-  useRef,
-  useCallback,
-} from 'react';
+import { useEffect, useRef } from 'react';
 import { ProfileReviewCard } from '@/components/reviews/cards/profileReviewCard';
-import { ReviewListSkeleton } from '@/components/reviews/reviewCardSkeleton';
 import { EmptyReviewsState } from '@/components/reviews/emptyReviewsState';
 import { loadUserReviewsAction } from '@/app/actions/reviews';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-
-type Review = {
-  user: {
-    image: string | null;
-    handle: string;
-    name: string;
-  };
-  location: {
-    name: string;
-    avgRating: number;
-    handle: string;
-  };
-  rating: number;
-  description: string;
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-  locationId: string;
-  photos: {
-    url: string;
-  }[];
-};
+import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
+import { ReviewsPageType } from '@/modules/review/server';
+import { Spinner } from '@/components/ui/spinner';
 
 type UserReviewsListProps = {
   userId: string;
-  reviewsCount: number;
-  isOwnProfile?: boolean;
-  userName?: string;
 };
 
-export const UserReviewsList = ({
-  userId,
-  reviewsCount,
-  isOwnProfile = false,
-  userName,
-}: UserReviewsListProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [isPending, startTransition] = useTransition();
-
-  // Ref for the intersection observer target
+export const UserReviewsList = ({ userId }: UserReviewsListProps) => {
+  const contentRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Load more reviews function
-  const loadMore = useCallback(() => {
-    if (!hasMore || isPending) return;
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery<
+    ReviewsPageType,
+    Error,
+    InfiniteData<ReviewsPageType>,
+    [string, string],
+    number
+  >({
+    queryKey: ['userReviews', userId],
+    queryFn: ({ pageParam = 1 }) => loadUserReviewsAction(userId, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => lastPage.nextPage,
+  });
 
-    startTransition(async () => {
-      try {
-        const result = await loadUserReviewsAction(userId, page);
-        setReviews(prev => [...prev, ...result.items]);
-        setHasMore(result.hasMore);
-        setPage(prev => prev + 1);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load more reviews. Please try again.');
-        console.error('Error loading more reviews:', err);
-      }
-    });
-  }, [userId, page, hasMore, isPending]);
-
-  // Set up intersection observer
   useEffect(() => {
-    if (!hasMore || isPending) return;
-
+    if (!loadMoreRef.current) return;
     const observer = new IntersectionObserver(
       entries => {
-        const target = entries[0];
-        if (target.isIntersecting) {
-          loadMore();
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
-      {
-        threshold: 0.1,
-        rootMargin: '100px', // Start loading 100px before the element comes into view
-      },
+      { rootMargin: '200px' },
     );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-    observerRef.current = observer;
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [loadMore, hasMore, isPending]);
-
-  // Load initial reviews - load more to fill the screen initially
-  React.useEffect(() => {
-    if (reviewsCount === 0) {
-      setIsInitialLoading(false);
-      return;
-    }
-
-    const loadInitialReviews = async () => {
-      try {
-        // Load first page
-        const result = await loadUserReviewsAction(userId, 1);
-        setReviews(result.items);
-        setHasMore(result.hasMore);
-        setPage(2);
-        setError(null);
-
-        // If we have fewer than 6 reviews and there are more, load the next page automatically
-        // This helps fill the screen on larger displays
-        if (result.items.length < 6 && result.hasMore) {
-          const secondResult = await loadUserReviewsAction(userId, 2);
-          setReviews([...result.items, ...secondResult.items]);
-          setHasMore(secondResult.hasMore);
-          setPage(3);
-        }
-      } catch (err) {
-        setError('Failed to load reviews. Please try again.');
-        console.error('Error loading reviews:', err);
-      } finally {
-        setIsInitialLoading(false);
-      }
-    };
-
-    startTransition(() => {
-      loadInitialReviews();
-    });
-  }, [userId, reviewsCount]);
-
-  // Show initial loading state
-  if (isInitialLoading) {
+  if (isLoading)
     return (
       <div className="space-y-6" role="status" aria-label="Loading reviews">
-        <ReviewListSkeleton count={3} />
+        <Spinner />
       </div>
     );
-  }
+  if (error) return <div>Error loading reviews</div>;
 
-  // Show empty state
-  if (reviewsCount === 0 || reviews.length === 0) {
-    return (
-      <EmptyReviewsState isOwnProfile={isOwnProfile} userName={userName} />
-    );
-  }
+  const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="space-y-6" role="region" aria-label="User reviews">
-      {/* Error Alert */}
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+    <div className="flex flex-col gap-6">
+      <div ref={contentRef} className="w-full flex-1 space-y-4">
+        {allReviews.length === 0 && <EmptyReviewsState />}
 
-      {/* Reviews Grid */}
-      <div
-        className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6"
-        role="list"
-        aria-label={`${reviews.length} reviews`}
-      >
-        {reviews.map((review, index) => (
-          <div
-            key={review.id}
-            role="listitem"
-            aria-label={`Review ${index + 1} for ${review.location.name}`}
-          >
-            <ProfileReviewCard review={review} />
-          </div>
+        {allReviews.map(review => (
+          <ProfileReviewCard key={review.id} review={review} />
         ))}
+
+        {isFetchingNextPage && <Spinner />}
       </div>
-
-      {/* Intersection Observer Target for Auto-loading */}
-      {hasMore && (
-        <div
-          ref={loadMoreRef}
-          className="flex h-20 items-center justify-center"
-        >
-          {isPending ? (
-            <div className="text-muted-foreground flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Loading more reviews...</span>
-            </div>
-          ) : (
-            <div className="text-muted-foreground text-xs">
-              Scroll to load more reviews
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Additional Loading Skeletons during fetch */}
-      {isPending && hasMore && <ReviewListSkeleton count={3} />}
-
-      {/* End of results indicator */}
-      {!hasMore && reviews.length > 0 && (
-        <div
-          className="text-muted-foreground py-8 text-center text-sm"
-          role="status"
-          aria-live="polite"
-        >
-          You&apos;ve reached the end of{' '}
-          {isOwnProfile ? 'your' : `${userName}&apos;s`} reviews
-        </div>
-      )}
     </div>
   );
 };

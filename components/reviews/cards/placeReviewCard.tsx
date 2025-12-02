@@ -15,30 +15,10 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
+import { ReviewsPageType } from '@/modules/review/server';
 
 type PlaceReviewCardProps = {
-  review: {
-    user: {
-      image: string | null;
-      handle: string;
-      name: string;
-    };
-    location: {
-      name: string;
-      avgRating: number;
-      handle: string;
-    };
-    rating: number;
-    description: string;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    userId: string;
-    locationId: string;
-    photos: {
-      url: string;
-    }[];
-  };
+  review: ReviewsPageType['reviews'][0];
 };
 
 export const PlaceReviewCard = ({ review }: PlaceReviewCardProps) => {
