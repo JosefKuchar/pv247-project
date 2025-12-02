@@ -2,20 +2,27 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
+import { FollowButton } from '@/components/ui/follow-button';
 import { MapPin } from 'lucide-react';
 import type { location } from '@/db/schema';
 import { PlaceReviewsList } from '@/components/reviews/lists/placeReviewsList';
+import { PlaceProfileOptions } from '@/components/profiles/place-profile-options';
 
 type PlaceProfile = typeof location.$inferSelect & {
   reviewsCount: number;
   avgRating: number;
+  isFollowing: boolean;
 };
 
 type PlaceProfileCardProps = {
   placeProfile: PlaceProfile;
+  isManager?: boolean;
 };
 
-export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
+export const PlaceProfileCard = ({
+  placeProfile,
+  isManager = false,
+}: PlaceProfileCardProps) => {
   return (
     <div className="space-y-6">
       {/* Main Profile Card */}
@@ -29,7 +36,7 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
               </AvatarFallback>
             </Avatar>
 
-            <div className="text-center sm:text-left">
+            <div className="flex-1 text-center sm:text-left">
               <h1 className="text-xl font-bold sm:text-2xl">
                 {placeProfile.name}
               </h1>
@@ -40,6 +47,15 @@ export const PlaceProfileCard = ({ placeProfile }: PlaceProfileCardProps) => {
                   <span className="text-sm">{placeProfile.address}</span>
                 </div>
               )}
+            </div>
+
+            <div className="flex items-center justify-center gap-3 sm:justify-end">
+              <FollowButton
+                type="location"
+                targetHandle={placeProfile.handle}
+                isFollowing={placeProfile.isFollowing}
+              />
+              <PlaceProfileOptions isManager={isManager} />
             </div>
           </div>
 
