@@ -23,13 +23,16 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const [showSearch, setShowSearch] = useState(false);
   const searchPanelRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         showSearch &&
         searchPanelRef.current &&
-        !searchPanelRef.current.contains(event.target as Node)
+        !searchPanelRef.current.contains(event.target as Node) &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
       ) {
         setShowSearch(false);
       }
@@ -43,7 +46,7 @@ export function AppSidebar() {
 
   const handleNavClick = (url: string) => {
     if (url === '/search' && !isMobile) {
-      setShowSearch(!showSearch);
+      setShowSearch(prev => !prev);
       return true;
     }
     setShowSearch(false);
@@ -52,7 +55,7 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar>
+      <Sidebar ref={sidebarRef}>
         <SidebarHeader />
         <SidebarContent>
           <SidebarGroup>
