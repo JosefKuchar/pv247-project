@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Marker, useMap } from 'react-leaflet';
 import { UserMarkerIcon } from './user-marker-icon';
 import { useUserLocation } from '@/hooks/use-user-location';

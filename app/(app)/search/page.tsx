@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { SearchBar } from '@/components/search/search-bar';
 import { SearchResults } from '@/components/search/search-results';
@@ -12,14 +12,14 @@ export default function Page() {
   const { results, isLoading } = useSearch(searchQuery);
   const isMobile = useIsMobile();
   const router = useRouter();
-  const [hasChecked, setHasChecked] = useState(false);
+  const previousIsMobile = useRef<boolean | null>(null);
 
   useEffect(() => {
-    if (hasChecked && !isMobile) {
+    if (previousIsMobile.current === true && !isMobile) {
       router.push('/');
     }
-    setHasChecked(true);
-  }, [isMobile, router, hasChecked]);
+    previousIsMobile.current = isMobile;
+  }, [isMobile, router]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8">
