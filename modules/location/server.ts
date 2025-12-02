@@ -10,6 +10,7 @@ import {
 import { eq, avg, count, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { randomUUID } from 'crypto';
 
 export const getLocationProfile = async (handle: string) => {
   const locationData = await db.query.location.findFirst({
@@ -100,3 +101,40 @@ export const getLocationManagementStatus = async (locationHandle: string) => {
     isManager: !!existingManagement,
   };
 };
+
+export async function getLocationByHandle(handle: string) {
+  return db.query.location.findFirst({
+    where: eq(location.handle, handle),
+  });
+}
+
+export async function checkLocationFollowStatus(
+  userId: string,
+  locationId: string,
+) {
+  return db.query.userLocationFollow.findFirst({
+    where: and(
+      eq(userLocationFollow.userId, userId),
+      eq(userLocationFollow.locationId, locationId),
+    ),
+  });
+}
+
+export async function createLocationFollow(userId: string, locationId: string) {
+  await db.insert(userLocationFollow).values({
+    id: randomUUID(),
+    userId: userId,
+    locationId: locationId,
+  });
+}
+
+export async function deleteLocationFollow(userId: string, locationId: string) {
+  await db
+    .delete(userLocationFollow)
+    .where(
+      and(
+        eq(userLocationFollow.userId, userId),
+        eq(userLocationFollow.locationId, locationId),
+      ),
+    );
+}

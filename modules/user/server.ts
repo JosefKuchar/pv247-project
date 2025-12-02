@@ -5,6 +5,7 @@ import { follow, review, user } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { randomUUID } from 'crypto';
 
 export const getUserProfile = async (handle: string) => {
   const userData = await db.query.user.findFirst({
@@ -60,3 +61,37 @@ export const getUserFollowStatus = async (targetUserHandle: string) => {
     isFollowing: !!existingFollow,
   };
 };
+
+export async function getUserByHandle(handle: string) {
+  return db.query.user.findFirst({
+    where: eq(user.handle, handle),
+  });
+}
+
+export async function checkUserFollowStatus(
+  userId: string,
+  targetUserId: string,
+) {
+  return db.query.follow.findFirst({
+    where: and(
+      eq(follow.followerId, userId),
+      eq(follow.followingId, targetUserId),
+    ),
+  });
+}
+
+export async function createUserFollow(userId: string, targetUserId: string) {
+  await db.insert(follow).values({
+    id: randomUUID(),
+    followerId: userId,
+    followingId: targetUserId,
+  });
+}
+
+export async function deleteUserFollow(userId: string, targetUserId: string) {
+  await db
+    .delete(follow)
+    .where(
+      and(eq(follow.followerId, userId), eq(follow.followingId, targetUserId)),
+    );
+}

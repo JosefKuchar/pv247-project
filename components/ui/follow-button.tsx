@@ -4,10 +4,10 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserPlus, UserMinus, MapPin, Loader2 } from 'lucide-react';
 import {
-  followUser,
-  unfollowUser,
-  followLocation,
-  unfollowLocation,
+  followUserAction,
+  unfollowUserAction,
+  followLocationAction,
+  unfollowLocationAction,
 } from '@/app/actions/follow';
 import { cn } from '@/lib/utils';
 
@@ -39,16 +39,16 @@ export function FollowButton({
       try {
         if (isFollowing) {
           if (type === 'user') {
-            await unfollowUser(targetHandle);
+            await unfollowUserAction(targetHandle);
           } else {
-            await unfollowLocation(targetHandle);
+            await unfollowLocationAction(targetHandle);
           }
           setIsFollowing(false);
         } else {
           if (type === 'user') {
-            await followUser(targetHandle);
+            await followUserAction(targetHandle);
           } else {
-            await followLocation(targetHandle);
+            await followLocationAction(targetHandle);
           }
           setIsFollowing(true);
         }

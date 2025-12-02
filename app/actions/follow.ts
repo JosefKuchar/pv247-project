@@ -7,6 +7,19 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import {
+  getUserByHandle,
+  checkUserFollowStatus,
+  createUserFollow,
+  deleteUserFollow,
+} from '@/modules/user/server';
+
+import {
+  checkLocationFollowStatus,
+  createLocationFollow,
+  deleteLocationFollow,
+  getLocationByHandle,
+} from '@/modules/location/server';
 
 async function getSession() {
   return await auth.api.getSession({
@@ -14,16 +27,14 @@ async function getSession() {
   });
 }
 
-export async function followUser(targetUserHandle: string) {
+export async function followUserAction(targetUserHandle: string) {
   const session = await getSession();
   if (!session?.user?.id) {
     throw new Error('Not authenticated');
   }
 
   // Get target user by handle
-  const targetUser = await db.query.user.findFirst({
-    where: eq(user.handle, targetUserHandle),
-  });
+  const targetUser = await getUserByHandle(targetUserHandle);
 
   if (!targetUser) {
     throw new Error('User not found');
@@ -34,94 +45,69 @@ export async function followUser(targetUserHandle: string) {
   }
 
   // Check if already following
-  const existingFollow = await db.query.follow.findFirst({
-    where: and(
-      eq(follow.followerId, session.user.id),
-      eq(follow.followingId, targetUser.id),
-    ),
-  });
+  const existingFollow = await checkUserFollowStatus(
+    session.user.id,
+    targetUser.id,
+  );
 
   if (existingFollow) {
     throw new Error('Already following this user');
   }
 
   // Create follow relationship
-  await db.insert(follow).values({
-    id: randomUUID(),
-    followerId: session.user.id,
-    followingId: targetUser.id,
-  });
+  await createUserFollow(session.user.id, targetUser.id);
 
-  // Revalidate the profile page
   revalidatePath(`/(app)/(profile)/${targetUserHandle}`);
 
   return { success: true };
 }
 
-export async function unfollowUser(targetUserHandle: string) {
+export async function unfollowUserAction(targetUserHandle: string) {
   const session = await getSession();
   if (!session?.user?.id) {
     throw new Error('Not authenticated');
   }
 
   // Get target user by handle
-  const targetUser = await db.query.user.findFirst({
-    where: eq(user.handle, targetUserHandle),
-  });
+  const targetUser = await getUserByHandle(targetUserHandle);
 
   if (!targetUser) {
     throw new Error('User not found');
   }
 
   // Delete follow relationship
-  await db
-    .delete(follow)
-    .where(
-      and(
-        eq(follow.followerId, session.user.id),
-        eq(follow.followingId, targetUser.id),
-      ),
-    );
+  await deleteUserFollow(session.user.id, targetUser.id);
 
-  // Revalidate the profile page
   revalidatePath(`/(app)/(profile)/${targetUserHandle}`);
 
   return { success: true };
 }
 
-export async function followLocation(locationHandle: string) {
+export async function followLocationAction(locationHandle: string) {
   const session = await getSession();
   if (!session?.user?.id) {
     throw new Error('Not authenticated');
   }
 
   // Get location by handle
-  const targetLocation = await db.query.location.findFirst({
-    where: eq(location.handle, locationHandle),
-  });
+  const targetLocation = await getLocationByHandle(locationHandle);
 
   if (!targetLocation) {
     throw new Error('Location not found');
   }
 
   // Check if already following
-  const existingFollow = await db.query.userLocationFollow.findFirst({
-    where: and(
-      eq(userLocationFollow.userId, session.user.id),
-      eq(userLocationFollow.locationId, targetLocation.id),
-    ),
-  });
+  const existingFollow = await checkLocationFollowStatus(
+    session.user.id,
+    targetLocation.id,
+  );
 
   if (existingFollow) {
     throw new Error('Already following this location');
   }
 
   // Create follow relationship
-  await db.insert(userLocationFollow).values({
-    id: randomUUID(),
-    userId: session.user.id,
-    locationId: targetLocation.id,
-  });
+  await createLocationFollow(session.user.id, targetLocation.id);
 
   // Revalidate the profile page
   revalidatePath(`/(app)/(profile)/place/${locationHandle}`);
@@ -129,30 +115,21 @@ export async function followLocation(locationHandle: string) {
   return { success: true };
 }
 
-export async function unfollowLocation(locationHandle: string) {
+export async function unfollowLocationAction(locationHandle: string) {
   const session = await getSession();
   if (!session?.user?.id) {
     throw new Error('Not authenticated');
   }
 
   // Get location by handle
-  const targetLocation = await db.query.location.findFirst({
-    where: eq(location.handle, locationHandle),
-  });
+  const targetLocation = await getLocationByHandle(locationHandle);
 
   if (!targetLocation) {
     throw new Error('Location not found');
   }
 
   // Delete follow relationship
-  await db
-    .delete(userLocationFollow)
-    .where(
-      and(
-        eq(userLocationFollow.userId, session.user.id),
-        eq(userLocationFollow.locationId, targetLocation.id),
-      ),
-    );
+  await deleteLocationFollow(session.user.id, targetLocation.id);
 
   // Revalidate the profile page
   revalidatePath(`/(app)/(profile)/place/${locationHandle}`);
@@ -160,7 +137,7 @@ export async function unfollowLocation(locationHandle: string) {
   return { success: true };
 }
 
-export async function getFollowStatus(
+export async function getFollowStatusAction(
   targetHandle: string,
   type: 'user' | 'location',
 ) {
@@ -170,10 +147,7 @@ export async function getFollowStatus(
   }
 
   if (type === 'user') {
-    // Get target user by handle
-    const targetUser = await db.query.user.findFirst({
-      where: eq(user.handle, targetHandle),
-    });
+    const targetUser = await getUserByHandle(targetHandle);
 
     if (!targetUser) {
       return { isFollowing: false };
@@ -183,30 +157,24 @@ export async function getFollowStatus(
       return { isFollowing: false, isOwnProfile: true };
     }
 
-    const existingFollow = await db.query.follow.findFirst({
-      where: and(
-        eq(follow.followerId, session.user.id),
-        eq(follow.followingId, targetUser.id),
-      ),
-    });
+    const existingFollow = await checkUserFollowStatus(
+      session.user.id,
+      targetUser.id,
+    );
 
     return { isFollowing: !!existingFollow, isOwnProfile: false };
   } else {
     // Get location by handle
-    const targetLocation = await db.query.location.findFirst({
-      where: eq(location.handle, targetHandle),
-    });
+    const targetLocation = await getLocationByHandle(targetHandle);
 
     if (!targetLocation) {
       return { isFollowing: false };
     }
 
-    const existingFollow = await db.query.userLocationFollow.findFirst({
-      where: and(
-        eq(userLocationFollow.userId, session.user.id),
-        eq(userLocationFollow.locationId, targetLocation.id),
-      ),
-    });
+    const existingFollow = await checkLocationFollowStatus(
+      session.user.id,
+      targetLocation.id,
+    );
 
     return { isFollowing: !!existingFollow, isOwnProfile: false };
   }
