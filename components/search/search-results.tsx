@@ -23,12 +23,14 @@ interface SearchResultsProps {
   locations: Location[];
   users: User[];
   isLoading?: boolean;
+  onResultClick?: () => void;
 }
 
 export function SearchResults({
   locations,
   users,
   isLoading = false,
+  onResultClick,
 }: SearchResultsProps) {
   if (isLoading) {
     return (
@@ -53,7 +55,11 @@ export function SearchResults({
           <h2 className="text-xl font-semibold text-gray-900">Locations</h2>
           <div className="flex flex-col gap-4">
             {locations.map(location => (
-              <LocationCard key={location.id} location={location} />
+              <LocationCard
+                key={location.id}
+                location={location}
+                onClick={onResultClick}
+              />
             ))}
           </div>
         </div>
@@ -64,7 +70,7 @@ export function SearchResults({
           <h2 className="text-xl font-semibold text-gray-900">Users</h2>
           <div className="flex flex-col gap-4">
             {users.map(user => (
-              <UserCard key={user.id} user={user} />
+              <UserCard key={user.id} user={user} onClick={onResultClick} />
             ))}
           </div>
         </div>

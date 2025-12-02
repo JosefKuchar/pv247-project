@@ -10,11 +10,12 @@ interface UserCardProps {
     handle: string;
     image: string | null;
   };
+  onClick?: () => void;
 }
 
-export function UserCard({ user }: UserCardProps) {
+export function UserCard({ user, onClick }: UserCardProps) {
   return (
-    <Link key={user.id} href={`/${user.handle}`}>
+    <Link key={user.id} href={`/${user.handle}`} onClick={onClick}>
       <Card className="p-4 transition-shadow hover:shadow-lg">
         <div className="flex items-start gap-3">
           <Avatar className="h-10 w-10">

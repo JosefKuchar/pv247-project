@@ -5,7 +5,11 @@ import { SearchBar } from '@/components/search/search-bar';
 import { SearchResults } from '@/components/search/search-results';
 import { useSearch } from '@/hooks/use-search';
 
-export function SearchPanel() {
+interface SearchPanelProps {
+  onResultClick?: () => void;
+}
+
+export function SearchPanel({ onResultClick }: SearchPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { results, isLoading } = useSearch(searchQuery);
 
@@ -20,6 +24,7 @@ export function SearchPanel() {
           locations={results.locations}
           users={results.users}
           isLoading={isLoading}
+          onResultClick={onResultClick}
         />
       </div>
     </div>

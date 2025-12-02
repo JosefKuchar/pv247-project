@@ -9,11 +9,16 @@ interface LocationCardProps {
     handle: string;
     address: string | null;
   };
+  onClick?: () => void;
 }
 
-export function LocationCard({ location }: LocationCardProps) {
+export function LocationCard({ location, onClick }: LocationCardProps) {
   return (
-    <Link key={location.id} href={`/place/${location.handle}`}>
+    <Link
+      key={location.id}
+      href={`/place/${location.handle}`}
+      onClick={onClick}
+    >
       <Card className="p-4 transition-shadow hover:shadow-lg">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">

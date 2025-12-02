@@ -112,7 +112,7 @@ export function AppSidebar() {
           ref={searchPanelRef}
           className="bg-background fixed top-0 left-[var(--sidebar-width)] z-40 h-screen w-96 border-r"
         >
-          <SearchPanel />
+          <SearchPanel onResultClick={() => setShowSearch(false)} />
         </div>
       )}
     </>
