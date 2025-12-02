@@ -13,7 +13,7 @@ const MapInner = () => {
   return (
     <div className="fixed top-0 left-0 h-screen w-full overflow-hidden">
       <MapContainer
-        center={{ lat: 40.7589, lng: -73.9851 }}
+        center={{ lat: 49.1951, lng: 16.6068 }}
         zoom={17}
         scrollWheelZoom={true}
         className="h-full w-full"
