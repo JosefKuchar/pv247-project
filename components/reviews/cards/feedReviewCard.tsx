@@ -17,46 +17,39 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Heart, MessageCircle, Send } from 'lucide-react';
+import { ReviewDataType } from '@/modules/review/server';
+import { useState } from 'react';
+import { ReviewCommentList } from '@/components/comment/reviewCommentsList';
 
-type reviewCardProps = {
-  review: {
-    user: {
-      image: string | null;
-      handle: string;
-      name: string;
-    };
-    location: {
-      name: string;
-      avgRating: number;
-      handle: string;
-    };
-    rating: number;
-    description: string;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    userId: string;
-    locationId: string;
-    photos: {
-      url: string;
-    }[];
-  };
+type ReviewCardProps = {
+  reviewData: ReviewDataType;
 };
 
-export const FeedReviewCard = ({ review }: reviewCardProps) => {
+export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
+  const [showComments, setShowComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(reviewData.commentsCount);
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
+  const callbackAddComment = () => {
+    setCommentsCount(commentsCount + 1);
+  };
+
   return (
     <Card className="w-full max-w-md shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
       <CardHeader className="flex flex-col gap-4">
         <div>
           <a
-            href={`/${review.user.handle}`}
+            href={`/${reviewData.user.handle}`}
             className="flex items-center gap-2"
           >
-            {review.user.image ? (
+            {reviewData.user.image ? (
               <Image
-                src={review.user.image}
-                alt={review.user.name}
+                src={reviewData.user.image}
+                alt={reviewData.user.name}
                 width={40}
                 height={40}
                 className="rounded-full"
@@ -66,27 +59,27 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
               <div className="h-10 w-10 rounded-full bg-gray-300" />
             )}
             <h3 className="font-semibold">
-              {review.user.name}
+              {reviewData.user.name}
               <span className="font-normal text-gray-500">
-                @{review.user.handle}
+                @{reviewData.user.handle}
               </span>
             </h3>
           </a>
         </div>
         <div className="flex items-center justify-between">
           <a
-            href={`/place/${review.location.handle}`}
+            href={`/place/${reviewData.location.handle}`}
             className="flex items-center gap-2"
           >
-            <p className="font-semibold">{review.location.name}</p>
-            <Rating value={review.location.avgRating} readOnly>
+            <p className="font-semibold">{reviewData.location.name}</p>
+            <Rating value={reviewData.location.avgRating} readOnly>
               {Array.from({ length: 5 }).map((_, index) => (
                 <RatingButton size={12} key={index} />
               ))}
             </Rating>
           </a>
         </div>
-        <Rating value={review.rating} readOnly className="gap-1">
+        <Rating value={reviewData.review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
             <RatingButton
               className="-mt-2.5 h-3 w-5 text-yellow-500"
@@ -97,12 +90,12 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-gray-700">{review.description}</p>
+        <p className="text-sm text-gray-700">{reviewData.review.description}</p>
 
-        {review.photos.length > 0 && (
+        {reviewData.photos.length > 0 && (
           <Carousel className="relative flex items-center justify-center pt-4">
             <CarouselContent>
-              {review.photos.map((photo, index) => (
+              {reviewData.photos.map((photo, index) => (
                 <CarouselItem
                   key={index}
                   className="relative h-96 w-96 object-contain"
@@ -117,7 +110,7 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {review.photos.length > 1 && (
+            {reviewData.photos.length > 1 && (
               <>
                 <CarouselPrevious className="absolute top-1/2 left-2 z-1 -translate-y-1/2" />
                 <CarouselNext className="absolute top-1/2 right-2 z-1 -translate-y-1/2" />
@@ -126,28 +119,43 @@ export const FeedReviewCard = ({ review }: reviewCardProps) => {
           </Carousel>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <div className="flex gap-4">
+      <CardFooter className="flex flex-col gap-2 border-t">
+        {showComments && (
+          <div className="w-full pb-4">
+            <ReviewCommentList
+              review_id={reviewData.review.id}
+              callbackAddComment={callbackAddComment}
+            />
+          </div>
+        )}
+        <div className="flex w-full justify-between">
+          <div className="flex gap-4">
+            <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
+              <Heart type="button" className="hover:cursor-pointer" />
+              <span className="ml-1">{reviewData.likesCount}</span>
+            </div>
+            <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
+              <MessageCircle
+                type="button"
+                className="hover:cursor-pointer"
+                onClick={toggleComments}
+              />
+              <span className="ml-1">{commentsCount}</span>
+            </div>
+          </div>
+
           <button
             type="button"
-            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-red-400"
+            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
+            onClick={() =>
+              navigator.clipboard.writeText(
+                window.location.href + `review/${reviewData.review.id}`,
+              )
+            }
           >
-            <Heart />
-          </button>
-          <button
-            type="button"
-            className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-blue-400"
-          >
-            <MessageCircle />
+            <Send />
           </button>
         </div>
-
-        <button
-          type="button"
-          className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
-        >
-          <Send />
-        </button>
       </CardFooter>
     </Card>
   );

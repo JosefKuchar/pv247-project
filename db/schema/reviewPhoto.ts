@@ -27,3 +27,5 @@ export const reviewPhotoRelations = relations(reviewPhoto, ({ one }) => ({
     references: [review.id],
   }),
 }));
+
+export type reviewPhotoType = typeof reviewPhoto.$inferSelect;

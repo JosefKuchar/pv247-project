@@ -7,8 +7,6 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
-  console.log('inside proxy middleware');
-
   // THIS IS NOT SECURE!
   // This is the recommended approach to optimistically redirect users
   // We recommend handling auth checks in each page/route
