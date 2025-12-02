@@ -19,7 +19,7 @@ import {
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import { ReviewDataType } from '@/modules/review/server';
 import { useState } from 'react';
-import { ReviewCommentList } from '@/components/comment/lists/reviewCommentsList';
+import { ReviewCommentList } from '@/components/comment/reviewCommentsList';
 
 type ReviewCardProps = {
   reviewData: ReviewDataType;
@@ -27,9 +27,14 @@ type ReviewCardProps = {
 
 export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
   const [showComments, setShowComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(reviewData.commentsCount);
 
   const toggleComments = () => {
     setShowComments(!showComments);
+  };
+
+  const callbackAddComment = () => {
+    setCommentsCount(commentsCount + 1);
   };
 
   return (
@@ -116,8 +121,11 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
       </CardContent>
       <CardFooter className="flex flex-col gap-2 border-t">
         {showComments && (
-          <div className="pb-4">
-            <ReviewCommentList review_id={reviewData.review.id} />
+          <div className="w-full pb-4">
+            <ReviewCommentList
+              review_id={reviewData.review.id}
+              callbackAddComment={callbackAddComment}
+            />
           </div>
         )}
         <div className="flex w-full justify-between">
@@ -132,7 +140,7 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
                 className="hover:cursor-pointer"
                 onClick={toggleComments}
               />
-              <span className="ml-1">{reviewData.commentsCount}</span>
+              <span className="ml-1">{commentsCount}</span>
             </div>
           </div>
 
