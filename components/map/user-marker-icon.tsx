@@ -13,7 +13,7 @@ export const UserMarkerIcon = L.divIcon({
     />,
   ),
   className:
-    'custom-user-marker-icon flex items-center justify-center rounded-full drop-shadow-md',
+    'custom-marker-icon flex items-center justify-center rounded-full drop-shadow-md',
   iconSize: [10, 10],
   iconAnchor: [5, 5],
   popupAnchor: [0, -10],
