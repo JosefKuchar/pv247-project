@@ -15,6 +15,7 @@ export const location = sqliteTable(
   {
     id: text('id').primaryKey(),
     name: text('name').notNull(),
+    handle: text('handle').notNull().unique(),
     address: text('address'),
     latitude: real('latitude').notNull(),
     longitude: real('longitude').notNull(),
@@ -36,3 +37,5 @@ export const locationRelations = relations(location, ({ many }) => ({
   followers: many(userLocationFollow, { relationName: 'followers' }),
   managers: many(locationManagement, { relationName: 'managers' }),
 }));
+
+export type locationType = typeof location.$inferSelect;

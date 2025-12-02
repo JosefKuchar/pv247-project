@@ -1,3 +1,7 @@
-export default function Page() {
-  return <div>Map Page</div>;
-}
+import { Map } from '@/components/map/map';
+
+const Page = () => {
+  return <Map />;
+};
+
+export default Page;

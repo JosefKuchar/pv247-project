@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Locagram
+
+A social web application focused on sharing and exploring reviews of real-world locations. Users can create posts linked to specific places, describe their experiences, and interact with other users through comments and likes.
+
+## Features
+
+### 🏪 Location-Based Reviews
+
+- Create posts linked to specific Google Maps locations
+- Add photos, ratings, and detailed descriptions
+- Automatic location association with map coordinates
+
+### 👥 Social Interaction
+
+- Follow other users and see their posts in your personalized feed
+- Like and comment on location reviews
+- Build a community around shared experiences
+
+### 🗺️ Discovery & Exploration
+
+- Browse reviews through multiple interfaces:
+  - Main feed with recent/popular posts
+  - Interactive map showing reviewed places
+  - Search functionality for locations and keywords
+- Filter content by category, rating, or proximity
+
+### 🏢 Business Management
+
+- Location owners can claim their places
+- Verified badges for Location Management accounts
+- Comprehensive location pages with aggregated reviews and ratings
+
+### 📱 User Profiles
+
+- Personal profiles with post history
+- Customizable profile information and photos
+- Follower/following system
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 with App Router, TypeScript, React 19
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Database**: Drizzle ORM with Turso (SQLite-compatible)
+- **Authentication**: better-auth
+- **State Management**: TanStack Query for server state
+- **Forms**: React Hook Form
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Local Turso database instance
+
+### Installation & Setup
+
+1. Clone the repository and install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Set up environment variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Start the local database:
 
-## Learn More
+```bash
+pnpm db
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Push schema and seed data:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm db:push
+pnpm db:seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Start the development server:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+```

@@ -36,6 +36,7 @@ async function main() {
         id: randomUUID(),
         name: 'Alice Johnson',
         email: 'alice@example.com',
+        handle: 'alicejohnson',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
       },
@@ -43,6 +44,7 @@ async function main() {
         id: randomUUID(),
         name: 'Bob Smith',
         email: 'bob@example.com',
+        handle: 'bobsmith',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob',
       },
@@ -50,6 +52,7 @@ async function main() {
         id: randomUUID(),
         name: 'Charlie Brown',
         email: 'charlie@example.com',
+        handle: 'charliebrown',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlie',
       },
@@ -57,6 +60,7 @@ async function main() {
         id: randomUUID(),
         name: 'Diana Prince',
         email: 'diana@example.com',
+        handle: 'dianaprince',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=diana',
       },
@@ -64,6 +68,7 @@ async function main() {
         id: randomUUID(),
         name: 'Eve Wilson',
         email: 'eve@example.com',
+        handle: 'evewilson',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eve',
       },
@@ -71,6 +76,7 @@ async function main() {
         id: randomUUID(),
         name: 'Frank Miller',
         email: 'frank@example.com',
+        handle: 'frankmiller',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=frank',
       },
@@ -88,6 +94,7 @@ async function main() {
         address: '123 Main St, New York, NY 10001',
         latitude: 40.7589,
         longitude: -73.9851,
+        handle: 'central-park-cafe',
       },
       {
         id: randomUUID(),
@@ -95,6 +102,7 @@ async function main() {
         address: '456 River Rd, New York, NY 10002',
         latitude: 40.7614,
         longitude: -73.9776,
+        handle: 'riverside-restaurant',
       },
       {
         id: randomUUID(),
@@ -102,6 +110,7 @@ async function main() {
         address: '789 Trail Way, New York, NY 10003',
         latitude: 40.7505,
         longitude: -73.9934,
+        handle: 'mountain-view-hiking-trail',
       },
       {
         id: randomUUID(),
@@ -109,6 +118,7 @@ async function main() {
         address: '321 Art Ave, New York, NY 10004',
         latitude: 40.7282,
         longitude: -73.9942,
+        handle: 'downtown-art-gallery',
       },
       {
         id: randomUUID(),
@@ -116,6 +126,7 @@ async function main() {
         address: '555 Ocean Blvd, New York, NY 10005',
         latitude: 40.6892,
         longitude: -74.0445,
+        handle: 'seaside-beach',
       },
       {
         id: randomUUID(),
@@ -123,6 +134,7 @@ async function main() {
         address: '999 Innovation St, New York, NY 10006',
         latitude: 40.7489,
         longitude: -73.968,
+        handle: 'tech-hub-co-working-space',
       },
     ];
 

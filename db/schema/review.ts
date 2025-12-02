@@ -45,3 +45,5 @@ export const reviewRelations = relations(review, ({ one, many }) => ({
   comments: many(comment),
   likes: many(reviewLike),
 }));
+
+export type reviewType = typeof review.$inferSelect;

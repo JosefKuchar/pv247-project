@@ -4,15 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { isNavItemActive, navItems } from './nav-items';
+import { isNavItemActive, getNavItems } from './nav-items';
+import { authClient } from '@/lib/auth-client';
 
 export function BottomNav() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
+  const { data: session } = authClient.useSession();
 
   if (!isMobile) {
     return null;
   }
+
+  const navItems = getNavItems(session?.user?.handle);
 
   return (
     <nav className="bg-background fixed right-0 bottom-0 left-0 z-50 border-t md:hidden">
