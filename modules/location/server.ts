@@ -7,7 +7,7 @@ import {
   userLocationFollow,
   locationManagement,
 } from '@/db/schema';
-import { eq, avg, count, and } from 'drizzle-orm';
+import { eq, avg, count, and, like, or, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { randomUUID } from 'crypto';
@@ -137,4 +137,42 @@ export async function deleteLocationFollow(userId: string, locationId: string) {
         eq(userLocationFollow.locationId, locationId),
       ),
     );
+}
+
+export type LocationSearchResult = {
+  value: string;
+  label: string;
+};
+
+/**
+ * Search locations by name or address for combobox
+ * @param query - Search query string
+ * @param limit - Maximum number of results (default: 20)
+ * @returns Array of locations matching the search query
+ */
+export async function searchLocations(
+  query: string,
+  limit: number = 20,
+): Promise<LocationSearchResult[]> {
+  const searchPattern = `%${query}%`;
+
+  const results = await db
+    .select({
+      id: location.id,
+      name: location.name,
+      address: location.address,
+    })
+    .from(location)
+    .where(
+      or(
+        like(sql`LOWER(${location.name})`, sql`LOWER(${searchPattern})`),
+        like(sql`LOWER(${location.address})`, sql`LOWER(${searchPattern})`),
+      ),
+    )
+    .limit(limit);
+
+  return results.map(loc => ({
+    value: loc.id,
+    label: loc.address ? `${loc.name} - ${loc.address}` : loc.name,
+  }));
 }
