@@ -8,10 +8,6 @@ export function LocationMarker() {
   const position = useUserLocation();
   const map = useMap();
 
-  useEffect(() => {
-    map.locate();
-  }, [map]);
-
   const handleLocate = () => {
     map.locate();
   };
