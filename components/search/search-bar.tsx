@@ -13,7 +13,7 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChange,
-  placeholder = 'Search locations and users...',
+  placeholder = 'Search',
 }: SearchBarProps) {
   return (
     <div className="relative flex items-center gap-2">

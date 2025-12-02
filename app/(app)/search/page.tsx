@@ -11,7 +11,6 @@ export default function Page() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-bold text-gray-900">Search</h1>
       <div className="mb-8">
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </div>
