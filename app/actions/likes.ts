@@ -1,14 +1,18 @@
 'use server';
 
-import { addLikeToReview } from '@/modules/like/server';
+import { addReviewLike, removeReviewLike } from '@/modules/like/server';
 
 import { withAuth } from '@/lib/server-actions';
 
-const internalAddLikeToReviewAction = async (
+const internalToggleReviewLikeAction = async (
   userId: string,
   reviewId: string,
+  liked: boolean,
 ) => {
-  return addLikeToReview(reviewId, userId);
+  if (liked) {
+    return removeReviewLike(reviewId, userId);
+  } else {
+    return addReviewLike(reviewId, userId);
+  }
 };
-
-export const addLikeToReviewAction = withAuth(internalAddLikeToReviewAction);
+export const toggleReviewLikeAction = withAuth(internalToggleReviewLikeAction);

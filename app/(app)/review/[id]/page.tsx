@@ -1,4 +1,4 @@
-import { FeedReviewCard } from '@/components/reviews/cards/feedReviewCard';
+import { FeedReviewCard } from '@/components/reviews/cards/feed-review-card';
 import { getReviewCard } from '@/modules/review/server';
 
 export default async function Page({

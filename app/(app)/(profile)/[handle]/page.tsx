@@ -1,5 +1,5 @@
 import { getUserProfile, getUserFollowStatus } from '@/modules/user/server';
-import { UserProfileCard } from '@/components/profiles/userProfileCard';
+import { UserProfileCard } from '@/components/profiles/user-profile-card';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 

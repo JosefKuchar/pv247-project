@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { FollowButton } from '@/components/ui/follow-button';
 import type { userType } from '@/db/schema';
-import { UserReviewsList } from '@/components/reviews/lists/userReviewsList';
+import { UserReviewsList } from '@/components/reviews/lists/user-reviews-list';
 import { UserProfileOptions } from '@/components/profiles/user-profile-options';
 
 type UserProfile = userType & {

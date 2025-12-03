@@ -2,17 +2,20 @@
 
 import { db } from '@/db';
 import { eq, desc } from 'drizzle-orm';
-import { review, reviewType, userType, locationType } from '@/db/schema';
+import { review, reviewType, userType, locationType, user } from '@/db/schema';
+import { Linkedin } from 'lucide-react';
 
 export type ReviewDataType = Pick<
   reviewType,
-  'id' | 'description' | 'rating' | 'createdAt'
+  'id' | 'userId' | 'description' | 'rating' | 'createdAt'
 > & {
   user: Pick<userType, 'name' | 'handle' | 'image'>;
   location: Pick<locationType, 'name' | 'handle'> & { avgRating: number };
   photos: { url: string }[];
   likesCount: number;
   commentsCount: number;
+  ownReview: boolean;
+  liked: boolean;
 };
 
 export type ReviewsPageType = {
@@ -37,7 +40,7 @@ export const getReviewCard = async (id: string) => {
         },
       },
       photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
+      likes: { columns: { userId: true } },
       comments: { columns: { id: true } },
     },
   });
@@ -65,10 +68,13 @@ export const getReviewCard = async (id: string) => {
     photos: photos,
     likesCount: likes.length,
     commentsCount: comments.length,
+    ownReview: false,
+    liked: false,
   };
 };
 
 export const getReviewsPaginated = async (
+  userId: string,
   page: number = 1,
   pageSize: number = 9,
 ) => {
@@ -88,7 +94,7 @@ export const getReviewsPaginated = async (
         },
       },
       photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
+      likes: { columns: { userId: true } },
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
@@ -120,6 +126,8 @@ export const getReviewsPaginated = async (
       },
       likesCount: likes.length,
       commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 
@@ -130,15 +138,16 @@ export const getReviewsPaginated = async (
   };
 };
 
-export const getUserReviewsPaginated = async (
+export const getProfileReviewsPaginated = async (
   userId: string,
+  profileId: string,
   page: number = 1,
   pageSize: number = 10,
 ) => {
   const offset = (page - 1) * pageSize;
 
   const reviewsData = await db.query.review.findMany({
-    where: eq(review.userId, userId),
+    where: eq(review.userId, profileId),
     with: {
       user: {
         columns: { name: true, handle: true, image: true },
@@ -152,7 +161,7 @@ export const getUserReviewsPaginated = async (
         },
       },
       photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
+      likes: { columns: { userId: true } },
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
@@ -184,6 +193,8 @@ export const getUserReviewsPaginated = async (
       },
       likesCount: likes.length,
       commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 
@@ -195,6 +206,7 @@ export const getUserReviewsPaginated = async (
 };
 
 export const getLocationReviewsPaginated = async (
+  userId: string,
   locationId: string,
   page: number = 1,
   pageSize: number = 10,
@@ -216,7 +228,7 @@ export const getLocationReviewsPaginated = async (
         },
       },
       photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
+      likes: { columns: { userId: true } },
       comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
@@ -248,6 +260,8 @@ export const getLocationReviewsPaginated = async (
       },
       likesCount: likes.length,
       commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 

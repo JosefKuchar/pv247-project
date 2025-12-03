@@ -1,18 +1,14 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { PlaceReviewCard } from '@/components/reviews/cards/placeReviewCard';
+import { FeedReviewCard } from '@/components/reviews/cards/feed-review-card';
+import { EmptyReviewsState } from '@/components/reviews/empty-reviews-state';
+import { loadReviewsAction } from '@/app/actions/reviews';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
-import { EmptyReviewsState } from '@/components/reviews/emptyReviewsState';
 import { ReviewsPageType } from '@/modules/review/server';
-import { loadLocationReviewsAction } from '@/app/actions/reviews';
 import { Spinner } from '@/components/ui/spinner';
 
-type PlaceReviewsListProps = {
-  locationId: string;
-};
-
-export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
+export const FeedReviewsList = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +23,11 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
     ReviewsPageType,
     Error,
     InfiniteData<ReviewsPageType>,
-    [string, string],
+    [string],
     number
   >({
-    queryKey: ['placeReviews', locationId],
-    queryFn: ({ pageParam = 1 }) =>
-      loadLocationReviewsAction(locationId, pageParam),
+    queryKey: ['feedReviews'],
+    queryFn: ({ pageParam = 1 }) => loadReviewsAction(pageParam),
     initialPageParam: 1,
     getNextPageParam: lastPage => lastPage.nextPage,
   });
@@ -62,12 +57,12 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col">
       <div ref={contentRef} className="w-full flex-1 space-y-4">
         {allReviews.length === 0 && <EmptyReviewsState />}
 
         {allReviews.map(review => (
-          <PlaceReviewCard key={review.id} review={review} />
+          <FeedReviewCard key={review.id} review={review} />
         ))}
 
         {hasNextPage && <div ref={loadMoreRef} />}

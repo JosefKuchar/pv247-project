@@ -19,8 +19,9 @@ import {
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import { ReviewDataType } from '@/modules/review/server';
 import { useState } from 'react';
-import { ReviewCommentList } from '@/components/comment/reviewCommentsList';
-import { addLikeToReviewAction } from '@/app/actions/likes';
+import { ReviewCommentList } from '@/components/comment/review-comments-list';
+import { toggleReviewLikeAction } from '@/app/actions/likes';
+import { useMutation } from '@tanstack/react-query';
 
 type ReviewCardProps = {
   review: ReviewDataType;
@@ -30,15 +31,24 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentsCount, setCommentsCount] = useState(review.commentsCount);
   const [likesCount, setLikesCount] = useState(review.likesCount);
+  const [liked, setLiked] = useState(review.liked);
 
   const toggleComments = () => {
     setShowComments(!showComments);
   };
 
-  const callbackAddLike = () => {
-    addLikeToReviewAction(review.id);
-    setLikesCount(likesCount + 1);
-  };
+  const toggleLikeMutation = useMutation({
+    mutationFn: () => toggleReviewLikeAction(review.id, liked),
+    onSuccess: () => {
+      setLiked(!liked);
+      if (liked) {
+        setLikesCount(likesCount - 1);
+      } else {
+        setLikesCount(likesCount + 1);
+      }
+    },
+  });
+
   const callbackAddComment = () => {
     setCommentsCount(commentsCount + 1);
   };
@@ -97,7 +107,6 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
 
       <CardContent>
         <p className="text-sm text-gray-700">{review.description}</p>
-
         {review.photos.length > 0 && (
           <Carousel className="relative flex items-center justify-center pt-4">
             <CarouselContent>
@@ -137,12 +146,16 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
         <div className="flex w-full justify-between">
           <div className="flex gap-4">
             <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
-              <Heart
-                type="button"
-                className="hover:cursor-pointer"
-                onClick={callbackAddLike}
-              />
-              <span className="ml-1">{review.likesCount}</span>
+              {toggleLikeMutation.isPending ? (
+                <Heart className="animate-pulse hover:cursor-pointer" />
+              ) : (
+                <Heart
+                  type="button"
+                  className={`hover:cursor-pointer ${liked ? 'text-red-500' : ''}`}
+                  onClick={() => toggleLikeMutation.mutate()}
+                />
+              )}
+              <span className="ml-1">{likesCount}</span>
             </div>
             <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
               <MessageCircle

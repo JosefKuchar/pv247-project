@@ -5,7 +5,7 @@ import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import { FollowButton } from '@/components/ui/follow-button';
 import { MapPin } from 'lucide-react';
 import type { location } from '@/db/schema';
-import { PlaceReviewsList } from '@/components/reviews/lists/placeReviewsList';
+import { PlaceReviewsList } from '@/components/reviews/lists/place-reviews-list';
 import { PlaceProfileOptions } from '@/components/profiles/place-profile-options';
 
 type PlaceProfile = typeof location.$inferSelect & {
