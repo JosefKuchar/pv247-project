@@ -56,9 +56,7 @@ export const getReviewCard = async (id: string) => {
   const { photos, user, location, likes, comments, ...rest } = reviewData;
 
   return {
-    review: {
-      ...rest,
-    },
+    ...rest,
     user: user,
     location: {
       name: location.name,

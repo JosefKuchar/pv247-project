@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 
 type UserReviewsListProps = {
   userId: string;
+  isOwnProfile?: boolean;
 };
 
 export const UserReviewsList = ({ userId }: UserReviewsListProps) => {

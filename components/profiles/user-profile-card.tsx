@@ -102,9 +102,7 @@ export const UserProfileCard = ({
 
           <UserReviewsList
             userId={userProfile.id}
-            reviewsCount={userProfile.reviewsCount}
             isOwnProfile={isOwnProfile}
-            userName={userProfile.name}
           />
         </CardContent>
       </Card>

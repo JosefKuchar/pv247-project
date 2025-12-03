@@ -15,7 +15,7 @@ export default async function Page({
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <FeedReviewCard reviewData={reviewData} />
+      <FeedReviewCard review={reviewData} />
     </div>
   );
 }

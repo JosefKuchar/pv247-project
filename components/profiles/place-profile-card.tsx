@@ -101,11 +101,7 @@ export const PlaceProfileCard = ({
 
           <Separator className="mb-6" />
 
-          <PlaceReviewsList
-            locationId={placeProfile.id}
-            reviewsCount={placeProfile.reviewsCount}
-            placeName={placeProfile.name}
-          />
+          <PlaceReviewsList locationId={placeProfile.id} />
         </CardContent>
       </Card>
     </div>
