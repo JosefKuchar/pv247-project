@@ -37,12 +37,12 @@ export const getReviewCommentsPaginated = async (
     offset: offset,
   });
 
-  const hasMore = commentsData.length > pageSize;
-  const comments = hasMore ? commentsData.slice(0, -1) : commentsData;
-
   if (!commentsData) {
     return null;
   }
+
+  const hasMore = commentsData.length > pageSize;
+  const comments = hasMore ? commentsData.slice(0, -1) : commentsData;
 
   return { comments, hasMore, nextPage: hasMore ? page + 1 : undefined };
 };
