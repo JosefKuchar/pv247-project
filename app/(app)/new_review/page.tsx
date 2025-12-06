@@ -1,3 +1,47 @@
+'use client';
+
+// import { createReview } from '@/app/actions/review/create-review';
+import { searchLocationsAction } from '@/app/actions/locations';
+import {
+  FormCombobox,
+  FormDropzone,
+  FormRating,
+  FormTextarea,
+} from '@/components/form';
+import { Button } from '@/components/ui/button';
+import { FormProvider, useForm } from 'react-hook-form';
+
 export default function Page() {
-  return <div>New Review Page</div>;
+  const methods = useForm();
+
+  return (
+    <div>
+      <FormProvider {...methods}>
+        <form
+          onSubmit={methods.handleSubmit(async () => {
+            const formData = new FormData();
+            formData.append('locationId', methods.getValues('locationId'));
+            formData.append('description', methods.getValues('description'));
+            formData.append('rating', methods.getValues('rating'));
+            formData.append('locationId', methods.getValues('location'));
+            // formData.append('photos', methods.getValues('photos'));
+            // await createReview(formData);
+          })}
+        >
+          <FormCombobox
+            name="location"
+            label="Location"
+            queryKey="locations"
+            fetchOptions={async (query: string) => {
+              return searchLocationsAction(query);
+            }}
+          />
+          <FormTextarea name="description" label="Description" />
+          <FormDropzone name="image" />
+          <FormRating name="rating" label="Rating" />
+          <Button type="submit">Submit</Button>
+        </form>
+      </FormProvider>
+    </div>
+  );
 }
