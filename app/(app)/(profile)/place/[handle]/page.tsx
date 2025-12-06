@@ -4,7 +4,7 @@ import {
   getLocationManagementStatus,
 } from '@/modules/location/server';
 import { notFound } from 'next/navigation';
-import { PlaceProfileCard } from '@/components/profiles/placeProfileCard';
+import { PlaceProfileCard } from '@/components/profiles/place-profile-card';
 
 export default async function Page({ params }: { params: { handle: string } }) {
   const wrappedParams = await Promise.resolve(params);

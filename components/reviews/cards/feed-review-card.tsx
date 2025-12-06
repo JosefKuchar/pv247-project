@@ -19,19 +19,35 @@ import {
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import { ReviewDataType } from '@/modules/review/server';
 import { useState } from 'react';
-import { ReviewCommentList } from '@/components/comment/reviewCommentsList';
+import { ReviewCommentList } from '@/components/comment/review-comments-list';
+import { toggleReviewLikeAction } from '@/app/actions/likes';
+import { useMutation } from '@tanstack/react-query';
 
 type ReviewCardProps = {
-  reviewData: ReviewDataType;
+  review: ReviewDataType;
 };
 
-export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
+export const FeedReviewCard = ({ review }: ReviewCardProps) => {
   const [showComments, setShowComments] = useState(false);
-  const [commentsCount, setCommentsCount] = useState(reviewData.commentsCount);
+  const [commentsCount, setCommentsCount] = useState(review.commentsCount);
+  const [likesCount, setLikesCount] = useState(review.likesCount);
+  const [liked, setLiked] = useState(review.liked);
 
   const toggleComments = () => {
     setShowComments(!showComments);
   };
+
+  const toggleLikeMutation = useMutation({
+    mutationFn: () => toggleReviewLikeAction(review.id, liked),
+    onSuccess: () => {
+      setLiked(!liked);
+      if (liked) {
+        setLikesCount(likesCount - 1);
+      } else {
+        setLikesCount(likesCount + 1);
+      }
+    },
+  });
 
   const callbackAddComment = () => {
     setCommentsCount(commentsCount + 1);
@@ -43,13 +59,13 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
       <CardHeader className="flex flex-col gap-4">
         <div>
           <a
-            href={`/${reviewData.user.handle}`}
+            href={`/${review.user.handle}`}
             className="flex items-center gap-2"
           >
-            {reviewData.user.image ? (
+            {review.user.image ? (
               <Image
-                src={reviewData.user.image}
-                alt={reviewData.user.name}
+                src={review.user.image}
+                alt={review.user.name}
                 width={40}
                 height={40}
                 className="rounded-full"
@@ -59,27 +75,27 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
               <div className="h-10 w-10 rounded-full bg-gray-300" />
             )}
             <h3 className="font-semibold">
-              {reviewData.user.name}
+              {review.user.name}
               <span className="font-normal text-gray-500">
-                @{reviewData.user.handle}
+                @{review.user.handle}
               </span>
             </h3>
           </a>
         </div>
         <div className="flex items-center justify-between">
           <a
-            href={`/place/${reviewData.location.handle}`}
+            href={`/place/${review.location.handle}`}
             className="flex items-center gap-2"
           >
-            <p className="font-semibold">{reviewData.location.name}</p>
-            <Rating value={reviewData.location.avgRating} readOnly>
+            <p className="font-semibold">{review.location.name}</p>
+            <Rating value={review.location.avgRating} readOnly>
               {Array.from({ length: 5 }).map((_, index) => (
                 <RatingButton size={12} key={index} />
               ))}
             </Rating>
           </a>
         </div>
-        <Rating value={reviewData.review.rating} readOnly className="gap-1">
+        <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
             <RatingButton
               className="-mt-2.5 h-3 w-5 text-yellow-500"
@@ -90,12 +106,11 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-gray-700">{reviewData.review.description}</p>
-
-        {reviewData.photos.length > 0 && (
+        <p className="text-sm text-gray-700">{review.description}</p>
+        {review.photos.length > 0 && (
           <Carousel className="relative flex items-center justify-center pt-4">
             <CarouselContent>
-              {reviewData.photos.map((photo, index) => (
+              {review.photos.map((photo, index) => (
                 <CarouselItem
                   key={index}
                   className="relative h-96 w-96 object-contain"
@@ -110,7 +125,7 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {reviewData.photos.length > 1 && (
+            {review.photos.length > 1 && (
               <>
                 <CarouselPrevious className="absolute top-1/2 left-2 z-1 -translate-y-1/2" />
                 <CarouselNext className="absolute top-1/2 right-2 z-1 -translate-y-1/2" />
@@ -123,7 +138,7 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
         {showComments && (
           <div className="w-full pb-4">
             <ReviewCommentList
-              review_id={reviewData.review.id}
+              review_id={review.id}
               callbackAddComment={callbackAddComment}
             />
           </div>
@@ -131,8 +146,16 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
         <div className="flex w-full justify-between">
           <div className="flex gap-4">
             <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
-              <Heart type="button" className="hover:cursor-pointer" />
-              <span className="ml-1">{reviewData.likesCount}</span>
+              {toggleLikeMutation.isPending ? (
+                <Heart className="animate-pulse hover:cursor-pointer" />
+              ) : (
+                <Heart
+                  type="button"
+                  className={`hover:cursor-pointer ${liked ? 'text-red-500' : ''}`}
+                  onClick={() => toggleLikeMutation.mutate()}
+                />
+              )}
+              <span className="ml-1">{likesCount}</span>
             </div>
             <div className="flex items-center transition duration-200 ease-in-out hover:text-blue-400">
               <MessageCircle
@@ -149,7 +172,7 @@ export const FeedReviewCard = ({ reviewData }: ReviewCardProps) => {
             className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
             onClick={() =>
               navigator.clipboard.writeText(
-                window.location.href + `review/${reviewData.review.id}`,
+                window.location.href + `review/${review.id}`,
               )
             }
           >

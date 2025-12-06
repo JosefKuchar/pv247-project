@@ -2,70 +2,26 @@
 
 import { db } from '@/db';
 import { eq, desc } from 'drizzle-orm';
-import { review } from '@/db/schema';
+import { review, reviewType, userType, locationType, user } from '@/db/schema';
+import { Linkedin } from 'lucide-react';
 
-import {
+export type ReviewDataType = Pick<
   reviewType,
-  userType,
-  locationType,
-  reviewPhotoType,
-} from '@/db/schema';
-
-export type ReviewDataType = {
-  review: reviewType;
+  'id' | 'userId' | 'description' | 'rating' | 'createdAt'
+> & {
   user: Pick<userType, 'name' | 'handle' | 'image'>;
   location: Pick<locationType, 'name' | 'handle'> & { avgRating: number };
-  photos: Pick<reviewPhotoType, 'url'>[];
+  photos: { url: string }[];
   likesCount: number;
   commentsCount: number;
+  ownReview: boolean;
+  liked: boolean;
 };
 
-export const getAllReviewCards = async () => {
-  const reviewsData = await db.query.review.findMany({
-    with: {
-      user: {
-        columns: { name: true, handle: true, image: true },
-      },
-      location: {
-        columns: { name: true, handle: true },
-        with: {
-          reviews: {
-            columns: { rating: true },
-          },
-        },
-      },
-      photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
-      comments: { columns: { id: true } },
-    },
-  });
-
-  if (!reviewsData) {
-    return null;
-  }
-
-  return reviewsData.map(r => {
-    const avgRating =
-      r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
-      (r.location.reviews.length || 1);
-
-    const { photos, user, location, likes, comments, ...rest } = r;
-
-    return {
-      review: {
-        ...rest,
-      },
-      user: user,
-      location: {
-        name: location.name,
-        avgRating,
-        handle: location.handle,
-      },
-      photos: photos,
-      likesCount: likes.length,
-      commentsCount: comments.length,
-    };
-  });
+export type ReviewsPageType = {
+  reviews: ReviewDataType[];
+  hasMore: boolean;
+  nextPage?: number;
 };
 
 export const getReviewCard = async (id: string) => {
@@ -84,7 +40,7 @@ export const getReviewCard = async (id: string) => {
         },
       },
       photos: { columns: { url: true } },
-      likes: { columns: { id: true } },
+      likes: { columns: { userId: true } },
       comments: { columns: { id: true } },
     },
   });
@@ -100,9 +56,7 @@ export const getReviewCard = async (id: string) => {
   const { photos, user, location, likes, comments, ...rest } = reviewData;
 
   return {
-    review: {
-      ...rest,
-    },
+    ...rest,
     user: user,
     location: {
       name: location.name,
@@ -112,18 +66,19 @@ export const getReviewCard = async (id: string) => {
     photos: photos,
     likesCount: likes.length,
     commentsCount: comments.length,
+    ownReview: false,
+    liked: false,
   };
 };
 
-export const getUserReviews = async (
+export const getReviewsPaginated = async (
   userId: string,
   page: number = 1,
   pageSize: number = 9,
 ) => {
   const offset = (page - 1) * pageSize;
 
-  const reviews = await db.query.review.findMany({
-    where: eq(review.userId, userId),
+  const reviewsData = await db.query.review.findMany({
     with: {
       user: {
         columns: { name: true, handle: true, image: true },
@@ -137,14 +92,23 @@ export const getUserReviews = async (
         },
       },
       photos: { columns: { url: true } },
+      likes: { columns: { userId: true } },
+      comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize,
+    limit: pageSize + 1,
     offset: offset,
   });
 
+  if (!reviewsData) {
+    return null;
+  }
+
+  const hasMore = reviewsData.length > pageSize;
+  const reviews = hasMore ? reviewsData.slice(0, -1) : reviewsData;
+
   const transformedReviews = reviews.map(r => {
-    const { location, user, ...rest } = r;
+    const { location, user, likes, comments, ...rest } = r;
 
     const avgRating =
       r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
@@ -158,25 +122,30 @@ export const getUserReviews = async (
         avgRating,
         handle: location.handle,
       },
+      likesCount: likes.length,
+      commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 
   return {
     reviews: transformedReviews,
-    hasMore: reviews.length === pageSize,
-    nextPage: reviews.length === pageSize ? page + 1 : null,
+    hasMore,
+    nextPage: hasMore ? page + 1 : undefined,
   };
 };
 
-export const getUserReviewsPaginated = async (
+export const getProfileReviewsPaginated = async (
   userId: string,
+  profileId: string,
   page: number = 1,
   pageSize: number = 10,
 ) => {
   const offset = (page - 1) * pageSize;
 
-  const reviews = await db.query.review.findMany({
-    where: eq(review.userId, userId),
+  const reviewsData = await db.query.review.findMany({
+    where: eq(review.userId, profileId),
     with: {
       user: {
         columns: { name: true, handle: true, image: true },
@@ -190,17 +159,23 @@ export const getUserReviewsPaginated = async (
         },
       },
       photos: { columns: { url: true } },
+      likes: { columns: { userId: true } },
+      comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize + 1, // +1 to check if there are more
+    limit: pageSize + 1,
     offset: offset,
   });
 
-  const hasMore = reviews.length > pageSize;
-  const items = hasMore ? reviews.slice(0, -1) : reviews;
+  if (!reviewsData) {
+    return null;
+  }
 
-  const transformedReviews = items.map(r => {
-    const { location, user, ...rest } = r;
+  const hasMore = reviewsData.length > pageSize;
+  const reviews = hasMore ? reviewsData.slice(0, -1) : reviewsData;
+
+  const transformedReviews = reviews.map(r => {
+    const { location, user, likes, comments, ...rest } = r;
 
     const avgRating =
       r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
@@ -214,24 +189,29 @@ export const getUserReviewsPaginated = async (
         avgRating,
         handle: location.handle,
       },
+      likesCount: likes.length,
+      commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 
   return {
-    items: transformedReviews,
+    reviews: transformedReviews,
     hasMore,
-    nextPage: hasMore ? page + 1 : null,
+    nextPage: hasMore ? page + 1 : undefined,
   };
 };
 
 export const getLocationReviewsPaginated = async (
+  userId: string,
   locationId: string,
   page: number = 1,
   pageSize: number = 10,
 ) => {
   const offset = (page - 1) * pageSize;
 
-  const reviews = await db.query.review.findMany({
+  const reviewsData = await db.query.review.findMany({
     where: eq(review.locationId, locationId),
     with: {
       user: {
@@ -246,17 +226,23 @@ export const getLocationReviewsPaginated = async (
         },
       },
       photos: { columns: { url: true } },
+      likes: { columns: { userId: true } },
+      comments: { columns: { id: true } },
     },
     orderBy: desc(review.createdAt),
-    limit: pageSize + 1, // +1 to check if there are more
+    limit: pageSize + 1,
     offset: offset,
   });
 
-  const hasMore = reviews.length > pageSize;
-  const items = hasMore ? reviews.slice(0, -1) : reviews;
+  if (!reviewsData) {
+    return null;
+  }
 
-  const transformedReviews = items.map(r => {
-    const { location, user, ...rest } = r;
+  const hasMore = reviewsData.length > pageSize;
+  const reviews = hasMore ? reviewsData.slice(0, -1) : reviewsData;
+
+  const transformedReviews = reviews.map(r => {
+    const { location, user, likes, comments, ...rest } = r;
 
     const avgRating =
       r.location.reviews.reduce((sum, rev) => sum + rev.rating, 0) /
@@ -270,12 +256,16 @@ export const getLocationReviewsPaginated = async (
         avgRating,
         handle: location.handle,
       },
+      likesCount: likes.length,
+      commentsCount: comments.length,
+      ownReview: r.userId === userId,
+      liked: likes.some(like => like.userId === userId),
     };
   });
 
   return {
-    items: transformedReviews,
+    reviews: transformedReviews,
     hasMore,
-    nextPage: hasMore ? page + 1 : null,
+    nextPage: hasMore ? page + 1 : undefined,
   };
 };
