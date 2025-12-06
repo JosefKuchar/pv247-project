@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDebounce } from './use-debounce';
+import { useQuery } from '@tanstack/react-query';
+import { useDebouncedValue } from '@tanstack/react-pacer/debouncer';
 
 interface Location {
   id: string;
@@ -22,38 +22,30 @@ interface SearchResponse {
   users: User[];
 }
 
+const fetchSearchResults = async (query: string): Promise<SearchResponse> => {
+  if (!query.trim()) {
+    return { locations: [], users: [] };
+  }
+
+  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  if (!response.ok) {
+    throw new Error('Search failed');
+  }
+  return response.json();
+};
+
 export function useSearch(query: string) {
-  const [results, setResults] = useState<SearchResponse>({
-    locations: [],
-    users: [],
+  const [debouncedQuery] = useDebouncedValue(query, { wait: 300 });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['search', debouncedQuery],
+    queryFn: () => fetchSearchResults(debouncedQuery),
+    staleTime: 1000 * 60 * 5,
+    placeholderData: { locations: [], users: [] },
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const debouncedQuery = useDebounce(query, 300);
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!debouncedQuery.trim()) {
-        setResults({ locations: [], users: [] });
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/search?q=${encodeURIComponent(debouncedQuery)}`,
-        );
-        const data = await response.json();
-        setResults(data);
-      } catch (error) {
-        console.error('Search error:', error);
-        setResults({ locations: [], users: [] });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [debouncedQuery]);
-
-  return { results, isLoading };
+  return {
+    results: data ?? { locations: [], users: [] },
+    isLoading,
+  };
 }
