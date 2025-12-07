@@ -11,6 +11,7 @@ import { PlaceProfileOptions } from '@/components/profiles/place-profile-options
 type PlaceProfile = typeof location.$inferSelect & {
   reviewsCount: number;
   avgRating: number;
+  followersCount: number;
   isFollowing: boolean;
 };
 
@@ -65,13 +66,21 @@ export const PlaceProfileCard = ({
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 text-center sm:gap-6">
+          <div className="grid grid-cols-3 gap-4 text-center sm:gap-6">
             <div>
               <div className="text-xl font-bold sm:text-2xl">
                 {placeProfile.reviewsCount}
               </div>
               <div className="text-muted-foreground text-xs sm:text-sm">
                 reviews
+              </div>
+            </div>
+            <div>
+              <div className="text-xl font-bold sm:text-2xl">
+                {placeProfile.followersCount}
+              </div>
+              <div className="text-muted-foreground text-xs sm:text-sm">
+                followers
               </div>
             </div>
             <div className="flex flex-col items-center">

@@ -1,19 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import { ProfileOptionsDropdown } from '@/components/ui/profile-options-dropdown';
+import { EditPlaceDialog } from '@/components/profiles/edit-place-dialog';
+import type { locationType } from '@/db/schema';
 
 type PlaceProfileOptionsProps = {
   isManager: boolean;
+  currentPlace: locationType;
   className?: string;
 };
 
 export const PlaceProfileOptions = ({
   isManager,
+  currentPlace,
   className,
 }: PlaceProfileOptionsProps) => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   const handleEditPlace = () => {
-    // TODO: Implement edit place functionality
-    console.log('Edit place clicked');
+    setIsEditDialogOpen(true);
   };
 
   const handleUnclaimPlace = () => {
