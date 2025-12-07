@@ -33,21 +33,37 @@ async function main() {
     console.log('Creating admin account with password...');
     const { auth: betterAuth } = await import('../../lib/auth');
 
+    const adminName = process.env.ADMIN_NAME;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminHandle = process.env.ADMIN_HANDLE;
+
+    if (!adminEmail || !adminPassword || !adminHandle || !adminName) {
+      throw new Error('Admin credentials not configured.');
+    }
+
     try {
       await betterAuth.api.signUpEmail({
         body: {
-          name: 'Admin profile',
-          email: 'admin@locagram.test',
-          password: 'admin12345678',
+          name: adminName,
+          email: adminEmail,
+          password: adminPassword,
           image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-          handle: 'admin',
+          handle: adminHandle,
           isAdmin: true,
         },
       });
       console.log('Admin account created');
-      console.log('Email: admin@locagram.test');
-      console.log('Password: admin12345678');
-      console.log('Handle: admin');
+
+      // Only log credentials in development
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Name: ${adminName}`);
+        console.log(`Email: ${adminEmail}`);
+        console.log(`Password: ${adminPassword}`);
+        console.log(`Handle: ${adminHandle}`);
+      } else {
+        console.log('Admin credentials set from environment variables');
+      }
     } catch (error) {
       console.error('Failed to create admin account:', error);
       throw error;
@@ -57,7 +73,7 @@ async function main() {
     const adminUsers = await db
       .select()
       .from(user)
-      .where(eqOperator(user.email, 'admin@locagram.test'))
+      .where(eqOperator(user.email, adminEmail))
       .limit(1);
 
     if (adminUsers.length === 0) {
