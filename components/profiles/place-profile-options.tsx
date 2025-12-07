@@ -57,10 +57,17 @@ export const PlaceProfileOptions = ({
   };
 
   return (
-    <ProfileOptionsDropdown
-      isOwner={isManager}
-      options={getOptions()}
-      className={className}
-    />
+    <>
+      <ProfileOptionsDropdown
+        isOwner={isManager}
+        options={getOptions()}
+        className={className}
+      />
+      <EditPlaceDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        currentPlace={currentPlace}
+      />
+    </>
   );
 };

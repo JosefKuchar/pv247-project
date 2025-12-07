@@ -42,7 +42,7 @@ export const PlaceProfileCard = ({
                 {placeProfile.name}
               </h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
-              {placeProfile.description.trim() && (
+              {placeProfile.description && placeProfile.description.trim() && (
                 <p className="mt-2 text-sm text-gray-700">
                   {placeProfile.description}
                 </p>
@@ -61,7 +61,10 @@ export const PlaceProfileCard = ({
                 targetHandle={placeProfile.handle}
                 isFollowing={placeProfile.isFollowing}
               />
-              <PlaceProfileOptions isManager={isManager} />
+              <PlaceProfileOptions
+                isManager={isManager}
+                currentPlace={placeProfile}
+              />
             </div>
           </div>
 
