@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { locationManagement, location, user } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { withAdminAuth } from '@/lib/server-actions';
 
 export async function getPendingClaims() {
   const claims = await db
@@ -29,26 +30,30 @@ export async function getPendingClaims() {
   return claims;
 }
 
-export async function approveClaim(claimId: string) {
-  await db
-    .update(locationManagement)
-    .set({ approved: true })
-    .where(eq(locationManagement.id, claimId));
+export const approveClaim = withAdminAuth(
+  async (_userId: string, claimId: string) => {
+    await db
+      .update(locationManagement)
+      .set({ approved: true })
+      .where(eq(locationManagement.id, claimId));
 
-  revalidatePath('/admin/claims');
-  return { success: true };
-}
+    revalidatePath('/admin/claims');
+    return { success: true };
+  },
+);
 
-export async function rejectClaim(claimId: string) {
-  await db
-    .delete(locationManagement)
-    .where(
-      and(
-        eq(locationManagement.id, claimId),
-        eq(locationManagement.approved, false),
-      ),
-    );
+export const rejectClaim = withAdminAuth(
+  async (_userId: string, claimId: string) => {
+    await db
+      .delete(locationManagement)
+      .where(
+        and(
+          eq(locationManagement.id, claimId),
+          eq(locationManagement.approved, false),
+        ),
+      );
 
-  revalidatePath('/admin/claims');
-  return { success: true };
-}
+    revalidatePath('/admin/claims');
+    return { success: true };
+  },
+);
