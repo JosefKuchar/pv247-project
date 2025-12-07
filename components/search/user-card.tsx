@@ -1,15 +1,11 @@
-import { User } from 'lucide-react';
+import { User as UserIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import Link from 'next/link';
+import type { User } from './search-results';
 
 interface UserCardProps {
-  user: {
-    id: string;
-    name: string;
-    handle: string;
-    image: string | null;
-  };
+  user: User;
   onClick?: () => void;
 }
 
@@ -27,7 +23,7 @@ export function UserCard({ user, onClick }: UserCardProps) {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-100">
-                <User className="h-5 w-5 text-blue-600" />
+                <UserIcon className="h-5 w-5 text-blue-600" />
               </div>
             )}
           </Avatar>

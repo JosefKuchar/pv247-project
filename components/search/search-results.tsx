@@ -3,7 +3,7 @@
 import { LocationCard } from './location-card';
 import { UserCard } from './user-card';
 
-interface Location {
+export interface Location {
   id: string;
   name: string;
   handle: string;
@@ -12,7 +12,7 @@ interface Location {
   longitude: number;
 }
 
-interface User {
+export interface User {
   id: string;
   name: string;
   handle: string;

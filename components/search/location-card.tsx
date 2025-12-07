@@ -1,14 +1,10 @@
 import { MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import type { Location } from './search-results';
 
 interface LocationCardProps {
-  location: {
-    id: string;
-    name: string;
-    handle: string;
-    address: string | null;
-  };
+  location: Pick<Location, 'id' | 'name' | 'handle' | 'address'>;
   onClick?: () => void;
 }
 
