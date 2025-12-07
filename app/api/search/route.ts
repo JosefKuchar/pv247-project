@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ locations: [], users: [] });
   }
 
-  const searchTerm = `%${query.toLowerCase()}%`;
+  const escapedQuery = query.toLowerCase().replace(/[%_]/g, '\\$&');
+
+  const searchTerm = `%${escapedQuery}%`;
 
   const locations = await db
     .select({

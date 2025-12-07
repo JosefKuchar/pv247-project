@@ -40,6 +40,7 @@ export function useSearch(query: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['search', debouncedQuery],
     queryFn: () => fetchSearchResults(debouncedQuery),
+    enabled: debouncedQuery.trim().length > 0,
     staleTime: 1000 * 60 * 5,
     placeholderData: { locations: [], users: [] },
   });
