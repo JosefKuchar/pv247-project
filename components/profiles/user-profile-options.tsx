@@ -1,23 +1,28 @@
 'use client';
 
+import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { ProfileOptionsDropdown } from '@/components/ui/profile-options-dropdown';
+import { EditProfileDialog } from '@/components/profiles/edit-profile-dialog';
+import type { userType } from '@/db/schema';
 
 type UserProfileOptionsProps = {
   isOwnProfile: boolean;
+  currentUser: userType;
   className?: string;
 };
 
 export const UserProfileOptions = ({
   isOwnProfile,
+  currentUser,
   className,
 }: UserProfileOptionsProps) => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleEditProfile = () => {
-    // TODO: Implement edit profile functionality
-    console.log('Edit profile clicked');
+    setIsEditDialogOpen(true);
   };
 
   const handleLogout = async () => {
@@ -50,10 +55,17 @@ export const UserProfileOptions = ({
   };
 
   return (
-    <ProfileOptionsDropdown
-      isOwner={isOwnProfile}
-      options={getOptions()}
-      className={className}
-    />
+    <>
+      <ProfileOptionsDropdown
+        isOwner={isOwnProfile}
+        options={getOptions()}
+        className={className}
+      />
+      <EditProfileDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        currentUser={currentUser}
+      />
+    </>
   );
 };

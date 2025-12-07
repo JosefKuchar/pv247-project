@@ -58,7 +58,10 @@ export const UserProfileCard = ({
                 isFollowing={userProfile.isFollowing}
                 isOwnProfile={isOwnProfile}
               />
-              <UserProfileOptions isOwnProfile={isOwnProfile} />
+              <UserProfileOptions
+                isOwnProfile={isOwnProfile}
+                currentUser={userProfile}
+              />
             </div>
           </div>
 
