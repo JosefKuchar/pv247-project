@@ -17,8 +17,9 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   try {
-    // Clear existing data (in reverse order of dependencies)
     console.log('Clearing existing data...');
+    const { account: accountTable } = await import('../schema');
+    await db.delete(accountTable);
     await db.delete(locationManagement);
     await db.delete(userLocationFollow);
     await db.delete(follow);
@@ -29,9 +30,44 @@ async function main() {
     await db.delete(location);
     await db.delete(user);
 
-    // Create users
-    console.log('Creating users...');
-    const users = [
+    console.log('Creating admin account with password...');
+    const { auth: betterAuth } = await import('../../lib/auth');
+
+    try {
+      await betterAuth.api.signUpEmail({
+        body: {
+          name: 'Admin profile',
+          email: 'admin@locagram.test',
+          password: 'admin12345678',
+          image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+          handle: 'admin',
+          isAdmin: true,
+        },
+      });
+      console.log('Admin account created');
+      console.log('Email: admin@locagram.test');
+      console.log('Password: admin12345678');
+      console.log('Handle: admin');
+    } catch (error) {
+      console.error('Failed to create admin account:', error);
+      throw error;
+    }
+
+    const { eq: eqOperator } = await import('drizzle-orm');
+    const adminUsers = await db
+      .select()
+      .from(user)
+      .where(eqOperator(user.email, 'admin@locagram.test'))
+      .limit(1);
+
+    if (adminUsers.length === 0) {
+      throw new Error('Admin user was not created');
+    }
+
+    const admin = adminUsers[0];
+
+    console.log('Creating other users...');
+    const otherUsers = [
       {
         id: randomUUID(),
         name: 'Alice Johnson',
@@ -82,8 +118,8 @@ async function main() {
       },
     ];
 
-    await db.insert(user).values(users);
-    const [alice, bob, charlie, diana, eve, frank] = users;
+    await db.insert(user).values(otherUsers);
+    const [alice, bob, charlie, diana, eve, frank] = otherUsers;
 
     // Create locations
     console.log('Creating locations...');
@@ -369,7 +405,7 @@ async function main() {
     ]);
 
     console.log('✅ Seeding completed successfully!');
-    console.log(`   - ${users.length} users created`);
+    console.log(`   - 7 users created (including admin)`);
     console.log(`   - ${locations.length} locations created`);
     console.log(`   - ${reviews.length} reviews created`);
     console.log(`   - 6 review photos created`);
