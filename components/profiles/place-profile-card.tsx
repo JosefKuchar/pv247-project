@@ -41,6 +41,11 @@ export const PlaceProfileCard = ({
                 {placeProfile.name}
               </h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
+              {placeProfile.description.trim() && (
+                <p className="mt-2 text-sm text-gray-700">
+                  {placeProfile.description}
+                </p>
+              )}
               {placeProfile.address && (
                 <div className="text-muted-foreground mt-2 flex items-center justify-center gap-1 sm:justify-start">
                   <MapPin className="h-4 w-4" />

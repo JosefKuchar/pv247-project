@@ -12,6 +12,7 @@ export const user = sqliteTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   handle: text('handle').notNull().unique(),
+  description: text('description', { length: 500 }).notNull().default(''),
   emailVerified: integer('email_verified', { mode: 'boolean' })
     .default(false)
     .notNull(),
