@@ -1,4 +1,4 @@
-import { getPendingClaims } from './actions';
+import { getPendingClaims } from '@/app/actions/admin';
 import { ClaimsTable } from '@/components/admin/claims-table';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
