@@ -12,6 +12,7 @@ type ProfileOption = {
   label: string;
   onClick: () => void;
   variant?: 'default' | 'destructive';
+  disabled?: boolean;
 };
 
 type ProfileOptionsDropdownProps = {
@@ -46,6 +47,7 @@ export const ProfileOptionsDropdown = ({
               key={index}
               onClick={option.onClick}
               variant={option.variant}
+              disabled={option.disabled}
             >
               {option.label}
             </DropdownMenuItem>

@@ -12,12 +12,14 @@ import { useRouter } from 'next/navigation';
 type PlaceProfileOptionsProps = {
   isManager: boolean;
   currentPlace: locationType;
+  hasPendingClaim?: boolean;
   className?: string;
 };
 
 export const PlaceProfileOptions = ({
   isManager,
   currentPlace,
+  hasPendingClaim = false,
   className,
 }: PlaceProfileOptionsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -85,7 +87,17 @@ export const PlaceProfileOptions = ({
       ];
     }
 
-    // For non-managers, show claim option
+    if (hasPendingClaim) {
+      return [
+        {
+          label: 'Claim request already sent',
+          onClick: () => {},
+          variant: 'default' as const,
+          disabled: true,
+        },
+      ];
+    }
+
     return [
       {
         label: 'Claim place',

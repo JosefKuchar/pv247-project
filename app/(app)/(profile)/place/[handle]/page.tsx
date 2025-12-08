@@ -27,6 +27,7 @@ export default async function Page({ params }: { params: { handle: string } }) {
           isFollowing: followStatus.isFollowing,
         }}
         isManager={managementStatus.isManager}
+        hasPendingClaim={managementStatus.hasPendingClaim}
       />
     </div>
   );

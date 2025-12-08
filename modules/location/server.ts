@@ -82,7 +82,7 @@ export const getLocationManagementStatus = async (locationHandle: string) => {
 
   // If not authenticated, return false
   if (!session?.user?.id) {
-    return { isManager: false };
+    return { isManager: false, hasPendingClaim: false };
   }
 
   // Get location by handle
@@ -92,19 +92,26 @@ export const getLocationManagementStatus = async (locationHandle: string) => {
 
   // If location doesn't exist, return false
   if (!targetLocation) {
-    return { isManager: false };
+    return { isManager: false, hasPendingClaim: false };
   }
 
   const existingManagement = await db.query.locationManagement.findFirst({
     where: and(
       eq(locationManagement.userId, session.user.id),
       eq(locationManagement.locationId, targetLocation.id),
-      eq(locationManagement.approved, true),
     ),
   });
 
+  const isManager = !!(
+    existingManagement && existingManagement.approved
+  );
+  const hasPendingClaim = !!(
+    existingManagement && !existingManagement.approved
+  );
+
   return {
-    isManager: !!existingManagement,
+    isManager,
+    hasPendingClaim,
   };
 };
 

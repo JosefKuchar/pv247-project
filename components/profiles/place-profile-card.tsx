@@ -18,11 +18,13 @@ type PlaceProfile = typeof location.$inferSelect & {
 type PlaceProfileCardProps = {
   placeProfile: PlaceProfile;
   isManager?: boolean;
+  hasPendingClaim?: boolean;
 };
 
 export const PlaceProfileCard = ({
   placeProfile,
   isManager = false,
+  hasPendingClaim = false,
 }: PlaceProfileCardProps) => {
   return (
     <div className="space-y-6">
@@ -64,6 +66,7 @@ export const PlaceProfileCard = ({
               <PlaceProfileOptions
                 isManager={isManager}
                 currentPlace={placeProfile}
+                hasPendingClaim={hasPendingClaim}
               />
             </div>
           </div>
