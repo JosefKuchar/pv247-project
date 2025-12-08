@@ -15,6 +15,7 @@ export const useRegisterMutation = () => {
         email: data.email,
         password: data.password,
         image: data.image,
+        isAdmin: false,
         // callbackURL doesn't work for client-side email signups
       });
 

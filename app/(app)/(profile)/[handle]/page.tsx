@@ -6,7 +6,6 @@ import { headers } from 'next/headers';
 export default async function Page({ params }: { params: { handle: string } }) {
   const wrappedParams = await Promise.resolve(params);
 
-  // Get current session to determine if viewing own profile
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -21,12 +20,14 @@ export default async function Page({ params }: { params: { handle: string } }) {
   }
 
   const isOwnProfile = session?.user?.handle === userProfile.handle;
+  const isAdmin = session?.user?.isAdmin ?? false;
 
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6">
       <UserProfileCard
         userProfile={{ ...userProfile, isFollowing: followStatus.isFollowing }}
         isOwnProfile={isOwnProfile}
+        isAdmin={isAdmin}
       />
     </div>
   );
