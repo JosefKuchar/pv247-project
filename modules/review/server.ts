@@ -1,13 +1,15 @@
 'server only';
 
 import { db } from '@/db';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, or, inArray, sql } from 'drizzle-orm';
 import {
   review,
   reviewPhoto,
   reviewType,
   userType,
   locationType,
+  follow,
+  userLocationFollow,
 } from '@/db/schema';
 import { v7 as uuidv7 } from 'uuid';
 
@@ -84,27 +86,89 @@ export const getReviewsPaginated = async (
 ) => {
   const offset = (page - 1) * pageSize;
 
-  const reviewsData = await db.query.review.findMany({
-    with: {
-      user: {
-        columns: { name: true, handle: true, image: true },
-      },
-      location: {
-        columns: { name: true, handle: true },
-        with: {
-          reviews: {
-            columns: { rating: true },
+  // Get IDs of users that current user follows
+  const followedUsers = await db.query.follow.findMany({
+    where: eq(follow.followerId, userId),
+    columns: { followingId: true },
+  });
+  const followedUserIds = followedUsers.map(f => f.followingId);
+
+  // Get IDs of locations that current user follows
+  const followedLocations = await db.query.userLocationFollow.findMany({
+    where: eq(userLocationFollow.userId, userId),
+    columns: { locationId: true },
+  });
+  const followedLocationIds = followedLocations.map(f => f.locationId);
+
+  // Build a query that prioritizes followed content
+  // Priority: 0 = followed user or location, 1 = other
+  const hasFollowedContent =
+    followedUserIds.length > 0 || followedLocationIds.length > 0;
+
+  let reviewsData;
+
+  if (hasFollowedContent) {
+    // Build condition for followed content
+    const followedConditions = [];
+    if (followedUserIds.length > 0) {
+      followedConditions.push(inArray(review.userId, followedUserIds));
+    }
+    if (followedLocationIds.length > 0) {
+      followedConditions.push(inArray(review.locationId, followedLocationIds));
+    }
+
+    const followedCondition = or(...followedConditions);
+
+    // Use raw SQL for priority sorting
+    reviewsData = await db.query.review.findMany({
+      with: {
+        user: {
+          columns: { name: true, handle: true, image: true },
+        },
+        location: {
+          columns: { name: true, handle: true },
+          with: {
+            reviews: {
+              columns: { rating: true },
+            },
           },
         },
+        photos: { columns: { url: true } },
+        likes: { columns: { userId: true } },
+        comments: { columns: { id: true } },
       },
-      photos: { columns: { url: true } },
-      likes: { columns: { userId: true } },
-      comments: { columns: { id: true } },
-    },
-    orderBy: desc(review.createdAt),
-    limit: pageSize + 1,
-    offset: offset,
-  });
+      orderBy: [
+        // Priority: followed content first (0), then others (1)
+        sql`CASE WHEN ${followedCondition} THEN 0 ELSE 1 END ASC`,
+        desc(review.createdAt),
+      ],
+      limit: pageSize + 1,
+      offset: offset,
+    });
+  } else {
+    // No followed content, just sort by date
+    reviewsData = await db.query.review.findMany({
+      with: {
+        user: {
+          columns: { name: true, handle: true, image: true },
+        },
+        location: {
+          columns: { name: true, handle: true },
+          with: {
+            reviews: {
+              columns: { rating: true },
+            },
+          },
+        },
+        photos: { columns: { url: true } },
+        likes: { columns: { userId: true } },
+        comments: { columns: { id: true } },
+      },
+      orderBy: desc(review.createdAt),
+      limit: pageSize + 1,
+      offset: offset,
+    });
+  }
 
   if (!reviewsData) {
     return null;
