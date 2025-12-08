@@ -2,7 +2,7 @@
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
-import { ChangeEventHandler, FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,15 +46,7 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
         render={({ field: { onChange, value } }) => (
           <Dropzone
             multiple={multiple}
-            onChange={e => {
-              if (multiple) {
-                // Convert FileList to array
-                const filesArray = Array.from(e.target.files || []);
-                onChange(filesArray.length > 0 ? filesArray : []);
-              } else {
-                onChange(e.target.files?.[0] ?? null);
-              }
-            }}
+            onChange={onChange}
             value={value}
             accept={accept}
             maxSize={maxSize}
@@ -66,7 +58,7 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
         )}
         name={name}
         control={control}
-        defaultValue={null}
+        defaultValue={multiple ? [] : null}
       />
       {error && (
         <p
@@ -84,7 +76,7 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
 
 const Dropzone: FC<{
   multiple?: boolean;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: (value: File[] | File | null) => void;
   value?: File | File[] | null;
   accept?: Record<string, string[]>;
   maxSize?: number;
@@ -126,23 +118,13 @@ const Dropzone: FC<{
         // Append new files to existing ones
         const newFiles = [...files, ...acceptedFiles];
         setFiles(newFiles);
-        // Create a synthetic event for onChange
-        const dataTransfer = new DataTransfer();
-        newFiles.forEach((file) => dataTransfer.items.add(file));
-        const syntheticEvent = {
-          target: { files: dataTransfer.files },
-        } as React.ChangeEvent<HTMLInputElement>;
-        onChange?.(syntheticEvent);
+        // Call onChange directly with the array
+        onChange?.(newFiles);
       } else {
         // Single file mode - replace
-        const newFiles = acceptedFiles.slice(0, 1);
-        setFiles(newFiles);
-        const dataTransfer = new DataTransfer();
-        newFiles.forEach((file) => dataTransfer.items.add(file));
-        const syntheticEvent = {
-          target: { files: dataTransfer.files },
-        } as React.ChangeEvent<HTMLInputElement>;
-        onChange?.(syntheticEvent);
+        const newFile = acceptedFiles[0] || null;
+        setFiles(newFile ? [newFile] : []);
+        onChange?.(newFile);
       }
     },
     ...rest,
@@ -152,19 +134,12 @@ const Dropzone: FC<{
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
     
-    if (newFiles.length === 0) {
-      // If no files remain, pass null for single mode or empty array for multiple
-      const syntheticEvent = {
-        target: { files: new FileList() },
-      } as React.ChangeEvent<HTMLInputElement>;
-      onChange?.(syntheticEvent);
+    if (multiple) {
+      // For multiple mode, pass array (empty if no files)
+      onChange?.(newFiles.length > 0 ? newFiles : []);
     } else {
-      const dataTransfer = new DataTransfer();
-      newFiles.forEach((file) => dataTransfer.items.add(file));
-      const syntheticEvent = {
-        target: { files: dataTransfer.files },
-      } as React.ChangeEvent<HTMLInputElement>;
-      onChange?.(syntheticEvent);
+      // For single mode, pass null if no files
+      onChange?.(newFiles.length > 0 ? newFiles[0] : null);
     }
   };
 
@@ -182,7 +157,7 @@ const Dropzone: FC<{
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
       >
-        <input {...getInputProps({ onChange })} />
+        <input {...getInputProps()} />
         <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
           <Upload
             className={cn(
