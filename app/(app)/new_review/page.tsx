@@ -27,9 +27,21 @@ export default function Page() {
             formData.append('description', methods.getValues('description'));
             formData.append('rating', methods.getValues('rating'));
             formData.append('locationId', methods.getValues('location'));
-            // formData.append('photos', methods.getValues('photos'));
+
+            // Handle multiple photos
+            const photos = methods.getValues('image');
+            if (photos) {
+              const photoArray = Array.isArray(photos) ? photos : [photos];
+              photoArray.forEach(photo => {
+                if (photo instanceof File) {
+                  formData.append('photos', photo);
+                }
+              });
+            }
+
             await createReview(formData);
           })}
+          className="space-y-4"
         >
           <FormCombobox
             name="location"
@@ -45,7 +57,12 @@ export default function Page() {
             createLabel="Create new location"
           />
           <FormTextarea name="description" label="Description" />
-          <FormDropzone name="image" />
+          <FormDropzone
+            name="image"
+            label="Photos"
+            multiple={true}
+            accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
+          />
           <FormRating name="rating" label="Rating" />
           <Button type="submit">Submit</Button>
         </form>
