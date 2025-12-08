@@ -7,10 +7,11 @@ import {
   userLocationFollow,
   locationManagement,
 } from '@/db/schema';
-import { eq, avg, count, and } from 'drizzle-orm';
+import { eq, avg, count, and, like, or, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { randomUUID } from 'crypto';
+import { slugify } from '@/lib/utils';
 
 export const getLocationProfile = async (handle: string) => {
   const locationData = await db.query.location.findFirst({
@@ -137,4 +138,94 @@ export async function deleteLocationFollow(userId: string, locationId: string) {
         eq(userLocationFollow.locationId, locationId),
       ),
     );
+}
+
+export type LocationSearchResult = {
+  value: string;
+  label: string;
+};
+
+/**
+ * Search locations by name or address for combobox
+ * @param query - Search query string
+ * @param limit - Maximum number of results (default: 20)
+ * @returns Array of locations matching the search query
+ */
+export async function searchLocations(
+  query: string,
+  limit: number = 20,
+): Promise<LocationSearchResult[]> {
+  const searchPattern = `%${query}%`;
+
+  const results = await db
+    .select({
+      id: location.id,
+      name: location.name,
+      address: location.address,
+    })
+    .from(location)
+    .where(
+      or(
+        like(sql`LOWER(${location.name})`, sql`LOWER(${searchPattern})`),
+        like(sql`LOWER(${location.address})`, sql`LOWER(${searchPattern})`),
+      ),
+    )
+    .limit(limit);
+
+  return results.map(loc => ({
+    value: loc.id,
+    label: loc.address ? `${loc.name} - ${loc.address}` : loc.name,
+  }));
+}
+
+/**
+ * Create a new location
+ * @param name - Location name
+ * @param address - Location address (optional)
+ * @param latitude - Latitude coordinate (default: 0)
+ * @param longitude - Longitude coordinate (default: 0)
+ * @returns Created location or null if creation failed
+ */
+export async function createLocation(
+  name: string,
+  address?: string | null,
+  latitude: number = 0,
+  longitude: number = 0,
+) {
+  if (!name || name.trim().length === 0) {
+    throw new Error('Location name is required');
+  }
+
+  // Generate handle from name
+  const baseHandle = slugify(name);
+  let handle = baseHandle;
+  let counter = 1;
+
+  // Ensure handle is unique
+  while (true) {
+    const existing = await db.query.location.findFirst({
+      where: eq(location.handle, handle),
+    });
+
+    if (!existing) {
+      break;
+    }
+
+    handle = `${baseHandle}-${counter}`;
+    counter++;
+  }
+
+  const newLocation = await db
+    .insert(location)
+    .values({
+      id: randomUUID(),
+      name: name.trim(),
+      handle,
+      address: address?.trim() || null,
+      latitude,
+      longitude,
+    })
+    .returning();
+
+  return newLocation[0];
 }

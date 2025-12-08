@@ -2,8 +2,16 @@
 
 import { db } from '@/db';
 import { eq, desc } from 'drizzle-orm';
-import { review, reviewType, userType, locationType, user } from '@/db/schema';
-import { Linkedin } from 'lucide-react';
+import {
+  review,
+  reviewPhoto,
+  reviewType,
+  userType,
+  locationType,
+} from '@/db/schema';
+import { v7 as uuidv7 } from 'uuid';
+import { join } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
 
 export type ReviewDataType = Pick<
   reviewType,
@@ -267,5 +275,72 @@ export const getLocationReviewsPaginated = async (
     reviews: transformedReviews,
     hasMore,
     nextPage: hasMore ? page + 1 : undefined,
+  };
+};
+
+export const createReviewWithPhotos = async (
+  userId: string,
+  locationId: string,
+  description: string,
+  rating: number,
+  photos?: File[],
+) => {
+  // Verify location exists
+  const locationExists = await db.query.location.findFirst({
+    where: (location, { eq }) => eq(location.id, locationId),
+  });
+
+  if (!locationExists) {
+    throw new Error('Location not found');
+  }
+
+  // Create review
+  const reviewId = uuidv7();
+  await db.insert(review).values({
+    id: reviewId,
+    userId,
+    locationId,
+    description,
+    rating,
+  });
+
+  // Handle file uploads if provided
+  const photoUrls: string[] = [];
+  if (photos && photos.length > 0) {
+    // Ensure uploads directory exists
+    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'reviews');
+    await mkdir(uploadsDir, { recursive: true });
+
+    // Process each uploaded photo
+    for (const photo of photos) {
+      const fileExtension = photo.name.split('.').pop() || 'jpg';
+      const fileName = `${uuidv7()}.${fileExtension}`;
+      const filePath = join(uploadsDir, fileName);
+
+      // Convert File to Buffer and save
+      const bytes = await photo.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      await writeFile(filePath, buffer);
+
+      // Generate URL for the saved file
+      const photoUrl = `/uploads/reviews/${fileName}`;
+      photoUrls.push(photoUrl);
+    }
+
+    // Create review photos records
+    if (photoUrls.length > 0) {
+      const photoRecords = photoUrls.map(url => ({
+        id: uuidv7(),
+        reviewId,
+        url,
+      }));
+
+      await db.insert(reviewPhoto).values(photoRecords);
+    }
+  }
+
+  return {
+    success: true,
+    reviewId,
   };
 };
