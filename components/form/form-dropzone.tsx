@@ -2,7 +2,7 @@
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef, startTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -99,14 +99,34 @@ const Dropzone: FC<{
     return Array.isArray(value) ? value : [value];
   });
 
+  const prevValueRef = useRef(value);
+
   // Sync local state with form value
   useEffect(() => {
-    if (!value) {
-      setFiles([]);
-    } else {
-      const newFiles = Array.isArray(value) ? value : [value];
-      setFiles(newFiles);
+    // Only update if value actually changed
+    if (prevValueRef.current === value) {
+      return;
     }
+
+    prevValueRef.current = value;
+
+    startTransition(() => {
+      if (!value) {
+        setFiles(prevFiles => (prevFiles.length === 0 ? prevFiles : []));
+      } else {
+        const newFiles = Array.isArray(value) ? value : [value];
+        setFiles(prevFiles => {
+          // Only update if files actually changed
+          if (
+            prevFiles.length === newFiles.length &&
+            prevFiles.every((file, index) => file === newFiles[index])
+          ) {
+            return prevFiles;
+          }
+          return newFiles;
+        });
+      }
+    });
   }, [value]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
