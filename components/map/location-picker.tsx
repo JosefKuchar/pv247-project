@@ -5,11 +5,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // Prevent Leaflet from ever importing on the server
 const LocationPickerMapInner = dynamic(
-  () => import('./location-picker-map').then(mod => ({ default: mod.LocationPickerMapInner })),
+  () =>
+    import('./location-picker-map').then(mod => ({
+      default: mod.LocationPickerMapInner,
+    })),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[250px] w-full rounded-lg overflow-hidden border border-border">
+      <div className="border-border h-[250px] w-full overflow-hidden rounded-lg border">
         <Skeleton className="h-full w-full" />
       </div>
     ),
@@ -40,4 +43,3 @@ export function LocationPicker({
     />
   );
 }
-

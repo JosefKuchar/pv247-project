@@ -4,10 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  updateProfileAction,
-  type UpdateProfileData,
-} from '@/app/actions/profile';
+import { updateProfileAction } from '@/app/actions/profile';
 import { userType } from '@/db/schema';
 import {
   Dialog,
@@ -99,7 +96,7 @@ export const EditProfileDialog = ({
           form.setError('root', { message: 'An unexpected error occurred' });
         }
       }
-    } catch (error) {
+    } catch {
       // Handle unexpected errors (network issues, etc.)
       form.setError('root', {
         message: 'Failed to update profile. Please try again.',

@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import Link from 'next/link';
 import type { User } from './search-results';
+import Image from 'next/image';
 
 interface UserCardProps {
   user: User;
@@ -16,7 +17,7 @@ export function UserCard({ user, onClick }: UserCardProps) {
         <div className="flex items-start gap-3">
           <Avatar className="h-10 w-10">
             {user.image ? (
-              <img
+              <Image
                 src={user.image}
                 alt={user.name}
                 className="h-full w-full rounded-full object-cover"

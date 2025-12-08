@@ -1,7 +1,13 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+} from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect } from 'react';
 
@@ -28,7 +34,7 @@ interface MapClickHandlerProps {
 
 function MapClickHandler({ onLocationSelect }: MapClickHandlerProps) {
   useMapEvents({
-    click: (e) => {
+    click: e => {
       onLocationSelect({ lat: e.latlng.lat, lng: e.latlng.lng });
     },
   });
@@ -41,13 +47,13 @@ interface MapCenterUpdaterProps {
 
 function MapCenterUpdater({ position }: MapCenterUpdaterProps) {
   const map = useMap();
-  
+
   useEffect(() => {
     if (position) {
       map.setView([position.lat, position.lng], map.getZoom());
     }
   }, [map, position]);
-  
+
   return null;
 }
 
@@ -63,7 +69,7 @@ export function LocationPickerMapInner({
   initialCenter = { lat: 49.1951, lng: 16.6068 }, // Default to Brno
 }: LocationPickerMapInnerProps) {
   return (
-    <div className="h-[250px] w-full rounded-lg overflow-hidden border border-border">
+    <div className="border-border h-[250px] w-full overflow-hidden rounded-lg border">
       <MapContainer
         center={[initialCenter.lat, initialCenter.lng]}
         zoom={13}
@@ -87,4 +93,3 @@ export function LocationPickerMapInner({
     </div>
   );
 }
-

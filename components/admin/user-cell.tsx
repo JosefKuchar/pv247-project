@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Avatar } from '@/components/ui/avatar';
+import Image from 'next/image';
 
 interface UserCellProps {
   userHandle: string;
@@ -15,7 +16,7 @@ export function UserCell({ userHandle, userName, userImage }: UserCellProps) {
     >
       <Avatar className="h-10 w-10">
         {userImage ? (
-          <img
+          <Image
             src={userImage}
             alt={userName}
             className="h-full w-full rounded-full object-cover"

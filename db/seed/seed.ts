@@ -80,8 +80,6 @@ async function main() {
       throw new Error('Admin user was not created');
     }
 
-    const admin = adminUsers[0];
-
     console.log('Creating other users...');
     const otherUsers = [
       {
