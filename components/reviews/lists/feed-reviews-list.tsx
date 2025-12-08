@@ -57,7 +57,7 @@ export const FeedReviewsList = () => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="flex flex-col">
+    <div className="mx-auto flex max-w-5xl flex-col px-2 md:px-4">
       <div ref={contentRef} className="w-full flex-1 space-y-4">
         {allReviews.length === 0 && <EmptyReviewsState />}
 

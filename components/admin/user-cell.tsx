@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { Avatar } from '@/components/ui/avatar';
-import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface UserCellProps {
   userHandle: string;
@@ -15,17 +14,8 @@ export function UserCell({ userHandle, userName, userImage }: UserCellProps) {
       className="flex items-center gap-3 hover:underline"
     >
       <Avatar className="h-10 w-10">
-        {userImage ? (
-          <Image
-            src={userImage}
-            alt={userName}
-            className="h-full w-full rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200">
-            {userName[0].toUpperCase()}
-          </div>
-        )}
+        <AvatarImage src={userImage || undefined} alt={userName} />
+        <AvatarFallback>{userName[0].toUpperCase()}</AvatarFallback>
       </Avatar>
       <div>
         <div className="font-medium">{userName}</div>

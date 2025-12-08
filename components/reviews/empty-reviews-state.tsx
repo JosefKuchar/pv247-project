@@ -11,7 +11,7 @@ export const EmptyReviewsState = ({
   userName = 'This user',
 }: EmptyReviewsStateProps) => {
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 px-4 py-12 text-center">
+    <div className="flex w-full flex-col items-center justify-center space-y-4 px-4 py-12 text-center">
       <div className="relative">
         {/* Background circle */}
         <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-full">
@@ -26,7 +26,7 @@ export const EmptyReviewsState = ({
         </div>
       </div>
 
-      <div className="max-w-md space-y-2">
+      <div className="max-w-80 space-y-2">
         <h3 className="text-lg font-semibold">
           {isOwnProfile
             ? 'No reviews yet'

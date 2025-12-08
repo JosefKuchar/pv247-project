@@ -33,27 +33,21 @@ export const PlaceProfileCard = ({
         <CardContent className="p-6">
           {/* Profile Header */}
           <div className="mb-6 flex flex-col items-center space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-6">
-            <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
-              <AvatarFallback className="text-xl sm:text-2xl">
-                {placeProfile.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-
             <div className="flex-1 text-center sm:text-left">
               <h1 className="text-xl font-bold sm:text-2xl">
                 {placeProfile.name}
               </h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
-              {placeProfile.description && placeProfile.description.trim() && (
-                <p className="mt-2 text-sm text-gray-700">
-                  {placeProfile.description}
-                </p>
-              )}
               {placeProfile.address && (
                 <div className="text-muted-foreground mt-2 flex items-center justify-center gap-1 sm:justify-start">
                   <MapPin className="h-4 w-4" />
                   <span className="text-sm">{placeProfile.address}</span>
                 </div>
+              )}
+              {placeProfile.description && placeProfile.description.trim() && (
+                <p className="mt-2 text-sm text-gray-700">
+                  {placeProfile.description}
+                </p>
               )}
             </div>
 

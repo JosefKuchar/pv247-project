@@ -62,22 +62,27 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div
-      ref={contentRef}
-      className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"
-    >
+    <>
       {allReviews.length === 0 && <EmptyReviewsState />}
+      <div
+        ref={contentRef}
+        className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"
+      >
+        {allReviews.map(review => (
+          <ReviewCard
+            key={review.id}
+            review={review}
+            showLocationInfo={false}
+          />
+        ))}
 
-      {allReviews.map(review => (
-        <ReviewCard key={review.id} review={review} showLocationInfo={false} />
-      ))}
-
-      {hasNextPage && <div ref={loadMoreRef} />}
-      {isFetchingNextPage && (
-        <div className="w-full">
-          <Spinner className="mx-auto" fontSize={32} />
-        </div>
-      )}
-    </div>
+        {hasNextPage && <div ref={loadMoreRef} />}
+        {isFetchingNextPage && (
+          <div className="w-full">
+            <Spinner className="mx-auto" fontSize={32} />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
