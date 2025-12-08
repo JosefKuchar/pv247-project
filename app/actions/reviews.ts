@@ -7,7 +7,6 @@ import {
   createReviewWithPhotos,
 } from '@/modules/review/server';
 import { withAuth } from '@/lib/server-actions';
-import { zfd } from 'zod-form-data';
 import z from 'zod';
 import { authActionClient } from '@/lib/safe-action';
 
@@ -71,17 +70,17 @@ async function internalLoadReviewsAction(
 }
 export const loadReviewsAction = withAuth(internalLoadReviewsAction);
 
-const createReviewSchema = zfd.formData({
-  locationId: zfd.text(z.string().min(1, 'Location is required')),
-  description: zfd.text(z.string().min(1, 'Description is required')),
-  rating: zfd.numeric(z.number().min(1).max(5)),
-  photos: zfd.repeatableOfType(zfd.file()).optional(),
+const createReviewSchema = z.object({
+  locationId: z.string().min(1, 'Location is required'),
+  description: z.string().min(1, 'Description is required'),
+  rating: z.number().min(1).max(5),
+  photoUrls: z.array(z.string().url()).optional(),
 });
 
 export const createReview = authActionClient
   .inputSchema(createReviewSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { locationId, description, rating, photos } = parsedInput;
+    const { locationId, description, rating, photoUrls } = parsedInput;
     const userId = (ctx as { userId: string }).userId;
 
     return await createReviewWithPhotos(
@@ -89,6 +88,6 @@ export const createReview = authActionClient
       locationId,
       description,
       rating,
-      photos,
+      photoUrls,
     );
   });

@@ -32,18 +32,14 @@ export default function Page() {
 
   const createReviewMutation = useMutation({
     mutationFn: async (data: CreateReviewFormSchema) => {
-      const formData = new FormData();
-      formData.append('description', data.description);
-      formData.append('rating', data.rating.toString());
-      formData.append('locationId', data.location);
+      const photoUrls = data.image?.map(file => file.url) ?? [];
 
-      if (data.image && data.image.length > 0) {
-        data.image.forEach(photo => {
-          formData.append('photos', photo);
-        });
-      }
-
-      return createReview(formData);
+      return createReview({
+        description: data.description,
+        rating: data.rating,
+        locationId: data.location,
+        photoUrls,
+      });
     },
     onSuccess: result => {
       if (result?.data?.success) {
@@ -81,12 +77,7 @@ export default function Page() {
             createLabel="Create new location"
           />
           <FormTextarea name="description" label="Description" />
-          <FormDropzone
-            name="image"
-            label="Photos"
-            multiple={true}
-            accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
-          />
+          <FormDropzone name="image" label="Photos" multiple={true} />
           <FormRating name="rating" label="Rating" />
           <Button type="submit" disabled={createReviewMutation.isPending}>
             Submit

@@ -10,8 +10,6 @@ import {
   locationType,
 } from '@/db/schema';
 import { v7 as uuidv7 } from 'uuid';
-import { join } from 'path';
-import { mkdir, writeFile } from 'fs/promises';
 
 export type ReviewDataType = Pick<
   reviewType,
@@ -283,7 +281,7 @@ export const createReviewWithPhotos = async (
   locationId: string,
   description: string,
   rating: number,
-  photos?: File[],
+  photoUrls?: string[],
 ) => {
   // Verify location exists
   const locationExists = await db.query.location.findFirst({
@@ -304,39 +302,15 @@ export const createReviewWithPhotos = async (
     rating,
   });
 
-  // Handle file uploads if provided
-  const photoUrls: string[] = [];
-  if (photos && photos.length > 0) {
-    // Ensure uploads directory exists
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'reviews');
-    await mkdir(uploadsDir, { recursive: true });
+  // Create review photos records if URLs provided
+  if (photoUrls && photoUrls.length > 0) {
+    const photoRecords = photoUrls.map(url => ({
+      id: uuidv7(),
+      reviewId,
+      url,
+    }));
 
-    // Process each uploaded photo
-    for (const photo of photos) {
-      const fileExtension = photo.name.split('.').pop() || 'jpg';
-      const fileName = `${uuidv7()}.${fileExtension}`;
-      const filePath = join(uploadsDir, fileName);
-
-      // Convert File to Buffer and save
-      const bytes = await photo.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      await writeFile(filePath, buffer);
-
-      // Generate URL for the saved file
-      const photoUrl = `/uploads/reviews/${fileName}`;
-      photoUrls.push(photoUrl);
-    }
-
-    // Create review photos records
-    if (photoUrls.length > 0) {
-      const photoRecords = photoUrls.map(url => ({
-        id: uuidv7(),
-        reviewId,
-        url,
-      }));
-
-      await db.insert(reviewPhoto).values(photoRecords);
-    }
+    await db.insert(reviewPhoto).values(photoRecords);
   }
 
   return {

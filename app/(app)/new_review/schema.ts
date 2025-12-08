@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+export const uploadedFileSchema = z.object({
+  url: z.string().url(),
+  name: z.string(),
+});
+
+export type UploadedFile = z.infer<typeof uploadedFileSchema>;
+
 export const createReviewFormSchema = z.object({
   location: z.string().min(1, 'Location is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
@@ -8,17 +15,8 @@ export const createReviewFormSchema = z.object({
     .min(1, 'Rating is required')
     .max(5, 'Rating must be between 1 and 5'),
   image: z
-    .array(z.instanceof(File))
+    .array(uploadedFileSchema)
     .optional()
-    .refine(
-      files => {
-        if (!files || files.length === 0) return true;
-        return files.every(file => file.size <= 50 * 1024 * 1024); // 50MB max
-      },
-      {
-        message: 'Each photo must be less than 50MB',
-      },
-    )
     .refine(
       files => {
         if (!files || files.length === 0) return true;

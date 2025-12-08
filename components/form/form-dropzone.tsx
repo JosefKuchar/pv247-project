@@ -1,29 +1,33 @@
 'use client';
 
 import { Controller, useFormContext } from 'react-hook-form';
-import { useDropzone } from 'react-dropzone';
-import { FC, useState, useEffect, useRef, startTransition } from 'react';
+import { FC, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useDropzone } from '@uploadthing/react';
+import { useUploadThing } from '@/lib/uploadthing-client';
+import { generateClientDropzoneAccept } from 'uploadthing/client';
+
+export interface UploadedFile {
+  url: string;
+  name: string;
+}
 
 export interface FormDropzoneProps {
   name: string;
   multiple?: boolean;
   label?: string;
   errorClassName?: string;
-  accept?: Record<string, string[]>;
-  maxSize?: number;
+  maxFiles?: number;
 }
 
 export const FormDropzone: FC<FormDropzoneProps> = ({
   name,
-  multiple,
+  multiple = true,
   label,
   errorClassName,
-  accept,
-  maxSize,
-  ...rest
+  maxFiles = 10,
 }) => {
   const {
     control,
@@ -44,21 +48,19 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
       )}
       <Controller
         render={({ field: { onChange, value } }) => (
-          <Dropzone
+          <UploadthingDropzone
             multiple={multiple}
             onChange={onChange}
             value={value}
-            accept={accept}
-            maxSize={maxSize}
+            maxFiles={maxFiles}
             className={cn(error && 'aria-invalid')}
             aria-invalid={!!error}
             aria-describedby={error ? `${name}-error` : undefined}
-            {...rest}
           />
         )}
         name={name}
         control={control}
-        defaultValue={multiple ? [] : null}
+        defaultValue={[]}
       />
       {error && (
         <p
@@ -74,143 +76,150 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
   );
 };
 
-const Dropzone: FC<{
+const UploadthingDropzone: FC<{
   multiple?: boolean;
-  onChange?: (value: File[] | File | null) => void;
-  value?: File | File[] | null;
-  accept?: Record<string, string[]>;
-  maxSize?: number;
+  onChange?: (value: UploadedFile[]) => void;
+  value?: UploadedFile[];
+  maxFiles?: number;
   className?: string;
   'aria-invalid'?: boolean;
   'aria-describedby'?: string;
 }> = ({
-  multiple,
+  multiple = true,
   onChange,
-  value,
-  accept,
-  maxSize,
+  value = [],
+  maxFiles = 10,
   className,
   'aria-invalid': ariaInvalid,
   'aria-describedby': ariaDescribedBy,
-  ...rest
 }) => {
-  const [files, setFiles] = useState<File[]>(() => {
-    if (!value) return [];
-    return Array.isArray(value) ? value : [value];
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const { startUpload, routeConfig } = useUploadThing('reviewImageUploader', {
+    onClientUploadComplete: res => {
+      const newFiles: UploadedFile[] = res.map(file => ({
+        url: file.ufsUrl,
+        name: file.name,
+      }));
+
+      const updatedFiles = multiple ? [...value, ...newFiles] : newFiles;
+      onChange?.(updatedFiles);
+      setIsUploading(false);
+      setUploadProgress(0);
+    },
+    onUploadError: error => {
+      console.error('Upload error:', error);
+      setIsUploading(false);
+      setUploadProgress(0);
+    },
+    onUploadProgress: progress => {
+      setUploadProgress(progress);
+    },
   });
 
-  const prevValueRef = useRef(value);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return;
 
-  // Sync local state with form value
-  useEffect(() => {
-    // Only update if value actually changed
-    if (prevValueRef.current === value) {
-      return;
-    }
+      // Limit files if not multiple or if exceeding max
+      const filesToUpload = multiple
+        ? acceptedFiles.slice(0, maxFiles - value.length)
+        : acceptedFiles.slice(0, 1);
 
-    prevValueRef.current = value;
+      if (filesToUpload.length === 0) return;
 
-    startTransition(() => {
-      if (!value) {
-        setFiles(prevFiles => (prevFiles.length === 0 ? prevFiles : []));
-      } else {
-        const newFiles = Array.isArray(value) ? value : [value];
-        setFiles(prevFiles => {
-          // Only update if files actually changed
-          if (
-            prevFiles.length === newFiles.length &&
-            prevFiles.every((file, index) => file === newFiles[index])
-          ) {
-            return prevFiles;
-          }
-          return newFiles;
-        });
-      }
-    });
-  }, [value]);
+      setIsUploading(true);
+      await startUpload(filesToUpload);
+    },
+    [multiple, maxFiles, value.length, startUpload],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: routeConfig
+      ? generateClientDropzoneAccept(
+          Object.keys(routeConfig).map(
+            key => key as Parameters<typeof generateClientDropzoneAccept>[0][0],
+          ),
+        )
+      : { 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] },
     multiple,
-    accept,
-    maxSize,
-    onDrop: acceptedFiles => {
-      if (multiple) {
-        // Append new files to existing ones
-        const newFiles = [...files, ...acceptedFiles];
-        setFiles(newFiles);
-        // Call onChange directly with the array
-        onChange?.(newFiles);
-      } else {
-        // Single file mode - replace
-        const newFile = acceptedFiles[0] || null;
-        setFiles(newFile ? [newFile] : []);
-        onChange?.(newFile);
-      }
-    },
-    ...rest,
+    disabled: isUploading || (!multiple && value.length >= 1),
+    maxFiles: multiple ? maxFiles - value.length : 1,
   });
 
   const handleRemove = (index: number) => {
-    const newFiles = files.filter((_, i) => i !== index);
-    setFiles(newFiles);
-
-    if (multiple) {
-      // For multiple mode, pass array (empty if no files)
-      onChange?.(newFiles.length > 0 ? newFiles : []);
-    } else {
-      // For single mode, pass null if no files
-      onChange?.(newFiles.length > 0 ? newFiles[0] : null);
-    }
+    const newFiles = value.filter((_, i) => i !== index);
+    onChange?.(newFiles);
   };
+
+  const canAddMore = multiple ? value.length < maxFiles : value.length < 1;
 
   return (
     <div className="space-y-2">
-      <div
-        {...getRootProps()}
-        className={cn(
-          'relative flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors',
-          'bg-background hover:bg-accent/50',
-          isDragActive && 'border-primary bg-accent',
-          ariaInvalid && 'border-destructive',
-          className,
-        )}
-        aria-invalid={ariaInvalid}
-        aria-describedby={ariaDescribedBy}
-      >
-        <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center px-4 pt-5 pb-6 text-center">
-          <Upload
-            className={cn(
-              'text-muted-foreground mb-3 h-10 w-10',
-              isDragActive && 'text-primary',
+      {canAddMore && (
+        <div
+          {...getRootProps()}
+          className={cn(
+            'relative flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors',
+            'bg-background hover:bg-accent/50',
+            isDragActive && 'border-primary bg-accent',
+            ariaInvalid && 'border-destructive',
+            isUploading && 'pointer-events-none opacity-60',
+            className,
+          )}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+        >
+          <input {...getInputProps()} />
+          <div className="flex flex-col items-center justify-center px-4 pt-5 pb-6 text-center">
+            {isUploading ? (
+              <>
+                <Loader2 className="text-primary mb-3 h-10 w-10 animate-spin" />
+                <p className="text-foreground mb-2 text-sm font-semibold">
+                  Uploading... {uploadProgress}%
+                </p>
+              </>
+            ) : (
+              <>
+                <Upload
+                  className={cn(
+                    'text-muted-foreground mb-3 h-10 w-10',
+                    isDragActive && 'text-primary',
+                  )}
+                />
+                <p className="text-foreground mb-2 text-sm">
+                  <span className="font-semibold">Click to upload</span> or drag
+                  and drop
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {multiple
+                    ? `Up to ${maxFiles} photos allowed`
+                    : 'Single photo'}{' '}
+                  (PNG, JPG, GIF, WEBP up to 50MB)
+                </p>
+              </>
             )}
-          />
-          <p className="text-foreground mb-2 text-sm">
-            <span className="font-semibold">Click to upload</span> or drag and
-            drop
-          </p>
-          <p className="text-muted-foreground text-xs">
-            {multiple ? 'Multiple photos allowed' : 'Single photo'}{' '}
-            {accept
-              ? `(${Object.values(accept).flat().join(', ')})`
-              : '(PNG, JPG, GIF up to 50MB)'}
-          </p>
+          </div>
         </div>
-      </div>
-      {files.length > 0 && (
+      )}
+      {value.length > 0 && (
         <div className="space-y-2">
-          {files.map((file, index) => (
+          {value.map((file, index) => (
             <div
-              key={`${file.name}-${index}`}
+              key={`${file.url}-${index}`}
               className="bg-background flex items-center justify-between rounded-md border p-3"
             >
               <div className="flex min-w-0 flex-1 items-center gap-2">
-                <Upload className="text-muted-foreground h-4 w-4 shrink-0" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={file.url}
+                  alt={file.name}
+                  className="h-10 w-10 shrink-0 rounded object-cover"
+                />
                 <span className="text-foreground truncate text-sm">
                   {file.name}
-                </span>
-                <span className="text-muted-foreground shrink-0 text-xs">
-                  ({(file.size / 1024 / 1024).toFixed(2)} MB)
                 </span>
               </div>
               <Button
@@ -222,6 +231,7 @@ const Dropzone: FC<{
                   handleRemove(index);
                 }}
                 className="shrink-0"
+                disabled={isUploading}
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Remove file</span>
