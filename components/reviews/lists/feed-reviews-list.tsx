@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { FeedReviewCard } from '@/components/reviews/cards/feed-review-card';
+import { ReviewCard } from '@/components/reviews/cards/review-card';
 import { EmptyReviewsState } from '@/components/reviews/empty-reviews-state';
 import { loadReviewsAction } from '@/app/actions/reviews';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
@@ -62,7 +62,7 @@ export const FeedReviewsList = () => {
         {allReviews.length === 0 && <EmptyReviewsState />}
 
         {allReviews.map(review => (
-          <FeedReviewCard key={review.id} review={review} />
+          <ReviewCard key={review.id} review={review} />
         ))}
 
         {hasNextPage && <div ref={loadMoreRef} />}

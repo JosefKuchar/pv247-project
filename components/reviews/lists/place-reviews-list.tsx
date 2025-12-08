@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { PlaceReviewCard } from '@/components/reviews/cards/place-review-card';
+import { ReviewCard } from '@/components/reviews/cards/review-card';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
 import { EmptyReviewsState } from '@/components/reviews/empty-reviews-state';
 import { ReviewsPageType } from '@/modules/review/server';
@@ -66,7 +66,7 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
       {allReviews.length === 0 && <EmptyReviewsState />}
 
       {allReviews.map(review => (
-        <PlaceReviewCard key={review.id} review={review} />
+        <ReviewCard key={review.id} review={review} showLocationInfo={false} />
       ))}
 
       {hasNextPage && <div ref={loadMoreRef} />}

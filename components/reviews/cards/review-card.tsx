@@ -26,9 +26,15 @@ import { toast } from 'sonner';
 
 type ReviewCardProps = {
   review: ReviewDataType;
+  showUserInfo?: boolean;
+  showLocationInfo?: boolean;
 };
 
-export const FeedReviewCard = ({ review }: ReviewCardProps) => {
+export const ReviewCard = ({
+  review,
+  showUserInfo = true,
+  showLocationInfo = true,
+}: ReviewCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentsCount, setCommentsCount] = useState(review.commentsCount);
   const [likesCount, setLikesCount] = useState(review.likesCount);
@@ -55,47 +61,64 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-md">
+    <Card className="w-full shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
       <CardHeader className="flex flex-col gap-4">
-        <div>
-          <a
-            href={`/${review.user.handle}`}
-            className="flex items-center gap-2"
-          >
-            {review.user.image ? (
-              <Image
-                src={review.user.image}
-                alt={review.user.name}
-                width={40}
-                height={40}
-                className="rounded-full"
-                unoptimized
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-gray-300" />
+        {showUserInfo && (
+          <div>
+            <a
+              href={`/${review.user.handle}`}
+              className="flex items-center gap-2"
+            >
+              {review.user.image ? (
+                <Image
+                  src={review.user.image}
+                  alt={review.user.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                  unoptimized
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-gray-300" />
+              )}
+              <h3 className="font-semibold">
+                {review.user.name}
+                <span className="font-normal text-gray-500">
+                  @{review.user.handle}
+                </span>
+              </h3>
+            </a>
+          </div>
+        )}
+
+        {showLocationInfo && (
+          <div className="flex items-center justify-between">
+            <a
+              href={`/place/${review.location.handle}`}
+              className="flex items-center gap-2"
+            >
+              <p className="font-semibold">{review.location.name}</p>
+              <Rating
+                value={review.location.avgRating}
+                readOnly
+                className="gap-1"
+              >
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <RatingButton size={12} key={index} />
+                ))}
+              </Rating>
+            </a>
+            {!showUserInfo && (
+              <Rating value={review.rating} readOnly>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <RatingButton size={12} key={index} />
+                ))}
+              </Rating>
             )}
-            <h3 className="font-semibold">
-              {review.user.name}
-              <span className="font-normal text-gray-500">
-                @{review.user.handle}
-              </span>
-            </h3>
-          </a>
-        </div>
-        <div className="flex items-center justify-between">
-          <a
-            href={`/place/${review.location.handle}`}
-            className="flex items-center gap-2"
-          >
-            <p className="font-semibold">{review.location.name}</p>
-            <Rating value={review.location.avgRating} readOnly>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <RatingButton size={12} key={index} />
-              ))}
-            </Rating>
-          </a>
-        </div>
+          </div>
+        )}
+
         <Rating value={review.rating} readOnly className="gap-1">
           {Array.from({ length: 5 }).map((_, index) => (
             <RatingButton
@@ -167,13 +190,12 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
               <span className="ml-1">{commentsCount}</span>
             </div>
           </div>
-
           <button
             type="button"
             className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
             onClick={() => {
               navigator.clipboard.writeText(
-                window.location.href + `review/${review.id}`,
+                window.location.origin + `/review/${review.id}`,
               );
               toast.success('Link copied to clipboard!');
             }}
