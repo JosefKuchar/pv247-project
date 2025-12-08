@@ -16,6 +16,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { createReviewFormSchema, type CreateReviewFormSchema } from './schema';
+import { useMutation } from '@tanstack/react-query';
 
 export default function Page() {
   const methods = useForm<CreateReviewFormSchema>({
@@ -29,27 +30,35 @@ export default function Page() {
   });
   const router = useRouter();
 
+  const createReviewMutation = useMutation({
+    mutationFn: async (data: CreateReviewFormSchema) => {
+      const formData = new FormData();
+      formData.append('description', data.description);
+      formData.append('rating', data.rating.toString());
+      formData.append('locationId', data.location);
+
+      if (data.image && data.image.length > 0) {
+        data.image.forEach(photo => {
+          formData.append('photos', photo);
+        });
+      }
+
+      return createReview(formData);
+    },
+    onSuccess: result => {
+      if (result?.data?.success) {
+        router.push('/');
+      }
+    },
+  });
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Create Review</h1>
       <FormProvider {...methods}>
         <form
-          onSubmit={methods.handleSubmit(async data => {
-            const formData = new FormData();
-            formData.append('description', data.description);
-            formData.append('rating', data.rating.toString());
-            formData.append('locationId', data.location);
-
-            if (data.image && data.image.length > 0) {
-              data.image.forEach(photo => {
-                formData.append('photos', photo);
-              });
-            }
-
-            const result = await createReview(formData);
-            if (result?.data?.success) {
-              router.push('/');
-            }
+          onSubmit={methods.handleSubmit(data => {
+            createReviewMutation.mutate(data);
           })}
           className="space-y-4"
         >
@@ -74,7 +83,9 @@ export default function Page() {
             accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
           />
           <FormRating name="rating" label="Rating" />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={createReviewMutation.isPending}>
+            Submit
+          </Button>
         </form>
       </FormProvider>
     </div>
