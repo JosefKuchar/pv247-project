@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { ReviewCommentList } from '@/components/comment/review-comments-list';
 import { toggleReviewLikeAction } from '@/app/actions/likes';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 type ReviewCardProps = {
   review: ReviewDataType;
@@ -170,11 +171,12 @@ export const FeedReviewCard = ({ review }: ReviewCardProps) => {
           <button
             type="button"
             className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
-            onClick={() =>
+            onClick={() => {
               navigator.clipboard.writeText(
                 window.location.href + `review/${review.id}`,
-              )
-            }
+              );
+              toast.success('Link copied to clipboard!');
+            }}
           >
             <Send />
           </button>
