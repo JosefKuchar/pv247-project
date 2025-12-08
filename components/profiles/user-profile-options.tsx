@@ -6,11 +6,13 @@ import { ProfileOptionsDropdown } from '@/components/ui/profile-options-dropdown
 
 type UserProfileOptionsProps = {
   isOwnProfile: boolean;
+  isAdmin?: boolean;
   className?: string;
 };
 
 export const UserProfileOptions = ({
   isOwnProfile,
+  isAdmin = false,
   className,
 }: UserProfileOptionsProps) => {
   const router = useRouter();
@@ -18,6 +20,10 @@ export const UserProfileOptions = ({
   const handleEditProfile = () => {
     // TODO: Implement edit profile functionality
     console.log('Edit profile clicked');
+  };
+
+  const handleAdminPanel = () => {
+    router.push('/admin/claims');
   };
 
   const handleLogout = async () => {
@@ -31,22 +37,29 @@ export const UserProfileOptions = ({
   };
 
   const getOptions = () => {
+    const options = [];
+
     if (isOwnProfile) {
-      return [
-        {
-          label: 'Edit profile',
-          onClick: handleEditProfile,
-        },
-        {
-          label: 'Log out',
-          onClick: handleLogout,
-          variant: 'destructive' as const,
-        },
-      ];
+      options.push({
+        label: 'Edit profile',
+        onClick: handleEditProfile,
+      });
+
+      if (isAdmin) {
+        options.push({
+          label: 'Admin panel',
+          onClick: handleAdminPanel,
+        });
+      }
+
+      options.push({
+        label: 'Log out',
+        onClick: handleLogout,
+        variant: 'destructive' as const,
+      });
     }
 
-    // For other users' profiles, no options for now
-    return [];
+    return options;
   };
 
   return (
