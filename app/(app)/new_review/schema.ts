@@ -13,10 +13,10 @@ export const createReviewFormSchema = z.object({
     .refine(
       files => {
         if (!files || files.length === 0) return true;
-        return files.every(file => file.size <= 10 * 1024 * 1024); // 10MB max
+        return files.every(file => file.size <= 50 * 1024 * 1024); // 50MB max
       },
       {
-        message: 'Each photo must be less than 10MB',
+        message: 'Each photo must be less than 50MB',
       },
     )
     .refine(

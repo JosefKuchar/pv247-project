@@ -173,7 +173,7 @@ const Dropzone: FC<{
             {multiple ? 'Multiple photos allowed' : 'Single photo'}{' '}
             {accept
               ? `(${Object.values(accept).flat().join(', ')})`
-              : '(PNG, JPG, GIF up to 10MB)'}
+              : '(PNG, JPG, GIF up to 50MB)'}
           </p>
         </div>
       </div>
