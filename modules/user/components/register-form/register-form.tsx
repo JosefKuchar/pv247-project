@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRegisterMutation } from './hooks';
 import { registerFormSchema, type RegisterFormSchema } from './schema';
+import { ProfileImageUploader } from '@/components/profiles/profile-image-uploader';
 
 export const RegisterForm = () => {
   const mutation = useRegisterMutation();
@@ -121,9 +122,14 @@ export const RegisterForm = () => {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL (Optional)</FormLabel>
+              <FormLabel>Profile Image (Optional)</FormLabel>
               <FormControl>
-                <Input type="text" {...field} />
+                <ProfileImageUploader
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  disabled={mutation.isPending}
+                  endpoint="registrationImageUploader"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

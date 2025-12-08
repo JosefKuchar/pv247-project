@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { ProfileImageUploader } from './profile-image-uploader';
 
 const updateProfileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -34,13 +35,7 @@ const updateProfileSchema = z.object({
   description: z
     .string()
     .max(500, 'Description must be 500 characters or less'),
-  image: z
-    .string()
-    .refine(
-      val => !val || val.trim() === '' || z.url().safeParse(val).success,
-      'Invalid image URL',
-    )
-    .transform(val => (val && val.trim() !== '' ? val : '')),
+  image: z.string(),
 });
 
 type FormData = z.infer<typeof updateProfileSchema>;
@@ -227,20 +222,14 @@ export const EditProfileDialog = ({
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Profile Image URL</FormLabel>
+                  <FormLabel>Profile Image</FormLabel>
                   <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://example.com/your-image.jpg"
-                      {...field}
+                    <ProfileImageUploader
                       value={field.value || ''}
+                      onChange={field.onChange}
                       disabled={isLoading}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Enter a URL for your profile image. Leave empty to use the
-                    default avatar.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
