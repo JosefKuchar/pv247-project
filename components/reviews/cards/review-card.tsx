@@ -60,6 +60,38 @@ export const ReviewCard = ({
     setCommentsCount(commentsCount + 1);
   };
 
+  const handleShare = async () => {
+    const url = window.location.origin + `/review/${review.id}`;
+    const shareData = {
+      title: `Review of ${review.location.name}`,
+      text:
+        review.description ||
+        `Check out this review of ${review.location.name}`,
+      url: url,
+    };
+
+    // Use Web Share API if available (mobile)
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+        toast.success('Shared successfully!');
+      } catch (error) {
+        // User cancelled or error occurred
+        if (error instanceof Error && error.name !== 'AbortError') {
+          toast.error('Failed to share');
+        }
+      }
+    } else {
+      // Fallback to clipboard copy (desktop)
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied to clipboard!');
+      } catch {
+        toast.error('Failed to copy link');
+      }
+    }
+  };
+
   return (
     <Card className="w-full max-w-full overflow-hidden shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
@@ -198,12 +230,7 @@ export const ReviewCard = ({
           <button
             type="button"
             className="transition duration-200 ease-in-out hover:cursor-pointer hover:text-green-400"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                window.location.origin + `/review/${review.id}`,
-              );
-              toast.success('Link copied to clipboard!');
-            }}
+            onClick={handleShare}
           >
             <Send />
           </button>
