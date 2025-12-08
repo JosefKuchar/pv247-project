@@ -19,7 +19,8 @@ export default function Page() {
   const methods = useForm();
 
   return (
-    <div>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Create Review</h1>
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(async () => {

@@ -32,11 +32,11 @@ export const FormRating: FC<FormRatingProps> = ({
   const error = errors[name];
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-2">
       {label && (
         <label
           htmlFor={name}
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          className="block text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           {label}
         </label>
@@ -49,12 +49,12 @@ export const FormRating: FC<FormRatingProps> = ({
             {...props}
             value={field.value ?? 0}
             onValueChange={value => field.onChange(value)}
-            className={cn(error && 'aria-invalid', className)}
+            className={cn('flex', error && 'aria-invalid', className)}
             aria-invalid={!!error}
             aria-describedby={error ? `${name}-error` : undefined}
           >
             {Array.from({ length: maxRating }).map((_, index) => (
-              <RatingButton key={index} />
+              <RatingButton key={index} size={24} />
             ))}
           </Rating>
         )}
