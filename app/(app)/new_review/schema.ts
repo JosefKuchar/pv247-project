@@ -2,9 +2,7 @@ import { z } from 'zod';
 
 export const createReviewFormSchema = z.object({
   location: z.string().min(1, 'Location is required'),
-  description: z
-    .string()
-    .min(10, 'Description must be at least 10 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
   rating: z
     .number()
     .min(1, 'Rating is required')
@@ -33,4 +31,3 @@ export const createReviewFormSchema = z.object({
 });
 
 export type CreateReviewFormSchema = z.infer<typeof createReviewFormSchema>;
-

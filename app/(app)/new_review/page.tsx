@@ -11,7 +11,7 @@ import {
   FormTextarea,
 } from '@/components/form';
 import { Button } from '@/components/ui/button';
-import { createReview } from '@/modules/review/action';
+import { createReview } from '@/app/actions/reviews';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';

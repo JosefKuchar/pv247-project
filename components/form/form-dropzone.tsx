@@ -37,7 +37,7 @@ export const FormDropzone: FC<FormDropzoneProps> = ({
       {label && (
         <label
           htmlFor={name}
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2 block"
+          className="mb-2 block text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           {label}
         </label>
@@ -113,7 +113,7 @@ const Dropzone: FC<{
     multiple,
     accept,
     maxSize,
-    onDrop: (acceptedFiles) => {
+    onDrop: acceptedFiles => {
       if (multiple) {
         // Append new files to existing ones
         const newFiles = [...files, ...acceptedFiles];
@@ -133,7 +133,7 @@ const Dropzone: FC<{
   const handleRemove = (index: number) => {
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
-    
+
     if (multiple) {
       // For multiple mode, pass array (empty if no files)
       onChange?.(newFiles.length > 0 ? newFiles : []);
@@ -148,7 +148,7 @@ const Dropzone: FC<{
       <div
         {...getRootProps()}
         className={cn(
-          'relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-md border-2 border-dashed transition-colors cursor-pointer',
+          'relative flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed transition-colors',
           'bg-background hover:bg-accent/50',
           isDragActive && 'border-primary bg-accent',
           ariaInvalid && 'border-destructive',
@@ -158,18 +158,18 @@ const Dropzone: FC<{
         aria-describedby={ariaDescribedBy}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+        <div className="flex flex-col items-center justify-center px-4 pt-5 pb-6 text-center">
           <Upload
             className={cn(
-              'w-10 h-10 mb-3 text-muted-foreground',
+              'text-muted-foreground mb-3 h-10 w-10',
               isDragActive && 'text-primary',
             )}
           />
-          <p className="mb-2 text-sm text-foreground">
+          <p className="text-foreground mb-2 text-sm">
             <span className="font-semibold">Click to upload</span> or drag and
             drop
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {multiple ? 'Multiple photos allowed' : 'Single photo'}{' '}
             {accept
               ? `(${Object.values(accept).flat().join(', ')})`
@@ -182,14 +182,14 @@ const Dropzone: FC<{
           {files.map((file, index) => (
             <div
               key={`${file.name}-${index}`}
-              className="flex items-center justify-between p-3 rounded-md border bg-background"
+              className="bg-background flex items-center justify-between rounded-md border p-3"
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <Upload className="w-4 h-4 text-muted-foreground shrink-0" />
-                <span className="text-sm text-foreground truncate">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <Upload className="text-muted-foreground h-4 w-4 shrink-0" />
+                <span className="text-foreground truncate text-sm">
                   {file.name}
                 </span>
-                <span className="text-xs text-muted-foreground shrink-0">
+                <span className="text-muted-foreground shrink-0 text-xs">
                   ({(file.size / 1024 / 1024).toFixed(2)} MB)
                 </span>
               </div>
@@ -197,13 +197,13 @@ const Dropzone: FC<{
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   handleRemove(index);
                 }}
                 className="shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
                 <span className="sr-only">Remove file</span>
               </Button>
             </div>

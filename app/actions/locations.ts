@@ -31,7 +31,8 @@ export async function createLocationAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create location',
+      error:
+        error instanceof Error ? error.message : 'Failed to create location',
     };
   }
 }
