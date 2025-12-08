@@ -23,6 +23,7 @@ import { ReviewCommentList } from '@/components/comment/review-comments-list';
 import { toggleReviewLikeAction } from '@/app/actions/likes';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { authClient } from '@/lib/auth-client';
 
 type ReviewCardProps = {
   review: ReviewDataType;
@@ -35,6 +36,9 @@ export const ReviewCard = ({
   showUserInfo = true,
   showLocationInfo = true,
 }: ReviewCardProps) => {
+  const { data: session } = authClient.useSession();
+  const isLoggedIn = !!session?.user;
+
   const [showComments, setShowComments] = useState(false);
   const [commentsCount, setCommentsCount] = useState(review.commentsCount);
   const [likesCount, setLikesCount] = useState(review.likesCount);
@@ -157,7 +161,7 @@ export const ReviewCard = ({
       </CardHeader>
 
       <CardContent className="flex-1 overflow-hidden">
-        <p className="text-sm break-words text-gray-700">
+        <p className="text-sm wrap-break-word text-gray-700">
           {review.description}
         </p>
         {review.photos.length > 0 && (
@@ -198,19 +202,28 @@ export const ReviewCard = ({
             <ReviewCommentList
               review_id={review.id}
               callbackAddComment={callbackAddComment}
+              canComment={isLoggedIn}
             />
           </div>
         )}
         <div className="flex w-full min-w-0 justify-between gap-2">
           <div className="flex gap-4">
-            <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
+            <div
+              className={`flex items-center ${isLoggedIn ? 'transition duration-200 ease-in-out hover:text-red-400' : 'text-gray-400'}`}
+            >
               {toggleLikeMutation.isPending ? (
                 <Heart className="animate-pulse hover:cursor-pointer" />
               ) : (
                 <Heart
                   type="button"
-                  className={`hover:cursor-pointer ${liked ? 'text-red-500' : ''}`}
-                  onClick={() => toggleLikeMutation.mutate()}
+                  className={
+                    isLoggedIn
+                      ? `hover:cursor-pointer ${liked ? 'text-red-500' : ''}`
+                      : 'cursor-default'
+                  }
+                  onClick={
+                    isLoggedIn ? () => toggleLikeMutation.mutate() : undefined
+                  }
                 />
               )}
               <span className="ml-1">{likesCount}</span>

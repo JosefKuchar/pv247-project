@@ -12,11 +12,13 @@ import { AddCommentForm } from './add-comment-form';
 type ReviewCommentListProps = {
   review_id: string;
   callbackAddComment: () => void;
+  canComment?: boolean;
 };
 
 export const ReviewCommentList = ({
   review_id,
   callbackAddComment,
+  canComment = true,
 }: ReviewCommentListProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -82,12 +84,18 @@ export const ReviewCommentList = ({
           <div ref={loadMoreRef} />
         </div>
       </div>
-      <div className="sticky bottom-0 mt-2 bg-white">
-        <AddCommentForm
-          review_id={review_id}
-          callbackAddComment={callbackAddComment}
-        />
-      </div>
+      {canComment ? (
+        <div className="sticky bottom-0 mt-2 bg-white">
+          <AddCommentForm
+            review_id={review_id}
+            callbackAddComment={callbackAddComment}
+          />
+        </div>
+      ) : (
+        <p className="mt-2 text-center text-sm text-gray-500">
+          Log in to add a comment
+        </p>
+      )}
     </>
   );
 };

@@ -59,7 +59,7 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center">
       <ReviewCard review={reviewData} />
     </div>
   );
