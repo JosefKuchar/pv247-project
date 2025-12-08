@@ -128,7 +128,7 @@ export const ReviewCard = ({
           <div className="flex min-w-0 items-center justify-between gap-2">
             <a
               href={`/place/${review.location.handle}`}
-              className="flex min-w-0 flex-1 items-center gap-2"
+              className="flex min-w-0 flex-1 flex-wrap items-center gap-2"
             >
               <p className="min-w-0 truncate font-semibold">
                 {review.location.name}

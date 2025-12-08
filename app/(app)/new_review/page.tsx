@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { createReviewFormSchema, type CreateReviewFormSchema } from './schema';
 import { useMutation } from '@tanstack/react-query';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Page() {
   const methods = useForm<CreateReviewFormSchema>({
@@ -49,41 +50,45 @@ export default function Page() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto mt-6 max-w-5xl space-y-6 px-4 md:mt-10">
       <h1 className="text-3xl font-bold">Create Review</h1>
-      <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(data => {
-            createReviewMutation.mutate(data);
-          })}
-          className="space-y-4"
-        >
-          <FormCombobox
-            name="location"
-            label="Location"
-            queryKey="locations"
-            fetchOptions={async (query: string) => {
-              return searchLocationsAction(query);
-            }}
-            allowCreate={true}
-            onCreateNew={async data => {
-              return createLocationAction(
-                data.name,
-                data.address,
-                data.latitude,
-                data.longitude,
-              );
-            }}
-            createLabel="Create new location"
-          />
-          <FormTextarea name="description" label="Description" />
-          <FormDropzone name="image" label="Photos" multiple={true} />
-          <FormRating name="rating" label="Rating" />
-          <Button type="submit" disabled={createReviewMutation.isPending}>
-            Submit
-          </Button>
-        </form>
-      </FormProvider>
+      <Card>
+        <CardContent>
+          <FormProvider {...methods}>
+            <form
+              onSubmit={methods.handleSubmit(data => {
+                createReviewMutation.mutate(data);
+              })}
+              className="space-y-4"
+            >
+              <FormCombobox
+                name="location"
+                label="Location"
+                queryKey="locations"
+                fetchOptions={async (query: string) => {
+                  return searchLocationsAction(query);
+                }}
+                allowCreate={true}
+                onCreateNew={async data => {
+                  return createLocationAction(
+                    data.name,
+                    data.address,
+                    data.latitude,
+                    data.longitude,
+                  );
+                }}
+                createLabel="Create new location"
+              />
+              <FormTextarea name="description" label="Description" />
+              <FormDropzone name="image" label="Photos" multiple={true} />
+              <FormRating name="rating" label="Rating" />
+              <Button type="submit" disabled={createReviewMutation.isPending}>
+                Submit
+              </Button>
+            </form>
+          </FormProvider>
+        </CardContent>
+      </Card>
     </div>
   );
 }

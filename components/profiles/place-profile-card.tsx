@@ -102,22 +102,8 @@ export const PlaceProfileCard = ({
         </CardContent>
       </Card>
 
-      {/* Reviews Section */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-semibold sm:text-xl">Reviews</h2>
-            <span className="text-muted-foreground text-sm">
-              {placeProfile.reviewsCount}{' '}
-              {placeProfile.reviewsCount === 1 ? 'review' : 'reviews'}
-            </span>
-          </div>
-
-          <Separator className="mb-6" />
-
-          <PlaceReviewsList locationId={placeProfile.id} />
-        </CardContent>
-      </Card>
+      <h2 className="text-lg font-semibold sm:text-xl">Reviews</h2>
+      <PlaceReviewsList locationId={placeProfile.id} />
     </div>
   );
 };

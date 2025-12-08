@@ -98,25 +98,8 @@ export const UserProfileCard = ({
         </CardContent>
       </Card>
 
-      {/* Reviews Section */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-semibold sm:text-xl">Reviews</h2>
-            <span className="text-muted-foreground text-sm">
-              {userProfile.reviewsCount}{' '}
-              {userProfile.reviewsCount === 1 ? 'review' : 'reviews'}
-            </span>
-          </div>
-
-          <Separator className="mb-6" />
-
-          <UserReviewsList
-            userId={userProfile.id}
-            isOwnProfile={isOwnProfile}
-          />
-        </CardContent>
-      </Card>
+      <h2 className="text-lg font-semibold sm:text-xl">Reviews</h2>
+      <UserReviewsList userId={userProfile.id} isOwnProfile={isOwnProfile} />
     </div>
   );
 };
