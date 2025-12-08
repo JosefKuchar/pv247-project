@@ -23,7 +23,7 @@ type ProfileReviewCardProps = {
 
 export const ProfileReviewCard = ({ review }: ProfileReviewCardProps) => {
   return (
-    <Card className="w-full max-w-md shadow-md">
+    <Card className="w-full shadow-md md:min-w-1/3 md:flex-1 lg:min-w-1/4">
       <CardTitle className="sr-only">User Review</CardTitle>
       <CardHeader className="flex flex-col gap-4">
         <div className="flex items-center justify-between">

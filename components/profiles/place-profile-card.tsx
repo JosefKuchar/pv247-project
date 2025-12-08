@@ -11,6 +11,7 @@ import { PlaceProfileOptions } from '@/components/profiles/place-profile-options
 type PlaceProfile = typeof location.$inferSelect & {
   reviewsCount: number;
   avgRating: number;
+  followersCount: number;
   isFollowing: boolean;
 };
 
@@ -41,6 +42,11 @@ export const PlaceProfileCard = ({
                 {placeProfile.name}
               </h1>
               <p className="text-muted-foreground">@{placeProfile.handle}</p>
+              {placeProfile.description && placeProfile.description.trim() && (
+                <p className="mt-2 text-sm text-gray-700">
+                  {placeProfile.description}
+                </p>
+              )}
               {placeProfile.address && (
                 <div className="text-muted-foreground mt-2 flex items-center justify-center gap-1 sm:justify-start">
                   <MapPin className="h-4 w-4" />
@@ -55,18 +61,29 @@ export const PlaceProfileCard = ({
                 targetHandle={placeProfile.handle}
                 isFollowing={placeProfile.isFollowing}
               />
-              <PlaceProfileOptions isManager={isManager} />
+              <PlaceProfileOptions
+                isManager={isManager}
+                currentPlace={placeProfile}
+              />
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 text-center sm:gap-6">
+          <div className="grid grid-cols-3 gap-4 text-center sm:gap-6">
             <div>
               <div className="text-xl font-bold sm:text-2xl">
                 {placeProfile.reviewsCount}
               </div>
               <div className="text-muted-foreground text-xs sm:text-sm">
                 reviews
+              </div>
+            </div>
+            <div>
+              <div className="text-xl font-bold sm:text-2xl">
+                {placeProfile.followersCount}
+              </div>
+              <div className="text-muted-foreground text-xs sm:text-sm">
+                followers
               </div>
             </div>
             <div className="flex flex-col items-center">

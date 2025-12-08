@@ -25,6 +25,12 @@ export const getUserProfile = async (handle: string) => {
   return { ...userData, reviewsCount, followersCount, followingCount };
 };
 
+export const getUserById = async (id: string) => {
+  return db.query.user.findFirst({
+    where: eq(user.id, id),
+  });
+};
+
 export const getUserFollowStatus = async (targetUserHandle: string) => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -94,4 +100,57 @@ export async function deleteUserFollow(userId: string, targetUserId: string) {
     .where(
       and(eq(follow.followerId, userId), eq(follow.followingId, targetUserId)),
     );
+}
+
+export async function updateUserProfile(
+  userId: string,
+  data: {
+    name: string;
+    email: string;
+    handle: string;
+    description: string;
+    image?: string | null;
+  },
+) {
+  await db.update(user).set(data).where(eq(user.id, userId));
+}
+
+export async function checkHandleAvailability(
+  handle: string,
+  excludeUserId?: string,
+) {
+  const existingUser = await db.query.user.findFirst({
+    where: eq(user.handle, handle),
+  });
+
+  if (!existingUser) {
+    return { available: true };
+  }
+
+  // If excluding current user, check if it's their own handle
+  if (excludeUserId && existingUser.id === excludeUserId) {
+    return { available: true };
+  }
+
+  return { available: false };
+}
+
+export async function checkEmailAvailability(
+  email: string,
+  excludeUserId?: string,
+) {
+  const existingUser = await db.query.user.findFirst({
+    where: eq(user.email, email),
+  });
+
+  if (!existingUser) {
+    return { available: true };
+  }
+
+  // If excluding current user, check if it's their own email
+  if (excludeUserId && existingUser.id === excludeUserId) {
+    return { available: true };
+  }
+
+  return { available: false };
 }

@@ -46,6 +46,11 @@ export const UserProfileCard = ({
                 {userProfile.name}
               </h1>
               <p className="text-muted-foreground">@{userProfile.handle}</p>
+              {userProfile.description.trim() && (
+                <p className="mt-2 text-sm text-gray-700">
+                  {userProfile.description}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-center gap-3 sm:justify-end">
@@ -57,6 +62,7 @@ export const UserProfileCard = ({
               />
               <UserProfileOptions
                 isOwnProfile={isOwnProfile}
+                currentUser={userProfile}
                 isAdmin={isAdmin}
               />
             </div>

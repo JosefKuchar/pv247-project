@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { PlaceReviewCard } from '@/components/reviews/cards/placeReviewCard';
+import { PlaceReviewCard } from '@/components/reviews/cards/place-review-card';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
 import { EmptyReviewsState } from '@/components/reviews/empty-reviews-state';
 import { ReviewsPageType } from '@/modules/review/server';
@@ -62,21 +62,19 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div ref={contentRef} className="w-full flex-1 space-y-4">
-        {allReviews.length === 0 && <EmptyReviewsState />}
+    <div ref={contentRef} className="flex flex-wrap justify-center gap-4">
+      {allReviews.length === 0 && <EmptyReviewsState />}
 
-        {allReviews.map(review => (
-          <PlaceReviewCard key={review.id} review={review} />
-        ))}
+      {allReviews.map(review => (
+        <PlaceReviewCard key={review.id} review={review} />
+      ))}
 
-        {hasNextPage && <div ref={loadMoreRef} />}
-        {isFetchingNextPage && (
-          <div className="w-full">
-            <Spinner className="mx-auto" fontSize={32} />
-          </div>
-        )}
-      </div>
+      {hasNextPage && <div ref={loadMoreRef} />}
+      {isFetchingNextPage && (
+        <div className="w-full">
+          <Spinner className="mx-auto" fontSize={32} />
+        </div>
+      )}
     </div>
   );
 };

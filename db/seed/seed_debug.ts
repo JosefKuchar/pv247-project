@@ -37,6 +37,8 @@ async function main() {
         name: 'Alice Johnson',
         email: 'alice@example.com',
         handle: 'alicejohnson',
+        description:
+          '☕ Coffee enthusiast and digital nomad. Love discovering cozy cafés and sharing great spots with fellow travelers.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
       },
@@ -45,6 +47,8 @@ async function main() {
         name: 'Bob Smith',
         email: 'bob@example.com',
         handle: 'bobsmith',
+        description:
+          '🍕 Foodie on a mission to find the best restaurants in the city. Always up for trying new cuisines!',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob',
       },
@@ -53,6 +57,8 @@ async function main() {
         name: 'Charlie Brown',
         email: 'charlie@example.com',
         handle: 'charliebrown',
+        description:
+          "🥾 Adventure seeker and nature lover. When I'm not hiking, you can find me planning my next outdoor expedition.",
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlie',
       },
@@ -61,6 +67,8 @@ async function main() {
         name: 'Diana Prince',
         email: 'diana@example.com',
         handle: 'dianaprince',
+        description:
+          '🎨 Art curator and culture enthusiast. I believe art has the power to transform communities and inspire change.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=diana',
       },
@@ -69,6 +77,8 @@ async function main() {
         name: 'Eve Wilson',
         email: 'eve@example.com',
         handle: 'evewilson',
+        description:
+          "🏖️ Beach lover and wellness advocate. Life's too short not to enjoy the simple pleasures by the ocean.",
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eve',
       },
@@ -77,6 +87,8 @@ async function main() {
         name: 'Frank Miller',
         email: 'frank@example.com',
         handle: 'frankmiller',
+        description:
+          '💻 Tech entrepreneur and startup mentor. Passionate about innovation and building communities for creators.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=frank',
       },
@@ -91,6 +103,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Central Park Café',
+        description:
+          'A charming neighborhood café serving artisanal coffee and fresh pastries. Perfect for remote work with reliable WiFi and cozy seating areas.',
         address: '123 Main St, New York, NY 10001',
         latitude: 40.7589,
         longitude: -73.9851,
@@ -99,6 +113,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Riverside Restaurant',
+        description:
+          'Elegant dining with stunning river views. Features seasonal Italian cuisine, an extensive wine list, and outdoor terrace seating.',
         address: '456 River Rd, New York, NY 10002',
         latitude: 40.7614,
         longitude: -73.9776,
@@ -107,6 +123,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Mountain View Hiking Trail',
+        description:
+          'Scenic 3-mile hiking trail offering breathtaking panoramic views of the city skyline. Moderate difficulty with well-marked paths.',
         address: '789 Trail Way, New York, NY 10003',
         latitude: 40.7505,
         longitude: -73.9934,
@@ -115,6 +133,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Downtown Art Gallery',
+        description:
+          'Contemporary art gallery featuring rotating exhibitions from emerging and established artists. Free admission on Sundays.',
         address: '321 Art Ave, New York, NY 10004',
         latitude: 40.7282,
         longitude: -73.9942,
@@ -123,6 +143,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Seaside Beach',
+        description:
+          'Beautiful sandy beach with crystal clear waters. Family-friendly with lifeguards on duty, beach volleyball courts, and snack bars.',
         address: '555 Ocean Blvd, New York, NY 10005',
         latitude: 40.6892,
         longitude: -74.0445,
@@ -131,6 +153,8 @@ async function main() {
       {
         id: randomUUID(),
         name: 'Tech Hub Co-working Space',
+        description:
+          'Modern co-working space designed for entrepreneurs and creatives. Features high-speed internet, meeting rooms, and networking events.',
         address: '999 Innovation St, New York, NY 10006',
         latitude: 40.7489,
         longitude: -73.968,

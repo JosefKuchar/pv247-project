@@ -22,19 +22,24 @@ export const getLocationProfile = async (handle: string) => {
     return null;
   }
 
-  // Get reviews count and average rating
-  const [reviewStats] = await db
-    .select({
-      reviewsCount: count(review.id),
-      avgRating: avg(review.rating),
-    })
-    .from(review)
-    .where(eq(review.locationId, locationData.id));
+  const [reviewsCount, followersCount, avgRating] = await Promise.all([
+    db.$count(review, eq(review.locationId, locationData.id)),
+    db.$count(
+      userLocationFollow,
+      eq(userLocationFollow.locationId, locationData.id),
+    ),
+    db
+      .select({ avgRating: avg(review.rating) })
+      .from(review)
+      .where(eq(review.locationId, locationData.id))
+      .then(results => Number(results[0]?.avgRating) || 0),
+  ]);
 
   return {
     ...locationData,
-    reviewsCount: reviewStats?.reviewsCount || 0,
-    avgRating: Number(reviewStats?.avgRating) || 0,
+    reviewsCount,
+    followersCount,
+    avgRating,
   };
 };
 
