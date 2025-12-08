@@ -1,6 +1,5 @@
 'use client';
 
-// import { createReview } from '@/app/actions/review/create-review';
 import {
   searchLocationsAction,
   createLocationAction,
@@ -14,10 +13,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { createReview } from '@/modules/review/action';
 import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { createReviewFormSchema, type CreateReviewFormSchema } from './schema';
 
 export default function Page() {
-  const methods = useForm();
+  const methods = useForm<CreateReviewFormSchema>({
+    resolver: zodResolver(createReviewFormSchema),
+    defaultValues: {
+      location: '',
+      description: '',
+      rating: 0,
+      image: [],
+    },
+  });
   const router = useRouter();
 
   return (
@@ -25,20 +34,15 @@ export default function Page() {
       <h1 className="text-3xl font-bold">Create Review</h1>
       <FormProvider {...methods}>
         <form
-          onSubmit={methods.handleSubmit(async () => {
+          onSubmit={methods.handleSubmit(async data => {
             const formData = new FormData();
-            formData.append('description', methods.getValues('description'));
-            formData.append('rating', methods.getValues('rating'));
-            formData.append('locationId', methods.getValues('location'));
+            formData.append('description', data.description);
+            formData.append('rating', data.rating.toString());
+            formData.append('locationId', data.location);
 
-            // Handle multiple photos
-            const photos = methods.getValues('image');
-            if (photos) {
-              const photoArray = Array.isArray(photos) ? photos : [photos];
-              photoArray.forEach(photo => {
-                if (photo instanceof File) {
-                  formData.append('photos', photo);
-                }
+            if (data.image && data.image.length > 0) {
+              data.image.forEach(photo => {
+                formData.append('photos', photo);
               });
             }
 
