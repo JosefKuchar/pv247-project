@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, X } from 'lucide-react';
-import { Stars } from '@/components/ui/stars';
+import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import { Button } from '@/components/ui/button';
 
 interface LocationDetailProps {
@@ -38,15 +38,19 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
           <span className="truncate">{address}</span>
         </div>
       )}
-
-      <div className="flex items-center gap-2">
-        <Stars rating={averageRating || 0} />
-        <span className="text-base font-bold text-gray-900">
-          {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
-        </span>
-        <span className="text-xs text-gray-500">/ 5</span>
-      </div>
-
+      {typeof averageRating === 'number' && (
+        <div className="flex items-center gap-2">
+          <Rating value={averageRating || 0} readOnly>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <RatingButton size={20} className="text-yellow-500" key={index} />
+            ))}
+          </Rating>
+          <span className="text-base font-bold text-gray-900">
+            {averageRating.toFixed(1)}
+          </span>
+          <span className="text-xs text-gray-500">/ 5</span>
+        </div>
+      )}
       <Button
         className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
         onClick={onDetailClick}
