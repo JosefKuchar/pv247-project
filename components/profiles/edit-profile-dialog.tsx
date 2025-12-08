@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { updateProfileAction, type UpdateProfileData } from '@/app/actions/profile';
+import {
+  updateProfileAction,
+  type UpdateProfileData,
+} from '@/app/actions/profile';
 import { userType } from '@/db/schema';
 import {
   Dialog,
@@ -39,9 +42,9 @@ const updateProfileSchema = z.object({
     .optional()
     .refine(
       val => !val || val.trim() === '' || z.url().safeParse(val).success,
-      'Invalid image URL'
+      'Invalid image URL',
     )
-    .transform(val => (!val || val.trim() === '') ? null : val),
+    .transform(val => (!val || val.trim() === '' ? null : val)),
 });
 
 type FormData = z.infer<typeof updateProfileSchema>;
@@ -100,7 +103,7 @@ export const EditProfileDialog = ({
     } catch (error) {
       // Handle unexpected errors (network issues, etc.)
       form.setError('root', {
-        message: 'Failed to update profile. Please try again.'
+        message: 'Failed to update profile. Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -118,7 +121,8 @@ export const EditProfileDialog = ({
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Update your profile information. Changes will be visible to other users.
+            Update your profile information. Changes will be visible to other
+            users.
           </DialogDescription>
         </DialogHeader>
 
@@ -214,7 +218,8 @@ export const EditProfileDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    {field.value.length}/500 characters. This appears on your profile.
+                    {field.value.length}/500 characters. This appears on your
+                    profile.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -237,7 +242,8 @@ export const EditProfileDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter a URL for your profile image. Leave empty to use the default avatar.
+                    Enter a URL for your profile image. Leave empty to use the
+                    default avatar.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

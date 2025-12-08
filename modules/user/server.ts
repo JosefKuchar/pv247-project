@@ -25,6 +25,12 @@ export const getUserProfile = async (handle: string) => {
   return { ...userData, reviewsCount, followersCount, followingCount };
 };
 
+export const getUserById = async (id: string) => {
+  return db.query.user.findFirst({
+    where: eq(user.id, id),
+  });
+};
+
 export const getUserFollowStatus = async (targetUserHandle: string) => {
   const session = await auth.api.getSession({
     headers: await headers(),

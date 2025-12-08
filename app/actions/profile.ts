@@ -4,13 +4,11 @@ import {
   updateUserProfile,
   checkHandleAvailability,
   checkEmailAvailability,
+  getUserById,
 } from '@/modules/user/server';
 import { withAuth } from '@/lib/server-actions';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
-import { db } from '@/db';
-import { user } from '@/db/schema';
 
 const updateProfileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -24,10 +22,14 @@ const updateProfileSchema = z.object({
     .nullable()
     .optional()
     .refine(
-      val => !val || val === null || val.trim() === '' || z.url().safeParse(val).success,
-      'Invalid image URL'
+      val =>
+        !val ||
+        val === null ||
+        val.trim() === '' ||
+        z.url().safeParse(val).success,
+      'Invalid image URL',
     )
-    .transform(val => (!val || val === null || val.trim() === '') ? null : val),
+    .transform(val => (!val || val === null || val.trim() === '' ? null : val)),
 });
 
 export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
@@ -47,9 +49,7 @@ async function internalUpdateProfileAction(
     const validatedData = updateProfileSchema.parse(data);
 
     // Get current user data to check what's changing
-    const currentUser = await db.query.user.findFirst({
-      where: eq(user.id, userId),
-    });
+    const currentUser = await getUserById(userId);
 
     if (!currentUser) {
       return { success: false, message: 'User not found' };
@@ -71,7 +71,10 @@ async function internalUpdateProfileAction(
 
     // Check email availability if it's changing
     if (validatedData.email !== currentUser.email) {
-      const emailCheck = await checkEmailAvailability(validatedData.email, userId);
+      const emailCheck = await checkEmailAvailability(
+        validatedData.email,
+        userId,
+      );
       if (!emailCheck.available) {
         fieldErrors.email = 'This email is already in use';
       }
@@ -81,7 +84,7 @@ async function internalUpdateProfileAction(
     if (Object.keys(fieldErrors).length > 0) {
       return {
         success: false,
-        fieldErrors
+        fieldErrors,
       };
     }
 
@@ -102,7 +105,7 @@ async function internalUpdateProfileAction(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {};
-      error.issues.forEach((err) => {
+      error.issues.forEach(err => {
         const field = err.path[0]?.toString();
         if (field) {
           fieldErrors[field] = err.message;

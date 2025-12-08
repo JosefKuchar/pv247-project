@@ -91,7 +91,7 @@ export const EditPlaceDialog = ({
     } catch (error) {
       // Handle unexpected errors (network issues, etc.)
       form.setError('root', {
-        message: 'Failed to update place profile. Please try again.'
+        message: 'Failed to update place profile. Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -109,7 +109,8 @@ export const EditPlaceDialog = ({
         <DialogHeader>
           <DialogTitle>Edit Place Profile</DialogTitle>
           <DialogDescription>
-            Update the place information. Changes will be visible to other users.
+            Update the place information. Changes will be visible to other
+            users.
           </DialogDescription>
         </DialogHeader>
 
@@ -160,7 +161,8 @@ export const EditPlaceDialog = ({
                     </div>
                   </FormControl>
                   <FormDescription>
-                    Unique identifier for this place. This will change the place URL.
+                    Unique identifier for this place. This will change the place
+                    URL.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -183,7 +185,8 @@ export const EditPlaceDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    {(field.value || '').length}/500 characters. This appears on the place profile.
+                    {(field.value || '').length}/500 characters. This appears on
+                    the place profile.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -205,7 +208,8 @@ export const EditPlaceDialog = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    Physical address of this place. Leave empty if not applicable.
+                    Physical address of this place. Leave empty if not
+                    applicable.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

@@ -43,7 +43,7 @@ async function internalUpdatePlaceAction(
     if (!canManage) {
       return {
         success: false,
-        message: 'You are not authorized to edit this place'
+        message: 'You are not authorized to edit this place',
       };
     }
 
@@ -74,7 +74,7 @@ async function internalUpdatePlaceAction(
     if (Object.keys(fieldErrors).length > 0) {
       return {
         success: false,
-        fieldErrors
+        fieldErrors,
       };
     }
 
@@ -95,7 +95,7 @@ async function internalUpdatePlaceAction(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {};
-      error.issues.forEach((err) => {
+      error.issues.forEach(err => {
         const field = err.path[0]?.toString();
         if (field) {
           fieldErrors[field] = err.message;

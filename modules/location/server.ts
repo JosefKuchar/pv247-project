@@ -23,7 +23,10 @@ export const getLocationProfile = async (handle: string) => {
 
   const [reviewsCount, followersCount, avgRating] = await Promise.all([
     db.$count(review, eq(review.locationId, locationData.id)),
-    db.$count(userLocationFollow, eq(userLocationFollow.locationId, locationData.id)),
+    db.$count(
+      userLocationFollow,
+      eq(userLocationFollow.locationId, locationData.id),
+    ),
     db
       .select({ avgRating: avg(review.rating) })
       .from(review)

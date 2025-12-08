@@ -12,7 +12,7 @@ export async function checkUserCanManagePlace(
     where: and(
       eq(locationManagement.userId, userId),
       eq(locationManagement.locationId, placeId),
-      eq(locationManagement.approved, true) // Only approved claims can manage
+      eq(locationManagement.approved, true), // Only approved claims can manage
     ),
   });
 

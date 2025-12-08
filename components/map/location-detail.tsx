@@ -35,7 +35,7 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
       <h2 className="truncate text-lg font-semibold text-gray-900">{name}</h2>
 
       {description.trim() && (
-        <p className="text-sm text-gray-700 line-clamp-2">{description}</p>
+        <p className="line-clamp-2 text-sm text-gray-700">{description}</p>
       )}
 
       {address && (
