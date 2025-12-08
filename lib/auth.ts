@@ -19,6 +19,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       handle: { type: 'string' },
+      isAdmin: { type: 'boolean' },
     },
   },
   emailAndPassword: {

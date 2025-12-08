@@ -16,11 +16,13 @@ type UserProfile = userType & {
 type UserProfileCardProps = {
   userProfile: UserProfile;
   isOwnProfile?: boolean;
+  isAdmin?: boolean;
 };
 
 export const UserProfileCard = ({
   userProfile,
   isOwnProfile = false,
+  isAdmin = false,
 }: UserProfileCardProps) => {
   return (
     <div className="space-y-6">
@@ -61,6 +63,7 @@ export const UserProfileCard = ({
               <UserProfileOptions
                 isOwnProfile={isOwnProfile}
                 currentUser={userProfile}
+                isAdmin={isAdmin}
               />
             </div>
           </div>

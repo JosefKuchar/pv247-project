@@ -17,8 +17,9 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   try {
-    // Clear existing data (in reverse order of dependencies)
     console.log('Clearing existing data...');
+    const { account: accountTable } = await import('../schema');
+    await db.delete(accountTable);
     await db.delete(locationManagement);
     await db.delete(userLocationFollow);
     await db.delete(follow);
@@ -29,9 +30,60 @@ async function main() {
     await db.delete(location);
     await db.delete(user);
 
-    // Create users
-    console.log('Creating users...');
-    const users = [
+    console.log('Creating admin account with password...');
+    const { auth: betterAuth } = await import('../../lib/auth');
+
+    const adminName = process.env.ADMIN_NAME;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminHandle = process.env.ADMIN_HANDLE;
+
+    if (!adminEmail || !adminPassword || !adminHandle || !adminName) {
+      throw new Error('Admin credentials not configured.');
+    }
+
+    try {
+      await betterAuth.api.signUpEmail({
+        body: {
+          name: adminName,
+          email: adminEmail,
+          password: adminPassword,
+          image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+          handle: adminHandle,
+          isAdmin: true,
+        },
+      });
+      console.log('Admin account created');
+
+      // Only log credentials in development
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Name: ${adminName}`);
+        console.log(`Email: ${adminEmail}`);
+        console.log(`Password: ${adminPassword}`);
+        console.log(`Handle: ${adminHandle}`);
+      } else {
+        console.log('Admin credentials set from environment variables');
+      }
+    } catch (error) {
+      console.error('Failed to create admin account:', error);
+      throw error;
+    }
+
+    const { eq: eqOperator } = await import('drizzle-orm');
+    const adminUsers = await db
+      .select()
+      .from(user)
+      .where(eqOperator(user.email, adminEmail))
+      .limit(1);
+
+    if (adminUsers.length === 0) {
+      throw new Error('Admin user was not created');
+    }
+
+    const admin = adminUsers[0];
+
+    console.log('Creating other users...');
+    const otherUsers = [
       {
         id: randomUUID(),
         name: 'Alice Johnson',
@@ -94,8 +146,8 @@ async function main() {
       },
     ];
 
-    await db.insert(user).values(users);
-    const [alice, bob, charlie, diana, eve, frank] = users;
+    await db.insert(user).values(otherUsers);
+    const [alice, bob, charlie, diana, eve, frank] = otherUsers;
 
     // Create locations
     console.log('Creating locations...');
@@ -393,7 +445,7 @@ async function main() {
     ]);
 
     console.log('✅ Seeding completed successfully!');
-    console.log(`   - ${users.length} users created`);
+    console.log(`   - 7 users created (including admin)`);
     console.log(`   - ${locations.length} locations created`);
     console.log(`   - ${reviews.length} reviews created`);
     console.log(`   - 6 review photos created`);

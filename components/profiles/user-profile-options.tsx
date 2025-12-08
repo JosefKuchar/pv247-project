@@ -10,12 +10,14 @@ import type { userType } from '@/db/schema';
 type UserProfileOptionsProps = {
   isOwnProfile: boolean;
   currentUser: userType;
+  isAdmin?: boolean;
   className?: string;
 };
 
 export const UserProfileOptions = ({
   isOwnProfile,
   currentUser,
+  isAdmin = false,
   className,
 }: UserProfileOptionsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -23,6 +25,10 @@ export const UserProfileOptions = ({
 
   const handleEditProfile = () => {
     setIsEditDialogOpen(true);
+  };
+
+  const handleAdminPanel = () => {
+    router.push('/admin/claims');
   };
 
   const handleLogout = async () => {
@@ -36,22 +42,29 @@ export const UserProfileOptions = ({
   };
 
   const getOptions = () => {
+    const options = [];
+
     if (isOwnProfile) {
-      return [
-        {
-          label: 'Edit profile',
-          onClick: handleEditProfile,
-        },
-        {
-          label: 'Log out',
-          onClick: handleLogout,
-          variant: 'destructive' as const,
-        },
-      ];
+      options.push({
+        label: 'Edit profile',
+        onClick: handleEditProfile,
+      });
+
+      if (isAdmin) {
+        options.push({
+          label: 'Admin panel',
+          onClick: handleAdminPanel,
+        });
+      }
+
+      options.push({
+        label: 'Log out',
+        onClick: handleLogout,
+        variant: 'destructive' as const,
+      });
     }
 
-    // For other users' profiles, no options for now
-    return [];
+    return options;
   };
 
   return (
