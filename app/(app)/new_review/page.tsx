@@ -1,7 +1,10 @@
 'use client';
 
 // import { createReview } from '@/app/actions/review/create-review';
-import { searchLocationsAction } from '@/app/actions/locations';
+import {
+  searchLocationsAction,
+  createLocationAction,
+} from '@/app/actions/locations';
 import {
   FormCombobox,
   FormDropzone,
@@ -35,6 +38,11 @@ export default function Page() {
             fetchOptions={async (query: string) => {
               return searchLocationsAction(query);
             }}
+            allowCreate={true}
+            onCreateNew={async data => {
+              return createLocationAction(data.name, data.address);
+            }}
+            createLabel="Create new location"
           />
           <FormTextarea name="description" label="Description" />
           <FormDropzone name="image" />

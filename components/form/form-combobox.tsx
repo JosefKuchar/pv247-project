@@ -7,7 +7,6 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -29,6 +28,18 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Spinner } from '@/components/ui/spinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
 
 export type ComboboxOption = {
   value: string;
@@ -52,6 +63,16 @@ export interface FormComboboxProps {
   fetchOptions?: (query: string) => Promise<ComboboxOption[]>;
   /** Debounce delay in ms (default: 300) */
   debounceMs?: number;
+  /** Enable creating new options when no results found */
+  allowCreate?: boolean;
+  /** Callback when creating a new option - receives the new option data */
+  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+    success: boolean;
+    data?: ComboboxOption;
+    error?: string;
+  }>;
+  /** Label for the create new option */
+  createLabel?: string;
 }
 
 export const FormCombobox: React.FC<FormComboboxProps> = ({
@@ -67,6 +88,9 @@ export const FormCombobox: React.FC<FormComboboxProps> = ({
   queryKey,
   fetchOptions,
   debounceMs = 300,
+  allowCreate = false,
+  onCreateNew,
+  createLabel = 'Create new...',
 }) => {
   const {
     control,
@@ -103,6 +127,9 @@ export const FormCombobox: React.FC<FormComboboxProps> = ({
             debounceMs={debounceMs}
             hasError={!!error}
             name={name}
+            allowCreate={allowCreate}
+            onCreateNew={onCreateNew}
+            createLabel={createLabel}
           />
         )}
       />
@@ -134,6 +161,13 @@ interface ComboboxResponsiveProps {
   debounceMs: number;
   hasError: boolean;
   name: string;
+  allowCreate?: boolean;
+  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+    success: boolean;
+    data?: ComboboxOption;
+    error?: string;
+  }>;
+  createLabel?: string;
 }
 
 function ComboboxResponsive({
@@ -150,6 +184,9 @@ function ComboboxResponsive({
   debounceMs,
   hasError,
   name,
+  allowCreate,
+  onCreateNew,
+  createLabel,
 }: ComboboxResponsiveProps) {
   const [open, setOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
@@ -229,6 +266,9 @@ function ComboboxResponsive({
             selectedValue={value}
             onSelect={handleSelect}
             setSelectedOption={setSelectedOption}
+            allowCreate={allowCreate}
+            onCreateNew={onCreateNew}
+            createLabel={createLabel}
           />
         </PopoverContent>
       </Popover>
@@ -253,6 +293,9 @@ function ComboboxResponsive({
             selectedValue={value}
             onSelect={handleSelect}
             setSelectedOption={setSelectedOption}
+            allowCreate={allowCreate}
+            onCreateNew={onCreateNew}
+            createLabel={createLabel}
           />
         </div>
       </DrawerContent>
@@ -272,6 +315,13 @@ interface OptionsListProps {
   setSelectedOption: React.Dispatch<
     React.SetStateAction<ComboboxOption | null>
   >;
+  allowCreate?: boolean;
+  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+    success: boolean;
+    data?: ComboboxOption;
+    error?: string;
+  }>;
+  createLabel?: string;
 }
 
 function OptionsList({
@@ -284,9 +334,17 @@ function OptionsList({
   selectedValue,
   onSelect,
   setSelectedOption,
+  allowCreate,
+  onCreateNew,
+  createLabel,
 }: OptionsListProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [debouncedQuery, setDebouncedQuery] = React.useState('');
+  const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+  const [isCreating, setIsCreating] = React.useState(false);
+  const [createError, setCreateError] = React.useState<string | null>(null);
+  const [newLocationName, setNewLocationName] = React.useState('');
+  const [newLocationAddress, setNewLocationAddress] = React.useState('');
 
   const isAsync = !!fetchOptions;
 
@@ -331,43 +389,167 @@ function OptionsList({
     }
   }, [asyncOptions, selectedValue, isAsync, setSelectedOption]);
 
+  const handleCreateClick = () => {
+    setNewLocationName(searchQuery.trim());
+    setNewLocationAddress('');
+    setCreateError(null);
+    setCreateDialogOpen(true);
+  };
+
+  const handleCreateSubmit = async () => {
+    if (!onCreateNew || !newLocationName.trim()) {
+      setCreateError('Location name is required');
+      return;
+    }
+
+    setIsCreating(true);
+    setCreateError(null);
+
+    try {
+      const result = await onCreateNew({
+        name: newLocationName.trim(),
+        address: newLocationAddress.trim() || undefined,
+      });
+
+      if (result.success && result.data) {
+        setSelectedOption(result.data);
+        onSelect(result.data);
+        setCreateDialogOpen(false);
+        setSearchQuery('');
+        setNewLocationName('');
+        setNewLocationAddress('');
+      } else {
+        setCreateError(result.error || 'Failed to create location');
+      }
+    } catch (error) {
+      setCreateError(
+        error instanceof Error ? error.message : 'Failed to create location',
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const showCreateOption =
+    allowCreate &&
+    onCreateNew &&
+    searchQuery.trim().length > 0 &&
+    !isLoading &&
+    options.length === 0;
+
   return (
-    <Command shouldFilter={false}>
-      <CommandInput
-        placeholder={searchPlaceholder}
-        value={searchQuery}
-        onValueChange={setSearchQuery}
-      />
-      <CommandList>
-        {isLoading ? (
-          <div className="flex items-center justify-center py-6">
-            <Spinner />
+    <>
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Location</DialogTitle>
+            <DialogDescription>
+              Add a new location to the platform
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-location-name">
+                Location Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="new-location-name"
+                type="text"
+                value={newLocationName}
+                onChange={e => setNewLocationName(e.target.value)}
+                placeholder="Enter location name"
+                disabled={isCreating}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-location-address">Address (optional)</Label>
+              <Input
+                id="new-location-address"
+                type="text"
+                value={newLocationAddress}
+                onChange={e => setNewLocationAddress(e.target.value)}
+                placeholder="Enter address"
+                disabled={isCreating}
+              />
+            </div>
+            {createError && (
+              <p className="text-destructive text-sm">{createError}</p>
+            )}
           </div>
-        ) : (
-          <>
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
-            <CommandGroup>
-              {options.map(option => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={() => onSelect(option)}
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedValue === option.value
-                        ? 'opacity-100'
-                        : 'opacity-0',
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </>
-        )}
-      </CommandList>
-    </Command>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCreateDialogOpen(false)}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateSubmit} disabled={isCreating}>
+              {isCreating ? 'Creating...' : 'Create'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Command shouldFilter={false}>
+        <CommandInput
+          placeholder={searchPlaceholder}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <CommandList>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              <CommandEmpty>
+                {showCreateOption ? (
+                  <div className="flex flex-col items-center gap-2 py-4">
+                    <p>{emptyMessage}</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCreateClick}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {createLabel} "{searchQuery}"
+                    </Button>
+                  </div>
+                ) : (
+                  emptyMessage
+                )}
+              </CommandEmpty>
+              <CommandGroup>
+                {options.map(option => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={() => onSelect(option)}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        selectedValue === option.value
+                          ? 'opacity-100'
+                          : 'opacity-0',
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                ))}
+                {showCreateOption && (
+                  <CommandItem onSelect={handleCreateClick}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    {createLabel} "{searchQuery}"
+                  </CommandItem>
+                )}
+              </CommandGroup>
+            </>
+          )}
+        </CommandList>
+      </Command>
+    </>
   );
 }
