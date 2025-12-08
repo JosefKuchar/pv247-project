@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { ProfileOptionsDropdown } from '@/components/ui/profile-options-dropdown';
 import { EditPlaceDialog } from '@/components/profiles/edit-place-dialog';
 import type { locationType } from '@/db/schema';
+import { claimPlaceAction, unclaimPlaceAction } from '@/app/actions/locations';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 type PlaceProfileOptionsProps = {
   isManager: boolean;
@@ -17,19 +21,53 @@ export const PlaceProfileOptions = ({
   className,
 }: PlaceProfileOptionsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleEditPlace = () => {
     setIsEditDialogOpen(true);
   };
 
+  const claimMutation = useMutation({
+    mutationFn: () => claimPlaceAction(currentPlace.handle),
+    onSuccess: result => {
+      if (result.success) {
+        toast.success(result.message || 'Claim submitted successfully');
+        // Invalidate queries and refresh the page to update the UI
+        queryClient.invalidateQueries();
+        router.refresh();
+      } else {
+        toast.error(result.message || 'Failed to submit claim');
+      }
+    },
+    onError: () => {
+      toast.error('An error occurred. Please try again.');
+    },
+  });
+
+  const unclaimMutation = useMutation({
+    mutationFn: () => unclaimPlaceAction(currentPlace.handle),
+    onSuccess: result => {
+      if (result.success) {
+        toast.success(result.message || 'Location unclaimed successfully');
+        // Invalidate queries and refresh the page to update the UI
+        queryClient.invalidateQueries();
+        router.refresh();
+      } else {
+        toast.error(result.message || 'Failed to unclaim location');
+      }
+    },
+    onError: () => {
+      toast.error('An error occurred. Please try again.');
+    },
+  });
+
   const handleUnclaimPlace = () => {
-    // TODO: Implement unclaim place functionality
-    console.log('Unclaim place clicked');
+    unclaimMutation.mutate();
   };
 
   const handleClaimPlace = () => {
-    // TODO: Implement claim place functionality
-    console.log('Claim place clicked');
+    claimMutation.mutate();
   };
 
   const getOptions = () => {

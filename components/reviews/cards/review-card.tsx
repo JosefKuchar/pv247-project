@@ -61,14 +61,14 @@ export const ReviewCard = ({
   };
 
   return (
-    <Card className="w-full shadow-md">
+    <Card className="w-full max-w-full overflow-hidden shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
-      <CardHeader className="flex flex-col gap-4">
+      <CardHeader className="flex min-w-0 flex-col gap-4">
         {showUserInfo && (
           <div>
             <a
               href={`/${review.user.handle}`}
-              className="flex items-center gap-2"
+              className="flex min-w-0 items-center gap-2"
             >
               {review.user.image ? (
                 <Image
@@ -76,15 +76,15 @@ export const ReviewCard = ({
                   alt={review.user.name}
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="shrink-0 rounded-full"
                   unoptimized
                 />
               ) : (
-                <div className="h-10 w-10 rounded-full bg-gray-300" />
+                <div className="h-10 w-10 shrink-0 rounded-full bg-gray-300" />
               )}
-              <h3 className="font-semibold">
-                {review.user.name}
-                <span className="font-normal text-gray-500">
+              <h3 className="min-w-0 truncate font-semibold">
+                <span className="block truncate">{review.user.name}</span>
+                <span className="block truncate font-normal text-gray-500">
                   @{review.user.handle}
                 </span>
               </h3>
@@ -93,16 +93,18 @@ export const ReviewCard = ({
         )}
 
         {showLocationInfo && (
-          <div className="flex items-center justify-between">
+          <div className="flex min-w-0 items-center justify-between gap-2">
             <a
               href={`/place/${review.location.handle}`}
-              className="flex items-center gap-2"
+              className="flex min-w-0 flex-1 items-center gap-2"
             >
-              <p className="font-semibold">{review.location.name}</p>
+              <p className="min-w-0 truncate font-semibold">
+                {review.location.name}
+              </p>
               <Rating
                 value={review.location.avgRating}
                 readOnly
-                className="gap-1"
+                className="shrink-0 gap-1"
               >
                 {Array.from({ length: 5 }).map((_, index) => (
                   <RatingButton size={12} key={index} />
@@ -110,7 +112,7 @@ export const ReviewCard = ({
               </Rating>
             </a>
             {!showUserInfo && (
-              <Rating value={review.rating} readOnly>
+              <Rating value={review.rating} readOnly className="shrink-0">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <RatingButton size={12} key={index} />
                 ))}
@@ -130,14 +132,16 @@ export const ReviewCard = ({
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-gray-700">{review.description}</p>
+        <p className="text-sm break-words text-gray-700">
+          {review.description}
+        </p>
         {review.photos.length > 0 && (
-          <Carousel className="relative flex items-center justify-center pt-4">
-            <CarouselContent>
+          <Carousel className="relative flex w-full max-w-full items-center justify-center pt-4">
+            <CarouselContent className="w-full">
               {review.photos.map((photo, index) => (
                 <CarouselItem
                   key={index}
-                  className="relative h-96 w-96 object-contain"
+                  className="relative aspect-square h-64 w-full max-w-full sm:h-80 md:h-96"
                 >
                   <Image
                     src={photo.url}
@@ -145,6 +149,7 @@ export const ReviewCard = ({
                     fill
                     placeholder="blur"
                     blurDataURL={photo.url}
+                    className="object-contain"
                   />
                 </CarouselItem>
               ))}
@@ -158,16 +163,16 @@ export const ReviewCard = ({
           </Carousel>
         )}
       </CardContent>
-      <CardFooter className="flex flex-col gap-2 border-t">
+      <CardFooter className="flex min-w-0 flex-col gap-2 border-t">
         {showComments && (
-          <div className="w-full pb-4">
+          <div className="w-full min-w-0 pb-4">
             <ReviewCommentList
               review_id={review.id}
               callbackAddComment={callbackAddComment}
             />
           </div>
         )}
-        <div className="flex w-full justify-between">
+        <div className="flex w-full min-w-0 justify-between gap-2">
           <div className="flex gap-4">
             <div className="flex items-center transition duration-200 ease-in-out hover:text-red-400">
               {toggleLikeMutation.isPending ? (
