@@ -26,6 +26,8 @@ export async function updatePlaceProfile(
     handle: string;
     description: string;
     address?: string;
+    latitude?: number;
+    longitude?: number;
   },
 ) {
   await db.update(location).set(data).where(eq(location.id, placeId));

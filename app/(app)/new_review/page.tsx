@@ -71,7 +71,12 @@ export default function Page() {
             }}
             allowCreate={true}
             onCreateNew={async data => {
-              return createLocationAction(data.name, data.address);
+              return createLocationAction(
+                data.name,
+                data.address,
+                data.latitude,
+                data.longitude,
+              );
             }}
             createLabel="Create new location"
           />

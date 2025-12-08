@@ -39,7 +39,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, MapPin } from 'lucide-react';
+import { LocationPicker } from '@/components/map/location-picker';
 
 export type ComboboxOption = {
   value: string;
@@ -66,7 +67,12 @@ export interface FormComboboxProps {
   /** Enable creating new options when no results found */
   allowCreate?: boolean;
   /** Callback when creating a new option - receives the new option data */
-  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+  onCreateNew?: (data: {
+    name: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+  }) => Promise<{
     success: boolean;
     data?: ComboboxOption;
     error?: string;
@@ -162,7 +168,12 @@ interface ComboboxResponsiveProps {
   hasError: boolean;
   name: string;
   allowCreate?: boolean;
-  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+  onCreateNew?: (data: {
+    name: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+  }) => Promise<{
     success: boolean;
     data?: ComboboxOption;
     error?: string;
@@ -316,7 +327,12 @@ interface OptionsListProps {
     React.SetStateAction<ComboboxOption | null>
   >;
   allowCreate?: boolean;
-  onCreateNew?: (data: { name: string; address?: string }) => Promise<{
+  onCreateNew?: (data: {
+    name: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+  }) => Promise<{
     success: boolean;
     data?: ComboboxOption;
     error?: string;
@@ -345,6 +361,12 @@ function OptionsList({
   const [createError, setCreateError] = React.useState<string | null>(null);
   const [newLocationName, setNewLocationName] = React.useState('');
   const [newLocationAddress, setNewLocationAddress] = React.useState('');
+  const [newLocationLat, setNewLocationLat] = React.useState<string>('');
+  const [newLocationLng, setNewLocationLng] = React.useState<string>('');
+  const [selectedMapPosition, setSelectedMapPosition] = React.useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   const isAsync = !!fetchOptions;
 
@@ -392,8 +414,39 @@ function OptionsList({
   const handleCreateClick = () => {
     setNewLocationName(searchQuery.trim());
     setNewLocationAddress('');
+    setNewLocationLat('');
+    setNewLocationLng('');
+    setSelectedMapPosition(null);
     setCreateError(null);
     setCreateDialogOpen(true);
+  };
+
+  const handleMapLocationSelect = (coords: { lat: number; lng: number }) => {
+    setSelectedMapPosition(coords);
+    setNewLocationLat(coords.lat.toFixed(6));
+    setNewLocationLng(coords.lng.toFixed(6));
+  };
+
+  const handleLatChange = (value: string) => {
+    setNewLocationLat(value);
+    const lat = parseFloat(value);
+    const lng = parseFloat(newLocationLng);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setSelectedMapPosition({ lat, lng });
+    } else if (!isNaN(lat) && selectedMapPosition) {
+      setSelectedMapPosition({ lat, lng: selectedMapPosition.lng });
+    }
+  };
+
+  const handleLngChange = (value: string) => {
+    setNewLocationLng(value);
+    const lat = parseFloat(newLocationLat);
+    const lng = parseFloat(value);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setSelectedMapPosition({ lat, lng });
+    } else if (!isNaN(lng) && selectedMapPosition) {
+      setSelectedMapPosition({ lat: selectedMapPosition.lat, lng });
+    }
   };
 
   const handleCreateSubmit = async () => {
@@ -406,9 +459,14 @@ function OptionsList({
     setCreateError(null);
 
     try {
+      const lat = parseFloat(newLocationLat);
+      const lng = parseFloat(newLocationLng);
+
       const result = await onCreateNew({
         name: newLocationName.trim(),
         address: newLocationAddress.trim() || undefined,
+        latitude: !isNaN(lat) ? lat : undefined,
+        longitude: !isNaN(lng) ? lng : undefined,
       });
 
       if (result.success && result.data) {
@@ -418,6 +476,9 @@ function OptionsList({
         setSearchQuery('');
         setNewLocationName('');
         setNewLocationAddress('');
+        setNewLocationLat('');
+        setNewLocationLng('');
+        setSelectedMapPosition(null);
       } else {
         setCreateError(result.error || 'Failed to create location');
       }
@@ -447,7 +508,7 @@ function OptionsList({
               Add a new location to the platform
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="max-h-[60vh] space-y-4 overflow-y-auto py-4">
             <div className="space-y-2">
               <Label htmlFor="new-location-name">
                 Location Name <span className="text-destructive">*</span>
@@ -471,6 +532,46 @@ function OptionsList({
                 placeholder="Enter address"
                 disabled={isCreating}
               />
+            </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Location on Map
+              </Label>
+              <p className="text-muted-foreground mb-2 text-xs">
+                Click on the map to select coordinates, or enter them manually
+                below
+              </p>
+              <LocationPicker
+                selectedPosition={selectedMapPosition}
+                onLocationSelect={handleMapLocationSelect}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-location-lat">Latitude</Label>
+                <Input
+                  id="new-location-lat"
+                  type="number"
+                  step="any"
+                  value={newLocationLat}
+                  onChange={e => handleLatChange(e.target.value)}
+                  placeholder="e.g., 49.1951"
+                  disabled={isCreating}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="new-location-lng">Longitude</Label>
+                <Input
+                  id="new-location-lng"
+                  type="number"
+                  step="any"
+                  value={newLocationLng}
+                  onChange={e => handleLngChange(e.target.value)}
+                  placeholder="e.g., 16.6068"
+                  disabled={isCreating}
+                />
+              </div>
             </div>
             {createError && (
               <p className="text-destructive text-sm">{createError}</p>

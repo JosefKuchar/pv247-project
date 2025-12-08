@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { updatePlaceAction, type UpdatePlaceData } from '@/app/actions/place';
+import { updatePlaceAction } from '@/app/actions/place';
 import { locationType } from '@/db/schema';
 import {
   Dialog,
@@ -26,6 +26,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { LocationPicker } from '@/components/map/location-picker';
+import { MapPin } from 'lucide-react';
 
 const updatePlaceSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -34,9 +36,16 @@ const updatePlaceSchema = z.object({
     .string()
     .max(500, 'Description must be 500 characters or less'),
   address: z.string().optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 type FormData = z.infer<typeof updatePlaceSchema>;
+
+type Coordinates = {
+  lat: number;
+  lng: number;
+};
 
 type EditPlaceDialogProps = {
   isOpen: boolean;
@@ -50,6 +59,12 @@ export const EditPlaceDialog = ({
   currentPlace,
 }: EditPlaceDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedMapPosition, setSelectedMapPosition] =
+    useState<Coordinates | null>(
+      currentPlace.latitude && currentPlace.longitude
+        ? { lat: currentPlace.latitude, lng: currentPlace.longitude }
+        : null,
+    );
   const router = useRouter();
 
   const form = useForm<FormData>({
@@ -59,8 +74,53 @@ export const EditPlaceDialog = ({
       handle: currentPlace.handle,
       description: currentPlace.description || '',
       address: currentPlace.address || '',
+      latitude: currentPlace.latitude || undefined,
+      longitude: currentPlace.longitude || undefined,
     },
   });
+
+  // Reset map position when dialog opens with new place data
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedMapPosition(
+        currentPlace.latitude && currentPlace.longitude
+          ? { lat: currentPlace.latitude, lng: currentPlace.longitude }
+          : null,
+      );
+    }
+  }, [isOpen, currentPlace.latitude, currentPlace.longitude]);
+
+  const handleMapLocationSelect = (coords: Coordinates) => {
+    setSelectedMapPosition(coords);
+    form.setValue('latitude', coords.lat);
+    form.setValue('longitude', coords.lng);
+  };
+
+  const handleLatChange = (value: string) => {
+    const lat = parseFloat(value);
+    if (!isNaN(lat)) {
+      form.setValue('latitude', lat);
+      const lng = form.getValues('longitude');
+      if (lng !== undefined) {
+        setSelectedMapPosition({ lat, lng });
+      }
+    } else {
+      form.setValue('latitude', undefined);
+    }
+  };
+
+  const handleLngChange = (value: string) => {
+    const lng = parseFloat(value);
+    if (!isNaN(lng)) {
+      form.setValue('longitude', lng);
+      const lat = form.getValues('latitude');
+      if (lat !== undefined) {
+        setSelectedMapPosition({ lat, lng });
+      }
+    } else {
+      form.setValue('longitude', undefined);
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -88,7 +148,7 @@ export const EditPlaceDialog = ({
           form.setError('root', { message: 'An unexpected error occurred' });
         }
       }
-    } catch (error) {
+    } catch {
       // Handle unexpected errors (network issues, etc.)
       form.setError('root', {
         message: 'Failed to update place profile. Please try again.',
@@ -100,12 +160,17 @@ export const EditPlaceDialog = ({
 
   const handleClose = () => {
     form.reset(); // Reset form when closing
+    setSelectedMapPosition(
+      currentPlace.latitude && currentPlace.longitude
+        ? { lat: currentPlace.latitude, lng: currentPlace.longitude }
+        : null,
+    );
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Place Profile</DialogTitle>
           <DialogDescription>
@@ -215,6 +280,72 @@ export const EditPlaceDialog = ({
                 </FormItem>
               )}
             />
+
+            <div className="space-y-2">
+              <FormLabel className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Location on Map
+              </FormLabel>
+              <p className="text-muted-foreground text-xs">
+                Click on the map to select coordinates, or enter them manually
+                below
+              </p>
+              <LocationPicker
+                selectedPosition={selectedMapPosition}
+                onLocationSelect={handleMapLocationSelect}
+                initialCenter={
+                  currentPlace.latitude && currentPlace.longitude
+                    ? {
+                        lat: currentPlace.latitude,
+                        lng: currentPlace.longitude,
+                      }
+                    : undefined
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="e.g., 49.1951"
+                        value={field.value ?? ''}
+                        onChange={e => handleLatChange(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="e.g., 16.6068"
+                        value={field.value ?? ''}
+                        onChange={e => handleLngChange(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button

@@ -19,6 +19,8 @@ const updatePlaceSchema = z.object({
     .string()
     .max(500, 'Description must be 500 characters or less'),
   address: z.string().optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 export type UpdatePlaceData = z.infer<typeof updatePlaceSchema>;
