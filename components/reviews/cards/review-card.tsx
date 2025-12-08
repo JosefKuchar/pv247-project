@@ -143,13 +143,6 @@ export const ReviewCard = ({
                 ))}
               </Rating>
             </a>
-            {!showUserInfo && (
-              <Rating value={review.rating} readOnly className="shrink-0">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <RatingButton size={12} key={index} />
-                ))}
-              </Rating>
-            )}
           </div>
         )}
 
@@ -163,36 +156,40 @@ export const ReviewCard = ({
         </Rating>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="overflow-hidden">
         <p className="text-sm break-words text-gray-700">
           {review.description}
         </p>
         {review.photos.length > 0 && (
-          <Carousel className="relative flex w-full max-w-full items-center justify-center pt-4">
-            <CarouselContent className="w-full">
-              {review.photos.map((photo, index) => (
-                <CarouselItem
-                  key={index}
-                  className="relative aspect-square h-64 w-full max-w-full sm:h-80 md:h-96"
-                >
-                  <Image
-                    src={photo.url}
-                    alt={`Photo ${index + 1}`}
-                    fill
-                    placeholder="blur"
-                    blurDataURL={photo.url}
-                    className="object-contain"
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {review.photos.length > 1 && (
-              <>
-                <CarouselPrevious className="absolute top-1/2 left-2 z-1 -translate-y-1/2" />
-                <CarouselNext className="absolute top-1/2 right-2 z-1 -translate-y-1/2" />
-              </>
-            )}
-          </Carousel>
+          <div className="pt-4">
+            <Carousel className="w-full">
+              <CarouselContent className="ml-0">
+                {review.photos.map((photo, index) => (
+                  <CarouselItem key={index} className="pl-0">
+                    <div className="relative w-full overflow-hidden rounded-md">
+                      <div className="relative aspect-video max-h-96 w-full">
+                        <Image
+                          src={photo.url}
+                          alt={`Photo ${index + 1}`}
+                          fill
+                          placeholder="blur"
+                          blurDataURL={photo.url}
+                          className="object-contain"
+                          sizes="100vw, (max-width: 768px) 80vw, 96vw"
+                        />
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {review.photos.length > 1 && (
+                <>
+                  <CarouselPrevious className="absolute top-1/2 left-2 z-10 -translate-y-1/2 sm:left-4" />
+                  <CarouselNext className="absolute top-1/2 right-2 z-10 -translate-y-1/2 sm:right-4" />
+                </>
+              )}
+            </Carousel>
+          </div>
         )}
       </CardContent>
       <CardFooter className="flex min-w-0 flex-col gap-2 border-t">
