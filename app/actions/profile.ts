@@ -95,10 +95,10 @@ async function internalUpdateProfileAction(
     await updateUserProfile(userId, validatedData);
 
     // Revalidate relevant paths
-    revalidatePath('/(app)/(profile)/[handle]');
-    revalidatePath(`/(app)/(profile)/${oldHandle}`);
     if (validatedData.handle !== oldHandle) {
       revalidatePath(`/(app)/(profile)/${validatedData.handle}`);
+    } else {
+      revalidatePath(`/(app)/(profile)/${oldHandle}`);
     }
 
     return { success: true };

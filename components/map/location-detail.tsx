@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 
 interface LocationDetailProps {
   name: string;
-  description: string;
   address?: string | null;
   averageRating?: number | null;
   onDetailClick?: () => void;
@@ -14,7 +13,6 @@ interface LocationDetailProps {
 
 export const LocationDetail: React.FC<LocationDetailProps> = ({
   name,
-  description,
   address,
   averageRating,
   onDetailClick,
@@ -33,10 +31,6 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
       )}
 
       <h2 className="truncate text-lg font-semibold text-gray-900">{name}</h2>
-
-      {description.trim() && (
-        <p className="line-clamp-2 text-sm text-gray-700">{description}</p>
-      )}
 
       {address && (
         <div className="flex items-center gap-2 text-xs text-gray-500">

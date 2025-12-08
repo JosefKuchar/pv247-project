@@ -39,12 +39,11 @@ const updateProfileSchema = z.object({
     .max(500, 'Description must be 500 characters or less'),
   image: z
     .string()
-    .optional()
     .refine(
       val => !val || val.trim() === '' || z.url().safeParse(val).success,
       'Invalid image URL',
     )
-    .transform(val => (!val || val.trim() === '' ? null : val)),
+    .transform(val => (val && val.trim() !== '' ? val : '')),
 });
 
 type FormData = z.infer<typeof updateProfileSchema>;
