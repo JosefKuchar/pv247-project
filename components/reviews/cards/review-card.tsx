@@ -93,7 +93,7 @@ export const ReviewCard = ({
   };
 
   return (
-    <Card className="w-full max-w-full overflow-hidden shadow-md">
+    <Card className="flex w-full max-w-full flex-col overflow-hidden shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
       <CardHeader className="flex min-w-0 flex-col gap-4">
         {showUserInfo && (
@@ -156,7 +156,7 @@ export const ReviewCard = ({
         </Rating>
       </CardHeader>
 
-      <CardContent className="overflow-hidden">
+      <CardContent className="flex-1 overflow-hidden">
         <p className="text-sm break-words text-gray-700">
           {review.description}
         </p>

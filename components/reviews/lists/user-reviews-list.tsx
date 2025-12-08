@@ -62,7 +62,10 @@ export const UserReviewsList = ({ userId }: UserReviewsListProps) => {
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
   return (
-    <div ref={contentRef} className="flex flex-wrap justify-center gap-4">
+    <div
+      ref={contentRef}
+      className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"
+    >
       {allReviews.length === 0 && <EmptyReviewsState />}
 
       {allReviews.map(review => (

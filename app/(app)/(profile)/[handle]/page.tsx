@@ -23,7 +23,7 @@ export default async function Page({ params }: { params: { handle: string } }) {
   const isAdmin = session?.user?.isAdmin ?? false;
 
   return (
-    <div className="mx-auto max-w-7xl p-4 sm:p-6">
+    <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
       <UserProfileCard
         userProfile={{ ...userProfile, isFollowing: followStatus.isFollowing }}
         isOwnProfile={isOwnProfile}
