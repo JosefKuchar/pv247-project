@@ -514,7 +514,7 @@ function OptionsList({
                       className="gap-2"
                     >
                       <Plus className="h-4 w-4" />
-                      {createLabel} "{searchQuery}"
+                      {createLabel} &quot;{searchQuery}&quot;
                     </Button>
                   </div>
                 ) : (
@@ -542,7 +542,7 @@ function OptionsList({
                 {showCreateOption && (
                   <CommandItem onSelect={handleCreateClick}>
                     <Plus className="mr-2 h-4 w-4" />
-                    {createLabel} "{searchQuery}"
+                    {createLabel} &quot;{searchQuery}&quot;
                   </CommandItem>
                 )}
               </CommandGroup>

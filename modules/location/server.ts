@@ -197,7 +197,7 @@ export async function createLocation(
   }
 
   // Generate handle from name
-  let baseHandle = slugify(name);
+  const baseHandle = slugify(name);
   let handle = baseHandle;
   let counter = 1;
 
