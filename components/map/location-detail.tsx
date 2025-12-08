@@ -19,7 +19,7 @@ export const LocationDetail: React.FC<LocationDetailProps> = ({
   onClose,
 }) => {
   return (
-    <div className="relative flex w-full max-w-xs flex-col gap-3 rounded-lg bg-white p-4 shadow-lg">
+    <div className="relative flex w-full max-w-xs flex-col gap-3 rounded-lg p-4">
       {onClose && (
         <button
           onClick={onClose}

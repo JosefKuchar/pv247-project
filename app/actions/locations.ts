@@ -1,6 +1,11 @@
 'use server';
 
-import { searchLocations, createLocation } from '@/modules/location/server';
+import {
+  searchLocations,
+  createLocation,
+  getAllLocations,
+  type Location,
+} from '@/modules/location/server';
 import { db } from '@/db';
 import { locationManagement, location } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
@@ -10,6 +15,17 @@ import { randomUUID } from 'crypto';
 
 export async function searchLocationsAction(query: string, limit: number = 20) {
   return searchLocations(query, limit);
+}
+
+export { type Location } from '@/modules/location/server';
+
+export async function getAllLocationsAction(): Promise<Location[]> {
+  try {
+    return await getAllLocations();
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return [];
+  }
 }
 
 export async function createLocationAction(

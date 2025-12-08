@@ -2,14 +2,16 @@
 
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { useLocations } from '@/hooks/use-locations';
+import type { Location } from '@/modules/location/server';
 import { LocationMarker } from './location-marker';
 import { PlaceMarkerIcon } from './place-marker-icon';
 import { LocationDetail } from './location-detail';
 
-const MapInner = () => {
-  const locations = useLocations();
+interface MapInnerProps {
+  locations: Location[];
+}
 
+const MapInner = ({ locations }: MapInnerProps) => {
   return (
     <div className="fixed top-0 left-0 h-screen w-full overflow-hidden">
       <MapContainer

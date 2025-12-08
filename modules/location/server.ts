@@ -7,7 +7,7 @@ import {
   userLocationFollow,
   locationManagement,
 } from '@/db/schema';
-import { eq, avg, count, and, like, or, sql } from 'drizzle-orm';
+import { eq, avg, and, like, or, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { randomUUID } from 'crypto';
@@ -102,9 +102,7 @@ export const getLocationManagementStatus = async (locationHandle: string) => {
     ),
   });
 
-  const isManager = !!(
-    existingManagement && existingManagement.approved
-  );
+  const isManager = !!(existingManagement && existingManagement.approved);
   const hasPendingClaim = !!(
     existingManagement && !existingManagement.approved
   );
@@ -240,4 +238,48 @@ export async function createLocation(
     .returning();
 
   return newLocation[0];
+}
+
+export interface Location {
+  id: string;
+  name: string;
+  address: string | null;
+  handle: string;
+  latitude: number;
+  longitude: number;
+  averageRating: number | null;
+}
+
+/**
+ * Get all locations with their average ratings
+ * @returns Array of locations with calculated average ratings
+ */
+export async function getAllLocations(): Promise<Location[]> {
+  const locations = await db.select().from(location);
+  const reviews = await db.select().from(review);
+
+  const locationRatings: Record<string, { sum: number; count: number }> = {};
+  for (const r of reviews) {
+    if (!locationRatings[r.locationId]) {
+      locationRatings[r.locationId] = { sum: 0, count: 0 };
+    }
+    locationRatings[r.locationId].sum += r.rating;
+    locationRatings[r.locationId].count += 1;
+  }
+
+  const locationsWithRating = locations
+    .filter(loc => loc.latitude !== 0 || loc.longitude !== 0)
+    .map(loc => ({
+      id: loc.id,
+      name: loc.name,
+      address: loc.address,
+      handle: loc.handle,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      averageRating: locationRatings[loc.id]?.count
+        ? locationRatings[loc.id].sum / locationRatings[loc.id].count
+        : null,
+    }));
+
+  return locationsWithRating;
 }
