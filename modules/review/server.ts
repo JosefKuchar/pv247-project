@@ -382,3 +382,24 @@ export const createReviewWithPhotos = async (
     reviewId,
   };
 };
+
+export const deleteReview = async (userId: string, reviewId: string) => {
+  // Verify the review exists and belongs to the user
+  const reviewData = await db.query.review.findFirst({
+    where: eq(review.id, reviewId),
+    columns: { userId: true },
+  });
+
+  if (!reviewData) {
+    throw new Error('Review not found');
+  }
+
+  if (reviewData.userId !== userId) {
+    throw new Error('You can only delete your own reviews');
+  }
+
+  // Delete the review (cascade will handle photos, comments, and likes)
+  await db.delete(review).where(eq(review.id, reviewId));
+
+  return { success: true };
+};

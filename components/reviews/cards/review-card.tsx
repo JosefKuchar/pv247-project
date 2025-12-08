@@ -16,14 +16,31 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Heart, MessageCircle, Send } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreVertical, Trash2 } from 'lucide-react';
 import { ReviewDataType } from '@/modules/review/server';
 import { useState } from 'react';
 import { ReviewCommentList } from '@/components/comment/review-comments-list';
 import { toggleReviewLikeAction } from '@/app/actions/likes';
+import { deleteReviewAction } from '@/app/actions/reviews';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type ReviewCardProps = {
   review: ReviewDataType;
@@ -59,6 +76,30 @@ export const ReviewCard = ({
       }
     },
   });
+
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: () => deleteReviewAction(review.id),
+    onSuccess: () => {
+      toast.success('Review deleted successfully');
+      setIsDeleted(true);
+      setShowDeleteDialog(false);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete review');
+      setShowDeleteDialog(false);
+    },
+  });
+
+  const handleDeleteReview = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteReview = () => {
+    deleteReviewMutation.mutate();
+  };
 
   const callbackAddComment = () => {
     setCommentsCount(commentsCount + 1);
@@ -96,12 +137,67 @@ export const ReviewCard = ({
     }
   };
 
+  if (isDeleted) {
+    return null;
+  }
+
   return (
     <Card className="flex w-full max-w-full flex-col overflow-hidden shadow-md">
       <CardTitle className="sr-only">User Review</CardTitle>
-      <CardHeader className="flex min-w-0 flex-col gap-4">
+      <CardHeader className="relative flex min-w-0 flex-col gap-4">
+        {review.ownReview && (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground absolute -top-2 right-2 shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100"
+                  aria-label="Review options"
+                >
+                  <MoreVertical className="h-5 w-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleDeleteReview}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete review
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <AlertDialog
+              open={showDeleteDialog}
+              onOpenChange={setShowDeleteDialog}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete review</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this review? This action
+                    cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleteReviewMutation.isPending}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={confirmDeleteReview}
+                    disabled={deleteReviewMutation.isPending}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {deleteReviewMutation.isPending ? 'Deleting...' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        )}
         {showUserInfo && (
-          <div>
+          <div className="min-w-0 flex-1 pr-8">
             <a
               href={`/${review.user.handle}`}
               className="flex min-w-0 items-center gap-2"

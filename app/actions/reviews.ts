@@ -5,6 +5,7 @@ import {
   getReviewsPaginated,
   getProfileReviewsPaginated,
   createReviewWithPhotos,
+  deleteReview,
 } from '@/modules/review/server';
 import { withAuth } from '@/lib/server-actions';
 import z from 'zod';
@@ -91,3 +92,9 @@ export const createReview = authActionClient
       photoUrls,
     );
   });
+
+async function internalDeleteReviewAction(userId: string, reviewId: string) {
+  return deleteReview(userId, reviewId);
+}
+
+export const deleteReviewAction = withAuth(internalDeleteReviewAction);
