@@ -194,10 +194,9 @@ export const EditPlaceDialog = ({
 
             <div className="space-y-2">
               <div className="flex items-center gap-1">
-                <span className="text-muted-foreground text-sm">@</span>
                 <FormInput
                   name="handle"
-                  label="Handle"
+                  label="@ Handle"
                   placeholder="place-handle"
                   maxLength={30}
                   showCharCount={true}

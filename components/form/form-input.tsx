@@ -48,7 +48,7 @@ export const FormInput: FC<FormInputProps> = ({
         {label && (
           <label
             htmlFor={name}
-            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="mb-1 text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             {label}
           </label>
