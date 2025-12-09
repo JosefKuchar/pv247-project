@@ -1,11 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateProfileAction } from '@/app/actions/profile';
 import { userType } from '@/db/schema';
+import {
+  nameSchema,
+  handleSchema,
+  emailSchema,
+  descriptionSchema,
+} from '@/lib/validation';
 import {
   Dialog,
   DialogContent,
@@ -14,27 +20,23 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { ProfileImageUploader } from './profile-image-uploader';
+import { FormInput } from '@/components/form/form-input';
+import { FormTextarea } from '@/components/form/form-textarea';
 
 const updateProfileSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.email('Email is required'),
-  handle: z.string().min(1, 'Handle is required'),
-  description: z
-    .string()
-    .max(500, 'Description must be 500 characters or less'),
+  name: nameSchema,
+  email: emailSchema,
+  handle: handleSchema,
+  description: descriptionSchema,
   image: z.string(),
 });
 
@@ -54,7 +56,7 @@ export const EditProfileDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const form = useForm<FormData>({
+  const methods = useForm<FormData>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       name: currentUser.name,
@@ -77,23 +79,23 @@ export const EditProfileDialog = ({
         }
 
         onClose();
-        form.reset(data); // Reset form with new values
+        methods.reset(data); // Reset form with new values
       } else {
         // Handle field-specific errors
         if (result.fieldErrors) {
           Object.entries(result.fieldErrors).forEach(([field, message]) => {
-            form.setError(field as keyof FormData, { message });
+            methods.setError(field as keyof FormData, { message });
           });
         } else if (result.message) {
           // Handle general error message
-          form.setError('root', { message: result.message });
+          methods.setError('root', { message: result.message });
         } else {
-          form.setError('root', { message: 'An unexpected error occurred' });
+          methods.setError('root', { message: 'An unexpected error occurred' });
         }
       }
     } catch {
       // Handle unexpected errors (network issues, etc.)
-      form.setError('root', {
+      methods.setError('root', {
         message: 'Failed to update profile. Please try again.',
       });
     } finally {
@@ -102,7 +104,7 @@ export const EditProfileDialog = ({
   };
 
   const handleClose = () => {
-    form.reset(); // Reset form when closing
+    methods.reset(); // Reset form when closing
     onClose();
   };
 
@@ -117,108 +119,60 @@ export const EditProfileDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {form.formState.errors.root && (
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+            {methods.formState.errors.root && (
               <div className="text-destructive text-sm">
-                {form.formState.errors.root.message}
+                {methods.formState.errors.root.message}
               </div>
             )}
 
-            <FormField
-              control={form.control}
+            <FormInput
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Display Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Your display name"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    This is the name that will be displayed on your profile.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Display Name"
+              placeholder="Your display name"
+              disabled={isLoading}
             />
 
-            <FormField
-              control={form.control}
-              name="handle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Handle</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center">
-                      <span className="text-muted-foreground mr-1">@</span>
-                      <Input
-                        placeholder="username"
-                        {...field}
-                        disabled={isLoading}
-                        className="flex-1"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    Your unique handle. This will change your profile URL.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <div className="flex items-center gap-1">
+                <FormInput
+                  name="handle"
+                  label="@ Handle"
+                  placeholder="username"
+                  maxLength={30}
+                  showCharCount={true}
+                  warningThreshold={24}
+                  disabled={isLoading}
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-muted-foreground text-xs">
+                Your unique handle. This will change your profile URL.
+              </p>
+            </div>
 
-            <FormField
-              control={form.control}
+            <FormInput
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Your email address. This is used for account management.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              disabled={isLoading}
             />
 
-            <FormField
-              control={form.control}
+            <FormTextarea
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Tell others about yourself..."
-                      className="min-h-[100px] resize-none"
-                      {...field}
-                      disabled={isLoading}
-                      maxLength={500}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {field.value.length}/500 characters. This appears on your
-                    profile.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Description"
+              placeholder="Tell others about yourself..."
+              maxLength={150}
+              showCharCount={true}
+              warningThreshold={120}
+              disabled={isLoading}
+              className="min-h-[100px] resize-none"
             />
 
             <FormField
-              control={form.control}
+              control={methods.control}
               name="image"
               render={({ field }) => (
                 <FormItem>
@@ -249,7 +203,7 @@ export const EditProfileDialog = ({
               </Button>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

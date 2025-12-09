@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { reviewDescriptionSchema } from '@/lib/validation';
 
 export const uploadedFileSchema = z.object({
-  url: z.string().url(),
+  url: z.url(),
   name: z.string(),
 });
 
@@ -9,7 +10,7 @@ export type UploadedFile = z.infer<typeof uploadedFileSchema>;
 
 export const createReviewFormSchema = z.object({
   location: z.string().min(1, 'Location is required'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
+  description: reviewDescriptionSchema,
   rating: z
     .number()
     .min(1, 'Rating is required')

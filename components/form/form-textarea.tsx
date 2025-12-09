@@ -10,6 +10,9 @@ export interface FormTextareaProps
   name: string;
   label?: string;
   errorClassName?: string;
+  maxLength?: number;
+  showCharCount?: boolean;
+  warningThreshold?: number;
 }
 
 export const FormTextarea: FC<FormTextareaProps> = ({
@@ -17,14 +20,24 @@ export const FormTextarea: FC<FormTextareaProps> = ({
   label,
   className,
   errorClassName,
+  maxLength = 2500,
+  showCharCount = true,
+  warningThreshold = 1800,
   ...props
 }) => {
   const {
     control,
     formState: { errors },
+    watch,
   } = useFormContext();
 
   const error = errors[name];
+  const currentValue = watch(name) ?? '';
+  const currentLength = currentValue.length;
+
+  const isApproachingLimit =
+    currentLength >= warningThreshold && currentLength < maxLength;
+  const isOverLimit = currentLength > maxLength;
 
   return (
     <div className="w-full">
@@ -45,20 +58,31 @@ export const FormTextarea: FC<FormTextareaProps> = ({
             {...props}
             value={field.value ?? ''}
             id={name}
-            className={cn(error && 'aria-invalid', className)}
+            maxLength={maxLength}
+            className={cn(
+              error && 'aria-invalid',
+              isApproachingLimit && 'border-yellow-500',
+              isOverLimit && 'border-destructive',
+              className,
+            )}
             aria-invalid={!!error}
             aria-describedby={error ? `${name}-error` : undefined}
           />
         )}
       />
+      {showCharCount && isApproachingLimit && !error && (
+        <p className="mt-1.5 text-sm text-yellow-600">
+          Approaching character limit ({currentLength}/{maxLength})
+        </p>
+      )}
       {error && (
         <p
           id={`${name}-error`}
           className={cn('text-destructive mt-1.5 text-sm', errorClassName)}
         >
           {typeof error.message === 'string'
-            ? error.message
-            : 'This field is required'}
+            ? `${error.message} (${currentLength}/${maxLength})`
+            : `This field is required (${currentLength}/${maxLength})`}
         </p>
       )}
     </div>

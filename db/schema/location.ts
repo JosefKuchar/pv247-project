@@ -14,9 +14,9 @@ export const location = sqliteTable(
   'location',
   {
     id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    handle: text('handle').notNull().unique(),
-    description: text('description', { length: 500 }).notNull().default(''),
+    name: text('name', { length: 30 }).notNull(),
+    handle: text('handle', { length: 30 }).notNull().unique(),
+    description: text('description', { length: 150 }).notNull().default(''),
     address: text('address'),
     latitude: real('latitude').notNull(),
     longitude: real('longitude').notNull(),

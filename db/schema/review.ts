@@ -16,7 +16,7 @@ export const review = sqliteTable(
     locationId: text('location_id')
       .notNull()
       .references(() => location.id, { onDelete: 'cascade' }),
-    description: text('description').notNull(),
+    description: text('description', { length: 2500 }).default('').notNull(),
     rating: integer('rating').notNull(),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
