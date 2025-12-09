@@ -4,7 +4,8 @@ import { db } from '@/db';
 import { locationManagement } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { withAdminAuth } from '@/lib/server-actions';
+import { adminActionClient } from '@/lib/safe-action';
+import { z } from 'zod';
 
 export async function getPendingClaims() {
   const claims = await db.query.locationManagement.findMany({
@@ -47,8 +48,15 @@ export async function getPendingClaims() {
   }));
 }
 
-export const approveClaim = withAdminAuth(
-  async (_userId: string, claimId: string) => {
+const claimIdSchema = z.object({
+  claimId: z.string().min(1, 'Claim ID is required'),
+});
+
+export const approveClaim = adminActionClient
+  .inputSchema(claimIdSchema)
+  .action(async ({ parsedInput }) => {
+    const { claimId } = parsedInput;
+
     await db
       .update(locationManagement)
       .set({ approved: true })
@@ -56,11 +64,13 @@ export const approveClaim = withAdminAuth(
 
     revalidatePath('/admin/claims');
     return { success: true };
-  },
-);
+  });
 
-export const rejectClaim = withAdminAuth(
-  async (_userId: string, claimId: string) => {
+export const rejectClaim = adminActionClient
+  .inputSchema(claimIdSchema)
+  .action(async ({ parsedInput }) => {
+    const { claimId } = parsedInput;
+
     await db
       .delete(locationManagement)
       .where(
@@ -72,5 +82,4 @@ export const rejectClaim = withAdminAuth(
 
     revalidatePath('/admin/claims');
     return { success: true };
-  },
-);
+  });

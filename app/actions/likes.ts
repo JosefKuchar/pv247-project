@@ -1,18 +1,23 @@
 'use server';
 
 import { addReviewLike, removeReviewLike } from '@/modules/like/server';
+import { authActionClient } from '@/lib/safe-action';
+import { z } from 'zod';
 
-import { withAuth } from '@/lib/server-actions';
+const toggleLikeSchema = z.object({
+  reviewId: z.string().min(1, 'Review ID is required'),
+  liked: z.boolean(),
+});
 
-const internalToggleReviewLikeAction = async (
-  userId: string,
-  reviewId: string,
-  liked: boolean,
-) => {
-  if (liked) {
-    return removeReviewLike(reviewId, userId);
-  } else {
-    return addReviewLike(reviewId, userId);
-  }
-};
-export const toggleReviewLikeAction = withAuth(internalToggleReviewLikeAction);
+export const toggleReviewLikeAction = authActionClient
+  .inputSchema(toggleLikeSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { reviewId, liked } = parsedInput;
+    const userId = ctx.userId;
+
+    if (liked) {
+      return removeReviewLike(reviewId, userId);
+    } else {
+      return addReviewLike(reviewId, userId);
+    }
+  });

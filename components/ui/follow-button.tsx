@@ -39,16 +39,16 @@ export function FollowButton({
       try {
         if (isFollowing) {
           if (type === 'user') {
-            await unfollowUserAction(targetHandle);
+            await unfollowUserAction({ targetUserHandle: targetHandle });
           } else {
-            await unfollowLocationAction(targetHandle);
+            await unfollowLocationAction({ locationHandle: targetHandle });
           }
           setIsFollowing(false);
         } else {
           if (type === 'user') {
-            await followUserAction(targetHandle);
+            await followUserAction({ targetUserHandle: targetHandle });
           } else {
-            await followLocationAction(targetHandle);
+            await followLocationAction({ locationHandle: targetHandle });
           }
           setIsFollowing(true);
         }

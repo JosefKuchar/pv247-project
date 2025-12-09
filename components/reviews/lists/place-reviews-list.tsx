@@ -31,8 +31,15 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
     number
   >({
     queryKey: ['placeReviews', locationId],
-    queryFn: ({ pageParam = 1 }) =>
-      loadLocationReviewsAction(locationId, pageParam),
+    queryFn: async ({ pageParam = 1 }) => {
+      const result = await loadLocationReviewsAction({
+        locationId,
+        page: pageParam,
+      });
+      return (
+        result?.data ?? { reviews: [], hasMore: false, nextPage: undefined }
+      );
+    },
     initialPageParam: 1,
     getNextPageParam: lastPage => lastPage.nextPage,
   });
@@ -63,7 +70,7 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
 
   return (
     <>
-      {allReviews.length === 0 && <EmptyReviewsState />}
+      {allReviews.length === 0 && <EmptyReviewsState userName="This place" />}
       <div
         ref={contentRef}
         className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"

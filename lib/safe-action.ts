@@ -22,3 +22,26 @@ export const authActionClient = createSafeActionClient().use(
     });
   },
 );
+
+export const adminActionClient = createSafeActionClient().use(
+  async ({ next }) => {
+    const headersList = await headers();
+    const session = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (!session?.user) {
+      throw new Error('Unauthorized');
+    }
+
+    if (!session.user.isAdmin) {
+      throw new Error('Unauthorized: Admin access required');
+    }
+
+    return next({
+      ctx: {
+        userId: session.user.id,
+      },
+    });
+  },
+);

@@ -38,7 +38,15 @@ export const ReviewCommentList = ({
     number
   >({
     queryKey: ['comments', review_id],
-    queryFn: ({ pageParam }) => loadReviewCommentsAction(review_id, pageParam),
+    queryFn: async ({ pageParam }) => {
+      const result = await loadReviewCommentsAction({
+        reviewId: review_id,
+        page: pageParam,
+      });
+      return (
+        result?.data ?? { comments: [], hasMore: false, nextPage: undefined }
+      );
+    },
     initialPageParam: 1,
     getNextPageParam: lastPage => lastPage.nextPage,
   });
