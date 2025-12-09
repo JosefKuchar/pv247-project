@@ -141,9 +141,9 @@ export const EditProfileDialog = ({
                   name="handle"
                   label="Handle"
                   placeholder="username"
-                  maxLength={20}
+                  maxLength={30}
                   showCharCount={true}
-                  warningThreshold={18}
+                  warningThreshold={24}
                   disabled={isLoading}
                   className="flex-1"
                 />
@@ -165,9 +165,9 @@ export const EditProfileDialog = ({
               name="description"
               label="Description"
               placeholder="Tell others about yourself..."
-              maxLength={500}
+              maxLength={150}
               showCharCount={true}
-              warningThreshold={400}
+              warningThreshold={120}
               disabled={isLoading}
               className="min-h-[100px] resize-none"
             />

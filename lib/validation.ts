@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Regex patterns for validation - shared across client and server
 export const nameRegex = /^[\p{L}\p{M}\p{N} .'-]+$/u; // Unicode letters, marks, numbers, spaces, periods, hyphens, apostrophes
-export const handlePattern = /^[a-zA-Z0-9_]{1,20}$/; // Letters, numbers, underscores only
+export const handlePattern = /^[a-zA-Z0-9_]{1,30}$/; // Letters, numbers, underscores only
 export const passwordPattern =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/; // At least one lowercase, uppercase, and digit
 
@@ -12,10 +12,16 @@ export const nameSchema = z
   .min(1, 'Name is required')
   .regex(nameRegex, 'Name contains invalid characters');
 
+export const displayNameSchema = z
+  .string()
+  .min(1, 'Display name is required')
+  .max(30, 'Display name must be 30 characters or less')
+  .regex(nameRegex, 'Display name contains invalid characters');
+
 export const handleSchema = z
   .string()
   .min(1, 'Handle is required')
-  .max(20, 'Handle must be less than 20 characters')
+  .max(30, 'Handle must be less than 30 characters')
   .regex(
     handlePattern,
     'Handle can only contain letters, numbers, and underscores',
@@ -34,7 +40,7 @@ export const passwordSchema = z
 
 export const descriptionSchema = z
   .string()
-  .max(500, 'Description must be 500 characters or less');
+  .max(150, 'Description must be 150 characters or less');
 
 // Review description schema (different limits)
 export const reviewDescriptionSchema = z
@@ -62,8 +68,8 @@ export const validateHandle = (handle: string): string | null => {
   if (!handle || typeof handle !== 'string') {
     return 'Handle is required';
   }
-  if (handle.length > 20) {
-    return 'Handle must be less than 20 characters';
+  if (handle.length > 30) {
+    return 'Handle must be less than 30 characters';
   }
   if (!handlePattern.test(handle)) {
     return 'Handle can only contain letters, numbers, and underscores';

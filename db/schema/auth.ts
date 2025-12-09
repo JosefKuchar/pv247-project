@@ -9,10 +9,10 @@ import { locationManagement } from './locationManagement';
 
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
-  name: text('name').notNull(),
+  name: text('name', { length: 30 }).notNull(),
   email: text('email', { length: 320 }).notNull().unique(),
-  handle: text('handle', { length: 20 }).notNull().unique(),
-  description: text('description', { length: 500 }).notNull().default(''),
+  handle: text('handle', { length: 30 }).notNull().unique(),
+  description: text('description', { length: 150 }).notNull().default(''),
   emailVerified: integer('email_verified', { mode: 'boolean' })
     .default(false)
     .notNull(),

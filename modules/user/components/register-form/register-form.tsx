@@ -60,9 +60,9 @@ export const RegisterForm = () => {
               name="handle"
               label="Handle"
               type="text"
-              maxLength={20}
+              maxLength={30}
               showCharCount={true}
-              warningThreshold={16}
+              warningThreshold={24}
               disabled={mutation.isPending}
               className="flex-1"
             />

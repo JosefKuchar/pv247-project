@@ -199,9 +199,9 @@ export const EditPlaceDialog = ({
                   name="handle"
                   label="Handle"
                   placeholder="place-handle"
-                  maxLength={20}
+                  maxLength={30}
                   showCharCount={true}
-                  warningThreshold={18}
+                  warningThreshold={24}
                   disabled={isLoading}
                   className="flex-1"
                 />
@@ -216,9 +216,9 @@ export const EditPlaceDialog = ({
               name="description"
               label="Description"
               placeholder="Describe this place..."
-              maxLength={500}
+              maxLength={150}
               showCharCount={true}
-              warningThreshold={400}
+              warningThreshold={120}
               disabled={isLoading}
               className="min-h-[100px] resize-none"
             />
