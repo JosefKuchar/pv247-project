@@ -6,7 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateProfileAction } from '@/app/actions/profile';
 import { userType } from '@/db/schema';
-import { nameSchema, handleSchema, emailSchema, descriptionSchema } from '@/lib/validation';
+import {
+  nameSchema,
+  handleSchema,
+  emailSchema,
+  descriptionSchema,
+} from '@/lib/validation';
 import {
   Dialog,
   DialogContent,
@@ -15,15 +20,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { ProfileImageUploader } from './profile-image-uploader';
@@ -146,7 +148,7 @@ export const EditProfileDialog = ({
                   className="flex-1"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Your unique handle. This will change your profile URL.
               </p>
             </div>

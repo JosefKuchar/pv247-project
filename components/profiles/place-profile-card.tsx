@@ -1,6 +1,4 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Rating, RatingButton } from '@/components/ui/shadcn-io/rating';
 import { FollowButton } from '@/components/ui/follow-button';
 import { MapPin } from 'lucide-react';

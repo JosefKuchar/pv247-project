@@ -35,7 +35,8 @@ export const FormTextarea: FC<FormTextareaProps> = ({
   const currentValue = watch(name) ?? '';
   const currentLength = currentValue.length;
 
-  const isApproachingLimit = currentLength >= warningThreshold && currentLength < maxLength;
+  const isApproachingLimit =
+    currentLength >= warningThreshold && currentLength < maxLength;
   const isOverLimit = currentLength > maxLength;
 
   return (
@@ -62,7 +63,7 @@ export const FormTextarea: FC<FormTextareaProps> = ({
               error && 'aria-invalid',
               isApproachingLimit && 'border-yellow-500',
               isOverLimit && 'border-destructive',
-              className
+              className,
             )}
             aria-invalid={!!error}
             aria-describedby={error ? `${name}-error` : undefined}
@@ -70,7 +71,7 @@ export const FormTextarea: FC<FormTextareaProps> = ({
         )}
       />
       {showCharCount && isApproachingLimit && !error && (
-        <p className="text-yellow-600 mt-1.5 text-sm">
+        <p className="mt-1.5 text-sm text-yellow-600">
           Approaching character limit ({currentLength}/{maxLength})
         </p>
       )}

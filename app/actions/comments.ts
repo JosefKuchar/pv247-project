@@ -30,7 +30,9 @@ const internalAddCommentToReviewAction = async (
   // Validate comment content
   const validationResult = commentSchema.safeParse(content);
   if (!validationResult.success) {
-    throw new Error(validationResult.error.issues[0]?.message || 'Invalid comment');
+    throw new Error(
+      validationResult.error.issues[0]?.message || 'Invalid comment',
+    );
   }
 
   return addCommentToReview(reviewId, userId, content);

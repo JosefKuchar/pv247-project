@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { nameSchema, handleSchema, emailSchema, passwordSchema } from '@/lib/validation';
+import {
+  nameSchema,
+  handleSchema,
+  emailSchema,
+  passwordSchema,
+} from '@/lib/validation';
 
 export const registerFormSchema = z
   .object({

@@ -15,9 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -208,8 +206,9 @@ export const EditPlaceDialog = ({
                   className="flex-1"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Unique identifier for this place. This will change the place URL.
+              <p className="text-muted-foreground text-xs">
+                Unique identifier for this place. This will change the place
+                URL.
               </p>
             </div>
 

@@ -9,7 +9,12 @@ import {
 import { withAuth } from '@/lib/server-actions';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { nameSchema, handleSchema, emailSchema, descriptionSchema } from '@/lib/validation';
+import {
+  nameSchema,
+  handleSchema,
+  emailSchema,
+  descriptionSchema,
+} from '@/lib/validation';
 
 const updateProfileSchema = z.object({
   name: nameSchema,

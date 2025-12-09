@@ -35,12 +35,16 @@ export const FormInput: FC<FormInputProps> = ({
   const currentValue = watch(name) ?? '';
   const currentLength = currentValue.length;
 
-  const isApproachingLimit = warningThreshold && maxLength && currentLength >= warningThreshold && currentLength < maxLength;
+  const isApproachingLimit =
+    warningThreshold &&
+    maxLength &&
+    currentLength >= warningThreshold &&
+    currentLength < maxLength;
   const isOverLimit = maxLength && currentLength > maxLength;
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         {label && (
           <label
             htmlFor={name}
@@ -56,8 +60,8 @@ export const FormInput: FC<FormInputProps> = ({
               isOverLimit
                 ? 'text-destructive font-medium'
                 : isApproachingLimit
-                  ? 'text-yellow-600 font-medium'
-                  : 'text-muted-foreground'
+                  ? 'font-medium text-yellow-600'
+                  : 'text-muted-foreground',
             )}
           >
             {currentLength}/{maxLength}
@@ -78,7 +82,7 @@ export const FormInput: FC<FormInputProps> = ({
               error && 'aria-invalid',
               isApproachingLimit && 'border-yellow-500',
               isOverLimit && 'border-destructive',
-              className
+              className,
             )}
             aria-invalid={!!error}
             aria-describedby={error ? `${name}-error` : undefined}
@@ -86,7 +90,7 @@ export const FormInput: FC<FormInputProps> = ({
         )}
       />
       {showCharCount && isApproachingLimit && !error && maxLength && (
-        <p className="text-yellow-600 mt-1.5 text-sm">
+        <p className="mt-1.5 text-sm text-yellow-600">
           Approaching character limit ({currentLength}/{maxLength})
         </p>
       )}

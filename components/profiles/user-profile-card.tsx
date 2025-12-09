@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { FollowButton } from '@/components/ui/follow-button';
 import type { userType } from '@/db/schema';
 import { UserReviewsList } from '@/components/reviews/lists/user-reviews-list';

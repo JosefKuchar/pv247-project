@@ -3,7 +3,8 @@ import { z } from 'zod';
 // Regex patterns for validation - shared across client and server
 export const nameRegex = /^[\p{L}\p{M}\p{N} .'-]+$/u; // Unicode letters, marks, numbers, spaces, periods, hyphens, apostrophes
 export const handlePattern = /^[a-zA-Z0-9_]{1,20}$/; // Letters, numbers, underscores only
-export const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/; // At least one lowercase, uppercase, and digit
+export const passwordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]/; // At least one lowercase, uppercase, and digit
 
 // Shared validation schemas
 export const nameSchema = z
@@ -15,7 +16,10 @@ export const handleSchema = z
   .string()
   .min(1, 'Handle is required')
   .max(20, 'Handle must be less than 20 characters')
-  .regex(handlePattern, 'Handle can only contain letters, numbers, and underscores');
+  .regex(
+    handlePattern,
+    'Handle can only contain letters, numbers, and underscores',
+  );
 
 export const emailSchema = z.email('Please enter a valid email address');
 
@@ -25,7 +29,7 @@ export const passwordSchema = z
   .max(128, 'Password must be less than 128 characters')
   .regex(
     passwordPattern,
-    'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    'Password must contain at least one uppercase letter, one lowercase letter, and one number',
   );
 
 export const descriptionSchema = z
