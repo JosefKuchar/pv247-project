@@ -7,8 +7,8 @@ import {
   type Location,
 } from '@/modules/location/server';
 import { db } from '@/db';
-import { locationManagement, location } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { locationManagement, location, user } from '@/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 import { authActionClient, actionClient } from '@/lib/safe-action';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
@@ -35,6 +35,69 @@ export async function getAllLocationsAction(): Promise<Location[]> {
     console.error('Error fetching locations:', error);
     return [];
   }
+}
+
+interface SearchLocation {
+  id: string;
+  name: string;
+  handle: string;
+  address: string | null;
+  latitude: number;
+  longitude: number;
+}
+
+interface SearchUser {
+  id: string;
+  name: string;
+  handle: string;
+  image: string | null;
+}
+
+export interface GlobalSearchResult {
+  locations: SearchLocation[];
+  users: SearchUser[];
+}
+
+export async function globalSearchAction(
+  query: string,
+): Promise<GlobalSearchResult> {
+  if (!query || query.trim().length === 0) {
+    return { locations: [], users: [] };
+  }
+
+  const escapedQuery = query.toLowerCase().replace(/[%_]/g, '\\$&');
+  const searchTerm = `%${escapedQuery}%`;
+
+  const [locations, users] = await Promise.all([
+    db
+      .select({
+        id: location.id,
+        name: location.name,
+        handle: location.handle,
+        address: location.address,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      })
+      .from(location)
+      .where(
+        sql`lower(${location.name}) like ${searchTerm} or lower(${location.address}) like ${searchTerm}`,
+      )
+      .limit(10),
+    db
+      .select({
+        id: user.id,
+        name: user.name,
+        handle: user.handle,
+        image: user.image,
+      })
+      .from(user)
+      .where(
+        sql`lower(${user.name}) like ${searchTerm} or lower(${user.handle}) like ${searchTerm}`,
+      )
+      .limit(10),
+  ]);
+
+  return { locations, users };
 }
 
 const createLocationSchema = z.object({

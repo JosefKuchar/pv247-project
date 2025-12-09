@@ -70,7 +70,7 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
 
   return (
     <>
-      {allReviews.length === 0 && <EmptyReviewsState />}
+      {allReviews.length === 0 && <EmptyReviewsState userName="This place" />}
       <div
         ref={contentRef}
         className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3"
