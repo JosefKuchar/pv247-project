@@ -9,14 +9,13 @@ import {
 import { withAuth } from '@/lib/server-actions';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { nameSchema, handleSchema, emailSchema, descriptionSchema } from '@/lib/validation';
 
 const updateProfileSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.email('Email is required'),
-  handle: z.string().min(1, 'Handle is required'),
-  description: z
-    .string()
-    .max(500, 'Description must be 500 characters or less'),
+  name: nameSchema,
+  email: emailSchema,
+  handle: handleSchema,
+  description: descriptionSchema,
   image: z
     .string()
     .nullable()

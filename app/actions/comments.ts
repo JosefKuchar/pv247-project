@@ -6,6 +6,7 @@ import {
 } from '@/modules/comment/server';
 
 import { withAuth } from '@/lib/server-actions';
+import { commentSchema } from '@/lib/validation';
 
 export const loadReviewCommentsAction = async (
   reviewId: string,
@@ -26,6 +27,12 @@ const internalAddCommentToReviewAction = async (
   reviewId: string,
   content: string,
 ) => {
+  // Validate comment content
+  const validationResult = commentSchema.safeParse(content);
+  if (!validationResult.success) {
+    throw new Error(validationResult.error.issues[0]?.message || 'Invalid comment');
+  }
+
   return addCommentToReview(reviewId, userId, content);
 };
 

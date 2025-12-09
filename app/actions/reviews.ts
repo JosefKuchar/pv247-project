@@ -10,6 +10,7 @@ import {
 import { withAuth } from '@/lib/server-actions';
 import z from 'zod';
 import { authActionClient } from '@/lib/safe-action';
+import { reviewDescriptionSchema } from '@/lib/validation';
 
 async function internalLoadProfileReviewsAction(
   userId: string,
@@ -73,7 +74,7 @@ export const loadReviewsAction = withAuth(internalLoadReviewsAction);
 
 const createReviewSchema = z.object({
   locationId: z.string().min(1, 'Location is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: reviewDescriptionSchema,
   rating: z.number().min(1).max(5),
   photoUrls: z.array(z.string().url()).optional(),
 });

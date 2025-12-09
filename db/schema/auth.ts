@@ -10,8 +10,8 @@ import { locationManagement } from './locationManagement';
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  handle: text('handle').notNull().unique(),
+  email: text('email', { length: 320 }).notNull().unique(),
+  handle: text('handle', { length: 20 }).notNull().unique(),
   description: text('description', { length: 500 }).notNull().default(''),
   emailVerified: integer('email_verified', { mode: 'boolean' })
     .default(false)

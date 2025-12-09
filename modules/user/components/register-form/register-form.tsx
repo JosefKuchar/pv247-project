@@ -1,9 +1,7 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -11,11 +9,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRegisterMutation } from './hooks';
 import { registerFormSchema, type RegisterFormSchema } from './schema';
 import { ProfileImageUploader } from '@/components/profiles/profile-image-uploader';
+import { FormInput } from '@/components/form/form-input';
 
 export const RegisterForm = () => {
   const mutation = useRegisterMutation();
@@ -37,7 +36,7 @@ export const RegisterForm = () => {
   };
 
   return (
-    <Form {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <h2 className="mb-4 text-center text-2xl font-bold">Register</h2>
 
@@ -47,74 +46,48 @@ export const RegisterForm = () => {
           </div>
         )}
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Name"
+          type="text"
+          disabled={mutation.isPending}
         />
 
-        <FormField
-          control={form.control}
-          name="handle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Handle</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-2">
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground text-sm">@</span>
+            <FormInput
+              name="handle"
+              label="Handle"
+              type="text"
+              maxLength={20}
+              showCharCount={true}
+              warningThreshold={16}
+              disabled={mutation.isPending}
+              className="flex-1"
+            />
+          </div>
+        </div>
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Email"
+          type="email"
+          disabled={mutation.isPending}
         />
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Password"
+          type="password"
+          disabled={mutation.isPending}
         />
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Confirm Password"
+          type="password"
+          disabled={mutation.isPending}
         />
 
         <FormField
@@ -148,6 +121,6 @@ export const RegisterForm = () => {
           </div>
         </div>
       </form>
-    </Form>
+    </FormProvider>
   );
 };

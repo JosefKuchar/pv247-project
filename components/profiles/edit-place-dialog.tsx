@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updatePlaceAction } from '@/app/actions/place';
 import { locationType } from '@/db/schema';
+import { nameSchema, handleSchema, descriptionSchema } from '@/lib/validation';
 import {
   Dialog,
   DialogContent,
@@ -23,18 +24,17 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { LocationPicker } from '@/components/map/location-picker';
 import { MapPin } from 'lucide-react';
+import { FormInput } from '@/components/form/form-input';
+import { FormTextarea } from '@/components/form/form-textarea';
 
 const updatePlaceSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  handle: z.string().min(1, 'Handle is required'),
-  description: z
-    .string()
-    .max(500, 'Description must be 500 characters or less'),
+  name: nameSchema,
+  handle: handleSchema,
+  description: descriptionSchema,
   address: z.string().optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
@@ -67,7 +67,7 @@ export const EditPlaceDialog = ({
     );
   const router = useRouter();
 
-  const form = useForm<FormData>({
+  const methods = useForm<FormData>({
     resolver: zodResolver(updatePlaceSchema),
     defaultValues: {
       name: currentPlace.name,
@@ -92,33 +92,33 @@ export const EditPlaceDialog = ({
 
   const handleMapLocationSelect = (coords: Coordinates) => {
     setSelectedMapPosition(coords);
-    form.setValue('latitude', coords.lat);
-    form.setValue('longitude', coords.lng);
+    methods.setValue('latitude', coords.lat);
+    methods.setValue('longitude', coords.lng);
   };
 
   const handleLatChange = (value: string) => {
     const lat = parseFloat(value);
     if (!isNaN(lat)) {
-      form.setValue('latitude', lat);
-      const lng = form.getValues('longitude');
+      methods.setValue('latitude', lat);
+      const lng = methods.getValues('longitude');
       if (lng !== undefined) {
         setSelectedMapPosition({ lat, lng });
       }
     } else {
-      form.setValue('latitude', undefined);
+      methods.setValue('latitude', undefined);
     }
   };
 
   const handleLngChange = (value: string) => {
     const lng = parseFloat(value);
     if (!isNaN(lng)) {
-      form.setValue('longitude', lng);
-      const lat = form.getValues('latitude');
+      methods.setValue('longitude', lng);
+      const lat = methods.getValues('latitude');
       if (lat !== undefined) {
         setSelectedMapPosition({ lat, lng });
       }
     } else {
-      form.setValue('longitude', undefined);
+      methods.setValue('longitude', undefined);
     }
   };
 
@@ -134,23 +134,23 @@ export const EditPlaceDialog = ({
         }
 
         onClose();
-        form.reset(data); // Reset form with new values
+        methods.reset(data); // Reset form with new values
       } else {
         // Handle field-specific errors
         if (result.fieldErrors) {
           Object.entries(result.fieldErrors).forEach(([field, message]) => {
-            form.setError(field as keyof FormData, { message });
+            methods.setError(field as keyof FormData, { message });
           });
         } else if (result.message) {
           // Handle general error message
-          form.setError('root', { message: result.message });
+          methods.setError('root', { message: result.message });
         } else {
-          form.setError('root', { message: 'An unexpected error occurred' });
+          methods.setError('root', { message: 'An unexpected error occurred' });
         }
       }
     } catch {
       // Handle unexpected errors (network issues, etc.)
-      form.setError('root', {
+      methods.setError('root', {
         message: 'Failed to update place profile. Please try again.',
       });
     } finally {
@@ -159,7 +159,7 @@ export const EditPlaceDialog = ({
   };
 
   const handleClose = () => {
-    form.reset(); // Reset form when closing
+    methods.reset(); // Reset form when closing
     setSelectedMapPosition(
       currentPlace.latitude && currentPlace.longitude
         ? { lat: currentPlace.latitude, lng: currentPlace.longitude }
@@ -179,106 +179,56 @@ export const EditPlaceDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {form.formState.errors.root && (
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+            {methods.formState.errors.root && (
               <div className="text-destructive text-sm">
-                {form.formState.errors.root.message}
+                {methods.formState.errors.root.message}
               </div>
             )}
 
-            <FormField
-              control={form.control}
+            <FormInput
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Place Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Place name"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    The name of this place as it should appear to visitors.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Place Name"
+              placeholder="Place name"
+              disabled={isLoading}
             />
 
-            <FormField
-              control={form.control}
-              name="handle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Handle</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center">
-                      <span className="text-muted-foreground mr-1">@</span>
-                      <Input
-                        placeholder="place-handle"
-                        {...field}
-                        disabled={isLoading}
-                        className="flex-1"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    Unique identifier for this place. This will change the place
-                    URL.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <div className="flex items-center gap-1">
+                <span className="text-muted-foreground text-sm">@</span>
+                <FormInput
+                  name="handle"
+                  label="Handle"
+                  placeholder="place-handle"
+                  maxLength={20}
+                  showCharCount={true}
+                  warningThreshold={18}
+                  disabled={isLoading}
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Unique identifier for this place. This will change the place URL.
+              </p>
+            </div>
 
-            <FormField
-              control={form.control}
+            <FormTextarea
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe this place..."
-                      className="min-h-[100px] resize-none"
-                      {...field}
-                      disabled={isLoading}
-                      maxLength={500}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {(field.value || '').length}/500 characters. This appears on
-                    the place profile.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Description"
+              placeholder="Describe this place..."
+              maxLength={500}
+              showCharCount={true}
+              warningThreshold={400}
+              disabled={isLoading}
+              className="min-h-[100px] resize-none"
             />
 
-            <FormField
-              control={form.control}
+            <FormInput
               name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="123 Main Street, City, State"
-                      {...field}
-                      value={field.value || ''}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Physical address of this place. Leave empty if not
-                    applicable.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Address"
+              placeholder="123 Main Street, City, State"
+              disabled={isLoading}
             />
 
             <div className="space-y-2">
@@ -306,7 +256,7 @@ export const EditPlaceDialog = ({
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
-                control={form.control}
+                control={methods.control}
                 name="latitude"
                 render={({ field }) => (
                   <FormItem>
@@ -326,7 +276,7 @@ export const EditPlaceDialog = ({
                 )}
               />
               <FormField
-                control={form.control}
+                control={methods.control}
                 name="longitude"
                 render={({ field }) => (
                   <FormItem>
@@ -361,7 +311,7 @@ export const EditPlaceDialog = ({
               </Button>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

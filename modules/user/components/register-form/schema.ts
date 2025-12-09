@@ -1,15 +1,15 @@
 import { z } from 'zod';
+import { nameSchema, handleSchema, emailSchema, passwordSchema } from '@/lib/validation';
 
-// TODO: proper filtering of valid strings
 export const registerFormSchema = z
   .object({
-    name: z.string().min(1, 'Name is required'),
-    handle: z.string().min(1, 'Handle is required'),
-    email: z.email('Email is required'),
-    password: z.string().min(8, 'Password must have at at least 8 characters'),
+    name: nameSchema,
+    handle: handleSchema,
+    email: emailSchema,
+    password: passwordSchema,
     confirmPassword: z
       .string()
-      .min(8, 'Password must have at at least 8 characters'),
+      .min(8, 'Password must be at least 8 characters'),
     image: z.string().optional(),
     // image: z.file().mime(['image/jpeg', 'image/png', 'image/jpg']),
   })

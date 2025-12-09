@@ -1,22 +1,13 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
 import { Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLoginMutationEmail, useLoginGithub } from './hooks';
-
 import { loginFormSchema, type LoginFormSchema } from './schema';
+import { FormInput } from '@/components/form/form-input';
 
 export const LoginForm = () => {
   const mutation = useLoginMutationEmail();
@@ -34,7 +25,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <Form {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <h2 className="mb-4 text-center text-2xl font-bold">
           Login with provider
@@ -59,32 +50,18 @@ export const LoginForm = () => {
           </div>
         )}
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Email"
+          type="email"
+          disabled={mutation.isPending}
         />
 
-        <FormField
-          control={form.control}
+        <FormInput
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Password"
+          type="password"
+          disabled={mutation.isPending}
         />
 
         <div className="flex justify-between">
@@ -102,6 +79,6 @@ export const LoginForm = () => {
           </div>
         </div>
       </form>
-    </Form>
+    </FormProvider>
   );
 };
