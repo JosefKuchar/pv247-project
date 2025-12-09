@@ -79,7 +79,13 @@ export default function Page() {
                 }}
                 createLabel="Create new location"
               />
-              <FormTextarea name="description" label="Description" />
+              <FormTextarea
+                name="description"
+                label="Description"
+                maxLength={2500}
+                showCharCount={true}
+                warningThreshold={1800}
+              />
               <FormDropzone name="image" label="Photos" multiple={true} />
               <FormRating name="rating" label="Rating" />
               <Button type="submit" disabled={createReviewMutation.isPending}>

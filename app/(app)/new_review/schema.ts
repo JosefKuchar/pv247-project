@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const uploadedFileSchema = z.object({
-  url: z.string().url(),
+  url: z.url(),
   name: z.string(),
 });
 
@@ -9,7 +9,9 @@ export type UploadedFile = z.infer<typeof uploadedFileSchema>;
 
 export const createReviewFormSchema = z.object({
   location: z.string().min(1, 'Location is required'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
+  description: z
+    .string()
+    .max(2500, 'Description must be under 2,500 characters'),
   rating: z
     .number()
     .min(1, 'Rating is required')
