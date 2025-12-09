@@ -123,9 +123,12 @@ export const EditPlaceDialog = ({
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const result = await updatePlaceAction(currentPlace.id, data);
+      const result = await updatePlaceAction({
+        placeId: currentPlace.id,
+        ...data,
+      });
 
-      if (result.success) {
+      if (result?.data?.success) {
         // If handle changed, redirect to new profile URL
         if (data.handle !== currentPlace.handle) {
           router.push(`/place/${data.handle}`);
@@ -133,18 +136,22 @@ export const EditPlaceDialog = ({
 
         onClose();
         methods.reset(data); // Reset form with new values
+      } else if (result?.serverError) {
+        methods.setError('root', { message: result.serverError });
+      } else if (result?.validationErrors) {
+        Object.entries(result.validationErrors).forEach(([field, errors]) => {
+          if (Array.isArray(errors) && errors.length > 0) {
+            methods.setError(field as keyof FormData, { message: errors[0] });
+          }
+        });
+      } else if (result?.data?.fieldErrors) {
+        Object.entries(result.data.fieldErrors).forEach(([field, message]) => {
+          methods.setError(field as keyof FormData, { message });
+        });
+      } else if (result?.data?.message) {
+        methods.setError('root', { message: result.data.message });
       } else {
-        // Handle field-specific errors
-        if (result.fieldErrors) {
-          Object.entries(result.fieldErrors).forEach(([field, message]) => {
-            methods.setError(field as keyof FormData, { message });
-          });
-        } else if (result.message) {
-          // Handle general error message
-          methods.setError('root', { message: result.message });
-        } else {
-          methods.setError('root', { message: 'An unexpected error occurred' });
-        }
+        methods.setError('root', { message: 'An unexpected error occurred' });
       }
     } catch {
       // Handle unexpected errors (network issues, etc.)

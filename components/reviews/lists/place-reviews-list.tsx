@@ -31,8 +31,15 @@ export const PlaceReviewsList = ({ locationId }: PlaceReviewsListProps) => {
     number
   >({
     queryKey: ['placeReviews', locationId],
-    queryFn: ({ pageParam = 1 }) =>
-      loadLocationReviewsAction(locationId, pageParam),
+    queryFn: async ({ pageParam = 1 }) => {
+      const result = await loadLocationReviewsAction({
+        locationId,
+        page: pageParam,
+      });
+      return (
+        result?.data ?? { reviews: [], hasMore: false, nextPage: undefined }
+      );
+    },
     initialPageParam: 1,
     getNextPageParam: lastPage => lastPage.nextPage,
   });

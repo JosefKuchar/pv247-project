@@ -5,7 +5,7 @@ import {
   checkPlaceHandleAvailability,
   checkUserCanManagePlace,
 } from '@/modules/place/server';
-import { withAuth } from '@/lib/server-actions';
+import { authActionClient } from '@/lib/safe-action';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
@@ -14,6 +14,7 @@ import { location } from '@/db/schema';
 import { nameSchema, handleSchema, descriptionSchema } from '@/lib/validation';
 
 const updatePlaceSchema = z.object({
+  placeId: z.string().min(1, 'Place ID is required'),
   name: nameSchema,
   handle: handleSchema,
   description: descriptionSchema,
@@ -24,20 +25,12 @@ const updatePlaceSchema = z.object({
 
 export type UpdatePlaceData = z.infer<typeof updatePlaceSchema>;
 
-type FormState = {
-  success: boolean;
-  message?: string;
-  fieldErrors?: Record<string, string>;
-};
-
-async function internalUpdatePlaceAction(
-  userId: string,
-  placeId: string,
-  data: UpdatePlaceData,
-): Promise<FormState> {
-  try {
-    // Validate input
-    const validatedData = updatePlaceSchema.parse(data);
+export const updatePlaceAction = authActionClient
+  .inputSchema(updatePlaceSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { placeId, name, handle, description, address, latitude, longitude } =
+      parsedInput;
+    const userId = ctx.userId;
 
     // Check if user can manage this place
     const canManage = await checkUserCanManagePlace(userId, placeId);
@@ -61,11 +54,8 @@ async function internalUpdatePlaceAction(
     const fieldErrors: Record<string, string> = {};
 
     // Check handle availability if it's changing
-    if (validatedData.handle !== currentPlace.handle) {
-      const handleCheck = await checkPlaceHandleAvailability(
-        validatedData.handle,
-        placeId,
-      );
+    if (handle !== currentPlace.handle) {
+      const handleCheck = await checkPlaceHandleAvailability(handle, placeId);
       if (!handleCheck.available) {
         fieldErrors.handle = 'This handle is already taken';
       }
@@ -83,30 +73,21 @@ async function internalUpdatePlaceAction(
     const oldHandle = currentPlace.handle;
 
     // Update place profile
-    await updatePlaceProfile(placeId, validatedData);
+    await updatePlaceProfile(placeId, {
+      name,
+      handle,
+      description,
+      address,
+      latitude,
+      longitude,
+    });
 
     // Revalidate relevant paths
     revalidatePath('/(app)/(profile)/place/[handle]');
     revalidatePath(`/(app)/(profile)/place/${oldHandle}`);
-    if (validatedData.handle !== oldHandle) {
-      revalidatePath(`/(app)/(profile)/place/${validatedData.handle}`);
+    if (handle !== oldHandle) {
+      revalidatePath(`/(app)/(profile)/place/${handle}`);
     }
 
     return { success: true };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const fieldErrors: Record<string, string> = {};
-      error.issues.forEach(err => {
-        const field = err.path[0]?.toString();
-        if (field) {
-          fieldErrors[field] = err.message;
-        }
-      });
-      return { success: false, fieldErrors };
-    }
-
-    return { success: false, message: 'An unexpected error occurred' };
-  }
-}
-
-export const updatePlaceAction = withAuth(internalUpdatePlaceAction);
+  });

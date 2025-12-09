@@ -31,15 +31,19 @@ export const PlaceProfileOptions = ({
   };
 
   const claimMutation = useMutation({
-    mutationFn: () => claimPlaceAction(currentPlace.handle),
+    mutationFn: () => claimPlaceAction({ locationHandle: currentPlace.handle }),
     onSuccess: result => {
-      if (result.success) {
-        toast.success(result.message || 'Claim submitted successfully');
+      if (result?.data?.success) {
+        toast.success(result.data.message || 'Claim submitted successfully');
         // Invalidate queries and refresh the page to update the UI
         queryClient.invalidateQueries();
         router.refresh();
       } else {
-        toast.error(result.message || 'Failed to submit claim');
+        toast.error(
+          result?.data?.message ||
+            result?.serverError ||
+            'Failed to submit claim',
+        );
       }
     },
     onError: () => {
@@ -48,15 +52,20 @@ export const PlaceProfileOptions = ({
   });
 
   const unclaimMutation = useMutation({
-    mutationFn: () => unclaimPlaceAction(currentPlace.handle),
+    mutationFn: () =>
+      unclaimPlaceAction({ locationHandle: currentPlace.handle }),
     onSuccess: result => {
-      if (result.success) {
-        toast.success(result.message || 'Location unclaimed successfully');
+      if (result?.data?.success) {
+        toast.success(result.data.message || 'Location unclaimed successfully');
         // Invalidate queries and refresh the page to update the UI
         queryClient.invalidateQueries();
         router.refresh();
       } else {
-        toast.error(result.message || 'Failed to unclaim location');
+        toast.error(
+          result?.data?.message ||
+            result?.serverError ||
+            'Failed to unclaim location',
+        );
       }
     },
     onError: () => {

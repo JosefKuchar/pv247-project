@@ -66,15 +66,22 @@ export default function Page() {
                 label="Location"
                 queryKey="locations"
                 fetchOptions={async (query: string) => {
-                  return searchLocationsAction(query);
+                  const result = await searchLocationsAction({ query });
+                  return result?.data ?? [];
                 }}
                 allowCreate={true}
                 onCreateNew={async data => {
-                  return createLocationAction(
-                    data.name,
-                    data.address,
-                    data.latitude,
-                    data.longitude,
+                  const result = await createLocationAction({
+                    name: data.name,
+                    address: data.address,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                  });
+                  return (
+                    result?.data ?? {
+                      success: false,
+                      error: 'Failed to create location',
+                    }
                   );
                 }}
                 createLabel="Create new location"

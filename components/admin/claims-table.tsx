@@ -25,8 +25,12 @@ export function ClaimsTable({ initialData }: ClaimsTableProps) {
   const handleApprove = async (claimId: string) => {
     setLoadingClaims(prev => new Set(prev).add(claimId));
     try {
-      await approveClaim(claimId);
-      handleRemoveClaim(claimId);
+      const result = await approveClaim({ claimId });
+      if (result?.data?.success) {
+        handleRemoveClaim(claimId);
+      } else {
+        console.error('Failed to approve claim:', result?.serverError);
+      }
     } catch (error) {
       console.error('Failed to approve claim:', error);
     } finally {
@@ -41,8 +45,12 @@ export function ClaimsTable({ initialData }: ClaimsTableProps) {
   const handleReject = async (claimId: string) => {
     setLoadingClaims(prev => new Set(prev).add(claimId));
     try {
-      await rejectClaim(claimId);
-      handleRemoveClaim(claimId);
+      const result = await rejectClaim({ claimId });
+      if (result?.data?.success) {
+        handleRemoveClaim(claimId);
+      } else {
+        console.error('Failed to reject claim:', result?.serverError);
+      }
     } catch (error) {
       console.error('Failed to reject claim:', error);
     } finally {

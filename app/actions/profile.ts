@@ -6,7 +6,7 @@ import {
   checkEmailAvailability,
   getUserById,
 } from '@/modules/user/server';
-import { withAuth } from '@/lib/server-actions';
+import { authActionClient } from '@/lib/safe-action';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -30,7 +30,7 @@ const updateProfileSchema = z.object({
         !val ||
         val === null ||
         val.trim() === '' ||
-        z.url().safeParse(val).success,
+        z.string().url().safeParse(val).success,
       'Invalid image URL',
     )
     .transform(val => (!val || val === null || val.trim() === '' ? null : val)),
@@ -38,19 +38,11 @@ const updateProfileSchema = z.object({
 
 export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
 
-type FormState = {
-  success: boolean;
-  message?: string;
-  fieldErrors?: Record<string, string>;
-};
-
-async function internalUpdateProfileAction(
-  userId: string,
-  data: UpdateProfileData,
-): Promise<FormState> {
-  try {
-    // Validate input
-    const validatedData = updateProfileSchema.parse(data);
+export const updateProfileAction = authActionClient
+  .inputSchema(updateProfileSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const userId = ctx.userId;
+    const { name, email, handle, description, image } = parsedInput;
 
     // Get current user data to check what's changing
     const currentUser = await getUserById(userId);
@@ -63,22 +55,16 @@ async function internalUpdateProfileAction(
     const fieldErrors: Record<string, string> = {};
 
     // Check handle availability if it's changing
-    if (validatedData.handle !== currentUser.handle) {
-      const handleCheck = await checkHandleAvailability(
-        validatedData.handle,
-        userId,
-      );
+    if (handle !== currentUser.handle) {
+      const handleCheck = await checkHandleAvailability(handle, userId);
       if (!handleCheck.available) {
         fieldErrors.handle = 'This handle is already taken';
       }
     }
 
     // Check email availability if it's changing
-    if (validatedData.email !== currentUser.email) {
-      const emailCheck = await checkEmailAvailability(
-        validatedData.email,
-        userId,
-      );
+    if (email !== currentUser.email) {
+      const emailCheck = await checkEmailAvailability(email, userId);
       if (!emailCheck.available) {
         fieldErrors.email = 'This email is already in use';
       }
@@ -96,30 +82,20 @@ async function internalUpdateProfileAction(
     const oldHandle = currentUser.handle;
 
     // Update user profile
-    await updateUserProfile(userId, validatedData);
+    await updateUserProfile(userId, {
+      name,
+      email,
+      handle,
+      description,
+      image,
+    });
 
     // Revalidate relevant paths
-    if (validatedData.handle !== oldHandle) {
-      revalidatePath(`/(app)/(profile)/${validatedData.handle}`);
+    if (handle !== oldHandle) {
+      revalidatePath(`/(app)/(profile)/${handle}`);
     } else {
       revalidatePath(`/(app)/(profile)/${oldHandle}`);
     }
 
     return { success: true };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const fieldErrors: Record<string, string> = {};
-      error.issues.forEach(err => {
-        const field = err.path[0]?.toString();
-        if (field) {
-          fieldErrors[field] = err.message;
-        }
-      });
-      return { success: false, fieldErrors };
-    }
-
-    return { success: false, message: 'An unexpected error occurred' };
-  }
-}
-
-export const updateProfileAction = withAuth(internalUpdateProfileAction);
+  });

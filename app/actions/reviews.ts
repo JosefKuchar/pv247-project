@@ -7,70 +7,80 @@ import {
   createReviewWithPhotos,
   deleteReview,
 } from '@/modules/review/server';
-import { withAuth } from '@/lib/server-actions';
-import z from 'zod';
+import { z } from 'zod';
 import { authActionClient } from '@/lib/safe-action';
 import { reviewDescriptionSchema } from '@/lib/validation';
 
-async function internalLoadProfileReviewsAction(
-  userId: string,
-  profileId: string,
-  page: number = 1,
-  pageSize: number = 10,
-) {
-  const res = await getProfileReviewsPaginated(
-    userId,
-    profileId,
-    page,
-    pageSize,
-  );
-  if (!res) {
-    return { reviews: [], hasMore: false, nextPage: undefined };
-  }
+const loadProfileReviewsSchema = z.object({
+  profileId: z.string().min(1, 'Profile ID is required'),
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().max(50).default(10),
+});
 
-  return res;
-}
-export const loadProfileReviewsAction = withAuth(
-  internalLoadProfileReviewsAction,
-);
+export const loadProfileReviewsAction = authActionClient
+  .inputSchema(loadProfileReviewsSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { profileId, page, pageSize } = parsedInput;
+    const userId = ctx.userId;
 
-async function internalLoadLocationReviewsAction(
-  userId: string,
-  locationId: string,
-  page: number = 1,
-  pageSize: number = 10,
-) {
-  const res = await getLocationReviewsPaginated(
-    userId,
-    locationId,
-    page,
-    pageSize,
-  );
+    const res = await getProfileReviewsPaginated(
+      userId,
+      profileId,
+      page,
+      pageSize,
+    );
+    if (!res) {
+      return { reviews: [], hasMore: false, nextPage: undefined };
+    }
 
-  if (!res) {
-    return { reviews: [], hasMore: false, nextPage: undefined };
-  }
+    return res;
+  });
 
-  return res;
-}
-export const loadLocationReviewsAction = withAuth(
-  internalLoadLocationReviewsAction,
-);
+const loadLocationReviewsSchema = z.object({
+  locationId: z.string().min(1, 'Location ID is required'),
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().max(50).default(10),
+});
 
-async function internalLoadReviewsAction(
-  userId: string,
-  page: number = 1,
-  pageSize: number = 10,
-) {
-  const res = await getReviewsPaginated(userId, page, pageSize);
+export const loadLocationReviewsAction = authActionClient
+  .inputSchema(loadLocationReviewsSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { locationId, page, pageSize } = parsedInput;
+    const userId = ctx.userId;
 
-  if (!res) {
-    return { reviews: [], hasMore: false, nextPage: undefined };
-  }
+    const res = await getLocationReviewsPaginated(
+      userId,
+      locationId,
+      page,
+      pageSize,
+    );
 
-  return res;
-}
-export const loadReviewsAction = withAuth(internalLoadReviewsAction);
+    if (!res) {
+      return { reviews: [], hasMore: false, nextPage: undefined };
+    }
+
+    return res;
+  });
+
+const loadReviewsSchema = z.object({
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().max(50).default(10),
+});
+
+export const loadReviewsAction = authActionClient
+  .inputSchema(loadReviewsSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { page, pageSize } = parsedInput;
+    const userId = ctx.userId;
+
+    const res = await getReviewsPaginated(userId, page, pageSize);
+
+    if (!res) {
+      return { reviews: [], hasMore: false, nextPage: undefined };
+    }
+
+    return res;
+  });
 
 const createReviewSchema = z.object({
   locationId: z.string().min(1, 'Location is required'),
@@ -83,7 +93,7 @@ export const createReview = authActionClient
   .inputSchema(createReviewSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { locationId, description, rating, photoUrls } = parsedInput;
-    const userId = (ctx as { userId: string }).userId;
+    const userId = ctx.userId;
 
     return await createReviewWithPhotos(
       userId,
@@ -94,8 +104,15 @@ export const createReview = authActionClient
     );
   });
 
-async function internalDeleteReviewAction(userId: string, reviewId: string) {
-  return deleteReview(userId, reviewId);
-}
+const deleteReviewSchema = z.object({
+  reviewId: z.string().min(1, 'Review ID is required'),
+});
 
-export const deleteReviewAction = withAuth(internalDeleteReviewAction);
+export const deleteReviewAction = authActionClient
+  .inputSchema(deleteReviewSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { reviewId } = parsedInput;
+    const userId = ctx.userId;
+
+    return deleteReview(userId, reviewId);
+  });

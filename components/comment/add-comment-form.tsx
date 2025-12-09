@@ -31,7 +31,7 @@ export const AddCommentForm = ({
 
   const addCommentMutation = useMutation({
     mutationFn: ({ content }: { content: string }) =>
-      addCommentToReviewAction(review_id, content),
+      addCommentToReviewAction({ reviewId: review_id, content }),
     onSuccess: () => {
       methods.reset();
       callbackAddComment();

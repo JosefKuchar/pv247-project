@@ -66,7 +66,7 @@ export const ReviewCard = ({
   };
 
   const toggleLikeMutation = useMutation({
-    mutationFn: () => toggleReviewLikeAction(review.id, liked),
+    mutationFn: () => toggleReviewLikeAction({ reviewId: review.id, liked }),
     onSuccess: () => {
       setLiked(!liked);
       if (liked) {
@@ -81,7 +81,7 @@ export const ReviewCard = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const deleteReviewMutation = useMutation({
-    mutationFn: () => deleteReviewAction(review.id),
+    mutationFn: () => deleteReviewAction({ reviewId: review.id }),
     onSuccess: () => {
       toast.success('Review deleted successfully');
       setIsDeleted(true);
