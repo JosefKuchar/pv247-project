@@ -41,6 +41,7 @@ async function main() {
           '☕ Coffee enthusiast and digital nomad. Love discovering cozy cafés and sharing great spots with fellow travelers.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
+        is_admin: false,
       },
       {
         id: randomUUID(),
@@ -51,6 +52,7 @@ async function main() {
           '🍕 Foodie on a mission to find the best restaurants in the city. Always up for trying new cuisines!',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob',
+        is_admin: false,
       },
       {
         id: randomUUID(),
@@ -61,6 +63,7 @@ async function main() {
           "🥾 Adventure seeker and nature lover. When I'm not hiking, you can find me planning my next outdoor expedition.",
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlie',
+        is_admin: false,
       },
       {
         id: randomUUID(),
@@ -71,6 +74,7 @@ async function main() {
           '🎨 Art curator and culture enthusiast. I believe art has the power to transform communities and inspire change.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=diana',
+        is_admin: false,
       },
       {
         id: randomUUID(),
@@ -81,6 +85,7 @@ async function main() {
           "🏖️ Beach lover and wellness advocate. Life's too short not to enjoy the simple pleasures by the ocean.",
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eve',
+        is_admin: false,
       },
       {
         id: randomUUID(),
@@ -91,6 +96,7 @@ async function main() {
           '💻 Tech entrepreneur and startup mentor. Passionate about innovation and building communities for creators.',
         emailVerified: true,
         image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=frank',
+        is_admin: false,
       },
     ];
 
