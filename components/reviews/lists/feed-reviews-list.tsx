@@ -53,11 +53,20 @@ export const FeedReviewsList = () => {
 
   if (isLoading)
     return (
-      <div className="space-y-6" role="status" aria-label="Loading reviews">
-        <Spinner />
+      <div
+        className="flex h-screen w-full items-center justify-center"
+        role="status"
+        aria-label="Loading reviews"
+      >
+        <Spinner className="mx-auto size-8" />
       </div>
     );
-  if (error) return <div>Error loading reviews</div>;
+  if (error)
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        Error loading reviews
+      </div>
+    );
 
   const allReviews = data?.pages.flatMap(page => page.reviews) || [];
 
